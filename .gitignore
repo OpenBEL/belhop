@@ -1,4 +1,7 @@
 node_modules
+
 # ignore karma junit output
 test-results.xml
 
+# the go shell (gosh) history
+.goshhst
