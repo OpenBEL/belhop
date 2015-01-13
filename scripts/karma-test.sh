@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # The next three lines are for the go shell.
-export SCRIPT_NAME="Start Karma"
-export SCRIPT_HELP="Continuous testing as JavaScript modifications occur."
+export SCRIPT_NAME="Test"
+export SCRIPT_HELP="Run tests once, via Karma."
 [[ "$GOGO_GOSH_SOURCE" -eq 1 ]] && return 0
 
 # Normal script execution starts here.
@@ -18,4 +18,4 @@ export PATH="$NPM_MODPATH/.bin":$PATH
 
 cd "$DIR" || exit 1
 require_cmd "karma"
-karma start belhop.conf.js
+karma start belhop.conf.js --single-run
