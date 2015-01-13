@@ -8,8 +8,15 @@ export SCRIPT_HELP="Lint JavaScript code style via jscs."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-cd "$DIR" || exit 1
+source "$SCRIPTS"/functions.sh || exit 1
+assert_env NPM_MODPATH
 
+# Create the node environment if needed...
+create_node_env || exit 1
+# ... and use it.
+export PATH="$NPM_MODPATH/.bin":$PATH
+
+cd "$DIR" || exit 1
 require_cmd "jscs"
 jscs -p google $(find -name "*.js" | grep -v "node_modules")
 

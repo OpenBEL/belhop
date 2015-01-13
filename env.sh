@@ -10,6 +10,20 @@ assert_source "$CUSTOM_ENV_SH" || return 1
 default DIR             "$DIR"
 default CUSTOM_ENV_SH   "$DIR/env.sh.custom"
 
+### PATHS ###
+default SCRIPTS         "$DIR"/scripts
+default TOOLS           "$DIR"/tools
+default VIRTUALENV      "$TOOLS"/virtualenv-12.0.5/virtualenv.py
+
+### NODE/NPM ENV VARS ###
+default NPM_MODPATH     "$DIR"/node_modules
+default NPM_PKGJSON     "$DIR"/package.json
+
+### PYTHON ENV VARS ###
+default PYTHON_ENVS     "$TOOLS"/envs
+default GJSLINT_ENV     "$PYTHON_ENVS"/gjslint
+default PYTHON_REQ_DEPS "deps.req"
+default PYTHON_OPT_DEPS "deps.opt"
+
 ### THE GO SHELL ###
 default GOSH_SCRIPTS    "$DIR"/scripts
-
