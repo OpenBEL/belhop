@@ -1,0 +1,20 @@
+[
+  {
+    "label": "Protein-Protein Interaction (increase)",
+    "value": "p() increases p()",
+    "type": "template",
+    "tokens": [
+      "proteinAbundance",
+      "p()"
+    ]
+  },
+  {
+    "label": "Protein-Protein Interaction (decrease)",
+    "value": "p() decreases p()",
+    "type": "template",
+    "tokens": [
+      "proteinAbundance",
+      "p()"
+    ]
+  }
+]

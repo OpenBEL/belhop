@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>BEL Expression Autocompletion Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bel-autocomplete.css">
+  </head>
+  <body>
+    <div class="container">
+
+      <div class="example" id="bel-expressions">
+        <h2 class="example-name">BEL Expressions</h2>
+        <p class="example-description">
+          Example autocompletion of <a
+          href="http://www.openbel.org/bel-expression-language">BEL</a> 
+          expressions.
+        </p>
+
+        <div class="demo">
+          <input class="typeahead"
+                 type="text"
+                 autocomplete="off"
+                 placeholder="BEL Expression">
+        </div>
+
+        <div class="gist">
+          <script src="https://gist.github.com/nbargnesi/c6f9d2dd6f947ffc2c1d.js"></script>
+        </div>
+      </div>
+
+    <script src="handlebars.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="typeahead.bundle.js"></script>
+    <script src="bel-autocomplete.js"></script>
+  </body>
+</html>
