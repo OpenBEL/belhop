@@ -3,7 +3,7 @@ window.BH = (function() {
 
   }
 
-  BELHop.defaultURL = "http://next.belframework.org/bel";
+  BELHop.defaultURL = "http://next.belframework.org/api";
   BELHop.url = BELHop.defaultURL;
 
   var belhop = {

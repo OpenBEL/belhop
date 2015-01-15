@@ -9,7 +9,7 @@ $(document).ready(function() {
   //   p() increases p() - Protein-Protein Interaction (increase)
   var COMPLETION_TEMPLATE =
     '<p>{{value}} - <strong>{{label}}</strong></p>';
-
+    
   /**
    * Tokenize the query before sending it to the API; currently only one token
    * is sent: the query itself.
@@ -28,7 +28,9 @@ $(document).ready(function() {
       datum = {
         value: element.completion.value,
         type: element.completion.type,
-        label: element.completion.label
+        label: element.completion.label,
+        // pretend API recommends we go to pos 1
+        cursorPos: 1
       };
       datums.push(datum);
     } 
@@ -38,15 +40,29 @@ $(document).ready(function() {
 
   var belExpressions = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    queryTokenizer: tokenizer,
     prefetch: 'data/templates.json',
     remote: {
-      url: 'http://next.belframework.org/bel/expressions/%QUERY/completions',
+      url: 'http://next.belframework.org/api/expressions/%QUERY/completions',
       filter: responseFilter
     }
   });
 
   belExpressions.initialize();
+  
+  /**
+   * Called when the user selects a completion from our dropdown.
+   */
+  function selectedCompletion(event, datum, name) {
+    console.log("[USER MADE A SELECTION]");
+    console.log("[JQUERY EVENT]");
+    console.log(event);
+    console.log("[DATUM (SELECTION)]");
+    console.log(datum);
+    var element = $("#expinput")[0];
+    element.selectionStart = datum.cursorPos;
+    element.selectionEnd = datum.cursorPos;
+  };
 
   $('#bel-expressions .typeahead').typeahead(null, {
     name: 'bel-expressions',
@@ -60,6 +76,6 @@ $(document).ready(function() {
       ].join('\n'),
       suggestion: Handlebars.compile(COMPLETION_TEMPLATE)
     }
-  });
+  }).on("typeahead:selected", selectedCompletion);
+    
 });
-
