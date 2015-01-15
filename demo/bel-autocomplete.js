@@ -53,7 +53,7 @@ $(document).ready(function() {
   /**
    * Called when the user selects a completion from our dropdown.
    */
-  function selectedCompletion(event, datum, name) {
+  function selected(event, datum, name) {
     console.log("[USER MADE A SELECTION]");
     console.log("[JQUERY EVENT]");
     console.log(event);
@@ -76,6 +76,8 @@ $(document).ready(function() {
       ].join('\n'),
       suggestion: Handlebars.compile(COMPLETION_TEMPLATE)
     }
-  }).on("typeahead:selected", selectedCompletion);
+  });
+  $('#bel-expressions .typeahead').on("typeahead:selected", selected);
+  $('#bel-expressions .typeahead').on("typeahead:autocompleted", selected);
     
 });
