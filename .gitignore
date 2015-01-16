@@ -9,3 +9,5 @@ test-results.xml
 # ignore build artifacts
 build
 
+*.pyc
+

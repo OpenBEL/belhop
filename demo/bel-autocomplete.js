@@ -1,6 +1,7 @@
 $(document).ready(function() {
-  
+
   var lastQuery;
+  var cursorPos;
 
   // Alternate autocompletion display including the "type" of completion, e.g.:
   //   p() increases p() (template) - Protein-Protein Interaction (increase)
@@ -11,7 +12,7 @@ $(document).ready(function() {
   //   p() increases p() - Protein-Protein Interaction (increase)
   var COMPLETION_TEMPLATE =
     '<p>{{value}} - <strong>{{label}}</strong></p>';
-    
+
   /**
    * Tokenize the query before sending it to the API; currently only one token
    * is sent: the query itself.
@@ -21,7 +22,19 @@ $(document).ready(function() {
     return [query];
   };
 
-  /**  
+  /**
+   * Manipulate the URL prior to generating an autocompletion.
+   */
+  var replacer = function(url, query) {
+    var ret = url.replace("%QUERY", query);
+    if (cursorPos !== undefined) {
+      ret += ("?caret_position=" + cursorPos);
+    }
+    console.log(url + " becomes " + ret);
+    return ret;
+  };
+
+  /**
    * Filters the API response into typeahead datums for use in the completion
    * template.
    */
@@ -35,7 +48,7 @@ $(document).ready(function() {
         actions: element.completion.actions
       };
       datums.push(datum);
-    } 
+    }
     response.forEach(insertDatum);
     return datums;
   };
@@ -46,12 +59,13 @@ $(document).ready(function() {
     prefetch: 'data/templates.json',
     remote: {
       url: 'http://next.belframework.org/api/expressions/%QUERY/completions',
+      replace: replacer,
       filter: responseFilter
     }
   });
 
   belExpressions.initialize();
-  
+
   /**
    * Delete the characters from startPos to endPos, inclusively, and return the
    * result.
@@ -62,7 +76,7 @@ $(document).ready(function() {
     var ret = str1 + str2;
     return ret;
   }
-  
+
   /**
    * Insert the string value at a position in str.
    */
@@ -72,7 +86,7 @@ $(document).ready(function() {
     var str3 = str.substr(position + value.length);
     return str1 + str2 + str3;
   }
-  
+
   /**
    * Move the cursor to position.
    */
@@ -80,7 +94,7 @@ $(document).ready(function() {
     $("#expinput")[0].selectionStart = position;
     $("#expinput")[0].selectionEnd = position;
   }
-  
+
   /**
    * Called when the user selects a completion from our dropdown.
    */
@@ -93,7 +107,10 @@ $(document).ready(function() {
     var element = $("#expinput")[0];
     var actions = datum.actions;
     var curInput = lastQuery;
-    
+
+    // Reset cursorPos
+    cursorPos = undefined;
+
     function actOn(action) {
       if (action.delete) {
         var startPos = action.delete.start_position;
@@ -108,11 +125,10 @@ $(document).ready(function() {
       } else if (action.move_cursor) {
         var position = action.move_cursor.position;
         moveAction(position);
+        cursorPos = position;
       }
     }
     actions.forEach(actOn);
-    //element.selectionStart = datum.cursorPos;
-    //element.selectionEnd = datum.cursorPos;
   };
 
   $('#bel-expressions .typeahead').typeahead(null, {
@@ -130,7 +146,7 @@ $(document).ready(function() {
   });
   $('#bel-expressions .typeahead').on("typeahead:selected", selected);
   $('#bel-expressions .typeahead').on("typeahead:autocompleted", selected);
-  
+
   /*
   var haunt = ghostwriter.haunt({
     loop: true,
@@ -149,5 +165,5 @@ $(document).ready(function() {
   });
   haunt.start();
   */
-    
+
 });
