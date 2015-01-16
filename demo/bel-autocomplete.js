@@ -1,7 +1,6 @@
 $(document).ready(function() {
 
   var lastQuery;
-  var cursorPos;
 
   // Alternate autocompletion display including the "type" of completion, e.g.:
   //   p() increases p() (template) - Protein-Protein Interaction (increase)
@@ -11,7 +10,7 @@ $(document).ready(function() {
   // Default autocompletion display w/out the "type" of completion, e.g.:
   //   p() increases p() - Protein-Protein Interaction (increase)
   var COMPLETION_TEMPLATE =
-    '<p>{{value}} - <strong>{{label}}</strong></p>';
+    '<p>{{value}}<span class="completion-type">{{displayType}}</p>';
 
   /**
    * Tokenize the query before sending it to the API; currently only one token
@@ -27,10 +26,8 @@ $(document).ready(function() {
    */
   var replacer = function(url, query) {
     var ret = url.replace("%QUERY", query);
-    if (cursorPos !== undefined) {
-      ret += ("?caret_position=" + cursorPos);
-    }
-    console.log(url + " becomes " + ret);
+    var end = $("#expinput")[0].selectionEnd;
+    ret += ("?caret_position=" + end);
     return ret;
   };
 
@@ -43,7 +40,7 @@ $(document).ready(function() {
     function insertDatum(element) {
       datum = {
         value: element.completion.value,
-        type: element.completion.type,
+        displayType: displayCompletionType(element.completion.type),
         label: element.completion.label,
         actions: element.completion.actions
       };
@@ -81,10 +78,11 @@ $(document).ready(function() {
    * Insert the string value at a position in str.
    */
   function insertAction(str, value, position) {
-    var str1 = str.substr(0, position + 1);
+    var str1 = str.substr(0, position);
     var str2 = value;
-    var str3 = str.substr(position + value.length);
-    return str1 + str2 + str3;
+    var str3 = str.substr(position);
+    var rslt = str1 + str2 + str3;
+    return rslt;
   }
 
   /**
@@ -108,9 +106,6 @@ $(document).ready(function() {
     var actions = datum.actions;
     var curInput = lastQuery;
 
-    // Reset cursorPos
-    cursorPos = undefined;
-
     function actOn(action) {
       if (action.delete) {
         var startPos = action.delete.start_position;
@@ -125,7 +120,6 @@ $(document).ready(function() {
       } else if (action.move_cursor) {
         var position = action.move_cursor.position;
         moveAction(position);
-        cursorPos = position;
       }
     }
     actions.forEach(actOn);
@@ -165,5 +159,22 @@ $(document).ready(function() {
   });
   haunt.start();
   */
+
+  /**
+   * Converts the type of a completion to a string suitable for display to the
+   * user.
+   */
+  var displayCompletionType = function(type) {
+    switch (type) {
+      case "function":
+        return "BEL Language Function";
+      case "namespace_prefix":
+        return "BEL Namespace";
+      case "namespace_value":
+        return "BEL Namespace Entity";
+      default:
+        return "Unknown type (" + type + ")";
+    }
+  }
 
 });
