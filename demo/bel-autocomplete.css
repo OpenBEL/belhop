@@ -152,6 +152,10 @@ p + p {
   font-size: 14px;
 }
 
+.completion-type {
+  float: right;
+}
+
 #bel-expressions .empty-message {
   padding: 5px 10px;
   text-align: center;
