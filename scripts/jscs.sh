@@ -18,5 +18,5 @@ export PATH="$NPM_MODPATH/.bin":$PATH
 
 cd "$DIR" || exit 1
 require_cmd "jscs"
-jscs -p google $(find -name "*.js" | grep -v "node_modules")
+jscs -p google $(find src spec -name "*.js")
 

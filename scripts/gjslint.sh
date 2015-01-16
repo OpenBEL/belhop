@@ -21,5 +21,5 @@ create_env "python2" || exit 1
 
 cd "$DIR" || exit 1
 require_cmd "gjslint"
-gjslint $(find -name "*.js" | grep -v "node_modules")
+gjslint $(find src spec -name "*.js")
 

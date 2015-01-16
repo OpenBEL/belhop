@@ -18,5 +18,5 @@ export PATH="$NPM_MODPATH/.bin":$PATH
 
 cd "$DIR" || exit 1
 require_cmd "eslint"
-eslint $(find -name "*.js" | grep -v "node_modules")
+eslint $(find src spec -name "*.js")
 
