@@ -14,6 +14,9 @@ default CUSTOM_ENV_SH   "$DIR/env.sh.custom"
 default SCRIPTS         "$DIR"/scripts
 default TOOLS           "$DIR"/tools
 default VIRTUALENV      "$TOOLS"/virtualenv-12.0.5/virtualenv.py
+default BUILD           "$DIR"/build
+default SRC             "$DIR"/src
+default MIN_JS          "$BUILD"/belhop.min.js
 
 ### NODE/NPM ENV VARS ###
 default NPM_MODPATH     "$DIR"/node_modules

@@ -5,3 +5,7 @@ test-results.xml
 
 # the go shell (gosh) history
 .goshhst
+
+# ignore build artifacts
+build
+
