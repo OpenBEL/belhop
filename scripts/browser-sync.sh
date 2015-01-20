@@ -18,4 +18,4 @@ export PATH="$NPM_MODPATH/.bin":$PATH
 
 cd "$DIR" || exit 1
 require_cmd "browser-sync"
-browser-sync start --files "demo/*.css, demo/*.js, demo/*.html" --port=3901 --server demo
+browser-sync start --files "demo/*.css, demo/*.js, demo/*.html" --port=3901 --server
