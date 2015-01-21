@@ -39,7 +39,7 @@ $(document).ready(function() {
     var datums = [];
     function insertDatum(element) {
       datum = {
-        value: element.completion.value,
+        value: applyActions(element.completion.actions, lastQuery),
         displayType: displayCompletionType(element.completion.type),
         label: element.completion.label,
         actions: element.completion.actions
@@ -86,43 +86,49 @@ $(document).ready(function() {
   }
 
   /**
-   * Move the cursor to position.
+   * Apply autocomplete actions to some input and return the result.
    */
-  function moveAction(position) {
-    $("#expinput")[0].selectionStart = position;
-    $("#expinput")[0].selectionEnd = position;
+  function applyActions(actions, input) {
+
+    /* applies a single action */
+    function actOn(action) {
+      if (action.delete) {
+        var startPos = action.delete.start_position;
+        var endPos = action.delete.end_position;
+        input = deleteAction(input, startPos, endPos);
+      } else if (action.insert) {
+        var value = action.insert.value;
+        var position = action.insert.position;
+        input = insertAction(input, value, position);
+      }
+    }
+
+    /* apply each action, mutating input */
+    actions.forEach(actOn);
+    return input;
   }
 
   /**
    * Called when the user selects a completion from our dropdown.
    */
   function selected(event, datum, name) {
-    console.log("[USER MADE A SELECTION]");
-    console.log("[JQUERY EVENT]");
-    console.log(event);
-    console.log("[DATUM (SELECTION)]");
-    console.log(datum);
     var element = $("#expinput")[0];
     var actions = datum.actions;
-    var curInput = lastQuery;
+    var cursorpos = -1;
 
-    function actOn(action) {
-      if (action.delete) {
-        var startPos = action.delete.start_position;
-        var endPos = action.delete.end_position;
-        curInput = deleteAction(curInput, startPos, endPos);
-        $("#expinput")[0].value = curInput;
-      } else if (action.insert) {
-        var value = action.insert.value;
-        var position = action.insert.position;
-        curInput = insertAction(curInput, value, position);
-        $("#expinput")[0].value = curInput;
-      } else if (action.move_cursor) {
-        var position = action.move_cursor.position;
-        moveAction(position);
+    function moveCur(action) {
+      if (action.move_cursor) {
+        cursorpos = action.move_cursor.position;
+        console.log("should move to: " + cursorpos);
       }
     }
-    actions.forEach(actOn);
+    actions.forEach(moveCur);
+
+    if (cursorpos !== -1) {
+      element.selectionStart = position;
+      element.selectionEnd = position;
+      console.log("moved to: " + cursorpos);
+    }
   };
 
   $('#bel-expressions .typeahead').typeahead(null, {
