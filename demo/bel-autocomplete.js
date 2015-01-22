@@ -25,9 +25,9 @@ $(document).ready(function() {
    * Manipulate the URL prior to generating an autocompletion.
    */
   var replacer = function(url, query) {
-    var ret = url.replace("%QUERY", query);
-    var end = $("#expinput")[0].selectionEnd;
-    ret += ("?caret_position=" + end);
+    var ret = url.replace('%QUERY', query);
+    var end = $('#expinput')[0].selectionEnd;
+    ret += ('?caret_position=' + end);
     return ret;
   };
 
@@ -39,7 +39,7 @@ $(document).ready(function() {
     var datums = [];
     function insertDatum(element) {
       datum = {
-        value: element.completion.value,
+        value: applyActions(element.completion.actions, lastQuery),
         displayType: displayCompletionType(element.completion.type),
         label: element.completion.label,
         actions: element.completion.actions
@@ -86,43 +86,47 @@ $(document).ready(function() {
   }
 
   /**
-   * Move the cursor to position.
+   * Apply autocomplete actions to some input and return the result.
    */
-  function moveAction(position) {
-    $("#expinput")[0].selectionStart = position;
-    $("#expinput")[0].selectionEnd = position;
+  function applyActions(actions, input) {
+
+    /* applies a single action */
+    function actOn(action) {
+      if (action.delete) {
+        var startPos = action.delete.start_position;
+        var endPos = action.delete.end_position;
+        input = deleteAction(input, startPos, endPos);
+      } else if (action.insert) {
+        var value = action.insert.value;
+        var position = action.insert.position;
+        input = insertAction(input, value, position);
+      }
+    }
+
+    /* apply each action, mutating input */
+    actions.forEach(actOn);
+    return input;
   }
 
   /**
    * Called when the user selects a completion from our dropdown.
    */
   function selected(event, datum, name) {
-    console.log("[USER MADE A SELECTION]");
-    console.log("[JQUERY EVENT]");
-    console.log(event);
-    console.log("[DATUM (SELECTION)]");
-    console.log(datum);
-    var element = $("#expinput")[0];
+    var element = $('#expinput')[0];
     var actions = datum.actions;
-    var curInput = lastQuery;
+    var cursorpos = -1;
 
-    function actOn(action) {
-      if (action.delete) {
-        var startPos = action.delete.start_position;
-        var endPos = action.delete.end_position;
-        curInput = deleteAction(curInput, startPos, endPos);
-        $("#expinput")[0].value = curInput;
-      } else if (action.insert) {
-        var value = action.insert.value;
-        var position = action.insert.position;
-        curInput = insertAction(curInput, value, position);
-        $("#expinput")[0].value = curInput;
-      } else if (action.move_cursor) {
-        var position = action.move_cursor.position;
-        moveAction(position);
+    function moveCur(action) {
+      if (action.move_cursor) {
+        cursorpos = action.move_cursor.position;
       }
     }
-    actions.forEach(actOn);
+    actions.forEach(moveCur);
+
+    if (cursorpos !== -1) {
+      element.selectionStart = cursorpos;
+      element.selectionEnd = cursorpos;
+    }
   };
 
   $('#bel-expressions .typeahead').typeahead(null, {
@@ -138,27 +142,35 @@ $(document).ready(function() {
       suggestion: Handlebars.compile(COMPLETION_TEMPLATE)
     }
   });
-  $('#bel-expressions .typeahead').on("typeahead:selected", selected);
-  $('#bel-expressions .typeahead').on("typeahead:autocompleted", selected);
+  $('#bel-expressions .typeahead').on('typeahead:selected', selected);
+  $('#bel-expressions .typeahead').on('typeahead:autocompleted', selected);
 
-  /*
   var haunt = ghostwriter.haunt({
-    loop: true,
+    loop: false,
     input: '#expinput',
-    interval: 150,
+    interval: 500,
     manuscript: [
       ghostwriter.noop,
-      'proteinAbun',
-      ghostwriter.backspace.repeat(10),
-      'm',
-      ghostwriter.backspace.repeat(1),
-      '(HGNC:AKT1, p',
       ghostwriter.selectAll,
-      ghostwriter.backspace
+      ghostwriter.backspace,
+      'proteinAbu',
+      ghostwriter.down,
+      ghostwriter.enter,
+      'HGNC:',
+      ghostwriter.down,
+      ghostwriter.enter,
+      ', pm',
+      ghostwriter.down,
+      ghostwriter.enter,
+      'P, S, 385'
     ]
   });
-  haunt.start();
-  */
+
+  var demo = function() {
+    haunt.stop();
+    haunt.start();
+  };
+  $('#demo').on('click', demo);
 
   /**
    * Converts the type of a completion to a string suitable for display to the
@@ -166,14 +178,14 @@ $(document).ready(function() {
    */
   var displayCompletionType = function(type) {
     switch (type) {
-      case "function":
-        return "BEL Language Function";
-      case "namespace_prefix":
-        return "BEL Namespace";
-      case "namespace_value":
-        return "BEL Namespace Entity";
+      case 'function':
+        return 'BEL Language Function';
+      case 'namespace_prefix':
+        return 'BEL Namespace';
+      case 'namespace_value':
+        return 'BEL Namespace Entity';
       default:
-        return "Unknown type (" + type + ")";
+        return 'Unknown type (' + type + ')';
     }
   }
 

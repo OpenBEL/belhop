@@ -14,8 +14,8 @@
         <h2 class="example-name">BEL Expressions</h2>
         <p class="example-description">
           Example autocompletion of <a
-          href="http://www.openbel.org/bel-expression-language">BEL</a> 
-          expressions.
+          href="http://www.openbel.org/bel-expression-language">BEL</a>
+          expressions, <a id="demo">batteries included</a>.
         </p>
 
         <div class="demo">
@@ -30,6 +30,7 @@
         <div class="gist">
           <script src="https://gist.github.com/nbargnesi/c6f9d2dd6f947ffc2c1d.js"></script>
         </div>
+
       </div>
 
     <script src="handlebars.js"></script>
@@ -37,6 +38,10 @@
     <script src="typeahead.bundle.js"></script>
     <script src="ghostwriter.js"></script>
     <script src="bel-autocomplete.js"></script>
+    <script src="../src/belhop.js"></script>
+    <script>
+      document.write('Using belhop version: ' + belhop.VERSION);
+    </script>
 
   </body>
 </html>

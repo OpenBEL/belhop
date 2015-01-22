@@ -17,6 +17,8 @@ default VIRTUALENV      "$TOOLS"/virtualenv-12.0.5/virtualenv.py
 default BUILD           "$DIR"/build
 default SRC             "$DIR"/src
 default MIN_JS          "$BUILD"/belhop.min.js
+default DOCS            "$DIR"/docs
+default DOCS_BUILD      "$DOCS"/build
 
 ### NODE/NPM ENV VARS ###
 default NPM_MODPATH     "$DIR"/node_modules
@@ -27,6 +29,9 @@ default PYTHON_ENVS     "$TOOLS"/envs
 default GJSLINT_ENV     "$PYTHON_ENVS"/gjslint
 default PYTHON_REQ_DEPS "deps.req"
 default PYTHON_OPT_DEPS "deps.opt"
+
+### BROWSERSYNC CONFIGURATION ###
+default BROWSERSYNC_PORT    3901
 
 ### THE GO SHELL ###
 default GOSH_SCRIPTS    "$DIR"/scripts

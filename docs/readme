@@ -1,0 +1,8 @@
+# BELHop
+
+This is a library for working with the Biological Expression Language ([BEL](
+http://www.openbel.org)) in JavaScript.
+
+See [https://github.com/OpenBEL/belhop](https://github.com/OpenBEL/belhop) for
+more.
+
