@@ -17,6 +17,8 @@ default VIRTUALENV      "$TOOLS"/virtualenv-12.0.5/virtualenv.py
 default BUILD           "$DIR"/build
 default SRC             "$DIR"/src
 default MIN_JS          "$BUILD"/belhop.min.js
+default DOCS            "$DIR"/docs
+default DOCS_BUILD      "$DOCS"/build
 
 ### NODE/NPM ENV VARS ###
 default NPM_MODPATH     "$DIR"/node_modules
