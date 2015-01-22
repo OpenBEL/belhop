@@ -25,9 +25,9 @@ $(document).ready(function() {
    * Manipulate the URL prior to generating an autocompletion.
    */
   var replacer = function(url, query) {
-    var ret = url.replace("%QUERY", query);
-    var end = $("#expinput")[0].selectionEnd;
-    ret += ("?caret_position=" + end);
+    var ret = url.replace('%QUERY', query);
+    var end = $('#expinput')[0].selectionEnd;
+    ret += ('?caret_position=' + end);
     return ret;
   };
 
@@ -112,22 +112,20 @@ $(document).ready(function() {
    * Called when the user selects a completion from our dropdown.
    */
   function selected(event, datum, name) {
-    var element = $("#expinput")[0];
+    var element = $('#expinput')[0];
     var actions = datum.actions;
     var cursorpos = -1;
 
     function moveCur(action) {
       if (action.move_cursor) {
         cursorpos = action.move_cursor.position;
-        console.log("should move to: " + cursorpos);
       }
     }
     actions.forEach(moveCur);
 
     if (cursorpos !== -1) {
-      element.selectionStart = position;
-      element.selectionEnd = position;
-      console.log("moved to: " + cursorpos);
+      element.selectionStart = cursorpos;
+      element.selectionEnd = cursorpos;
     }
   };
 
@@ -172,14 +170,14 @@ $(document).ready(function() {
    */
   var displayCompletionType = function(type) {
     switch (type) {
-      case "function":
-        return "BEL Language Function";
-      case "namespace_prefix":
-        return "BEL Namespace";
-      case "namespace_value":
-        return "BEL Namespace Entity";
+      case 'function':
+        return 'BEL Language Function';
+      case 'namespace_prefix':
+        return 'BEL Namespace';
+      case 'namespace_value':
+        return 'BEL Namespace Entity';
       default:
-        return "Unknown type (" + type + ")";
+        return 'Unknown type (' + type + ')';
     }
   }
 
