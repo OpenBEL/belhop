@@ -142,27 +142,35 @@ $(document).ready(function() {
       suggestion: Handlebars.compile(COMPLETION_TEMPLATE)
     }
   });
-  $('#bel-expressions .typeahead').on("typeahead:selected", selected);
-  $('#bel-expressions .typeahead').on("typeahead:autocompleted", selected);
+  $('#bel-expressions .typeahead').on('typeahead:selected', selected);
+  $('#bel-expressions .typeahead').on('typeahead:autocompleted', selected);
 
-  /*
   var haunt = ghostwriter.haunt({
-    loop: true,
+    loop: false,
     input: '#expinput',
-    interval: 150,
+    interval: 500,
     manuscript: [
       ghostwriter.noop,
-      'proteinAbun',
-      ghostwriter.backspace.repeat(10),
-      'm',
-      ghostwriter.backspace.repeat(1),
-      '(HGNC:AKT1, p',
       ghostwriter.selectAll,
-      ghostwriter.backspace
+      ghostwriter.backspace,
+      'proteinAbu',
+      ghostwriter.down,
+      ghostwriter.enter,
+      'HGNC:',
+      ghostwriter.down,
+      ghostwriter.enter,
+      ', pm',
+      ghostwriter.down,
+      ghostwriter.enter,
+      'P, S, 385'
     ]
   });
-  haunt.start();
-  */
+
+  var demo = function() {
+    haunt.stop();
+    haunt.start();
+  };
+  $('#demo').on('click', demo);
 
   /**
    * Converts the type of a completion to a string suitable for display to the
