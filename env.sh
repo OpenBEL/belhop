@@ -30,5 +30,8 @@ default GJSLINT_ENV     "$PYTHON_ENVS"/gjslint
 default PYTHON_REQ_DEPS "deps.req"
 default PYTHON_OPT_DEPS "deps.opt"
 
+### BROWSERSYNC CONFIGURATION ###
+default BROWSERSYNC_PORT    3901
+
 ### THE GO SHELL ###
 default GOSH_SCRIPTS    "$DIR"/scripts
