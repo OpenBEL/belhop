@@ -156,6 +156,10 @@ p + p {
   float: right;
 }
 
+.pointer {
+  cursor: pointer;
+}
+
 #bel-expressions .empty-message {
   padding: 5px 10px;
   text-align: center;
