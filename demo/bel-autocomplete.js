@@ -150,7 +150,6 @@ $(document).ready(function() {
     input: '#expinput',
     interval: 500,
     manuscript: [
-      ghostwriter.noop,
       ghostwriter.selectAll,
       ghostwriter.backspace,
       'proteinAbu',
