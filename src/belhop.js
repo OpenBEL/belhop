@@ -6,10 +6,12 @@
 (function() {
 
   var root = this;
+  const defaultURL = "http://next.belframework.org/api";
 
   /**
    * The BELHop module.
    * @exports belhop
+   * @namespace belhop
    * @author Nick Bargnesi <nbargnesi@selventa.com>
    * @version 0.1.0
    */
@@ -26,6 +28,16 @@
   }
 
   /**
+   * @name DEFAULT_URL
+   * @readonly
+   * @type {string}
+   * @default
+   */
+  Object.defineProperty(belhop, 'DEFAULT_URL', {
+    get: function() { return defaultURL; }
+  });
+
+  /**
    * @name VERSION
    * @readonly
    * @type {string}
@@ -37,10 +49,59 @@
 
   /**
    * Executes a completion on some input and returns the results.
+   * @namespace belhop.complete
    * @arg {object} completion - BEL API completion object.
    * @arg {string} input - BEL expression to autocomplete.
    */
   belhop.complete = function(completion, input) {
+
+  };
+
+  /**
+   * @namespace belhop.complete.actions
+   */
+  belhop.complete.actions = {};
+
+  /**
+   * Delete the characters from startPos to endPos inclusively and return the
+   * result.
+   *
+   * @protected
+   * @function
+   * @name belhop.complete.actions.delete
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {number} startPos - Starting position of the deletion range.
+   * @arg {number} endPos - Ending position of the deletion range.
+   *
+   * @example
+   * // delete "JUNK" from input
+   * belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * 'foobar'
+   *
+   * @returns {string} Input string after deletion operation.
+   */
+  belhop.complete.actions.delete = function(str, startPos, endPos) {
+    var str1 = str.substr(0, startPos);
+    var str2 = str.substr(endPos + 1);
+    var ret = str1 + str2;
+    return ret;
+  };
+
+  /**
+   * Insert the string value at position and return the result.
+   *
+   * @protected
+   * @function
+   * @name belhop.complete.actions.insert
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {string} value - String to insert.
+   * @arg {number} position - Insertion position.
+   *
+   * @returns {string} Input string after insertion operation.
+   */
+  belhop.complete.actions.insert = function(str, value, position) {
 
   };
 
