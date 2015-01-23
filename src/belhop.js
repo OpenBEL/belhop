@@ -75,8 +75,9 @@
    * @arg {number} endPos - Ending position of the deletion range.
    *
    * @example
-   * // delete "JUNK" from input
-   * belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * > // delete "JUNK" from input
+   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * > 'foobar'
    * 'foobar'
    *
    * @returns {string} Input string after deletion operation.
@@ -99,10 +100,20 @@
    * @arg {string} value - String to insert.
    * @arg {number} position - Insertion position.
    *
+   * @example
+   * > // insert "bar" into input
+   * > belhop.complete.actions.insert('foo', 'bar', 3);
+   * > 'foobar'
+   * 'foobar'
+   *
    * @returns {string} Input string after insertion operation.
    */
   belhop.complete.actions.insert = function(str, value, position) {
-
+    var str1 = str.substr(0, position);
+    var str2 = value;
+    var str3 = str.substr(position);
+    var rslt = str1 + str2 + str3;
+    return rslt;
   };
 
 }.call(this));
