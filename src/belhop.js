@@ -6,7 +6,7 @@
 (function() {
 
   var root = this;
-  const defaultURL = "http://next.belframework.org/api";
+  var _defaultURL = "http://next.belframework.org/api";
 
   /**
    * The BELHop module.
@@ -34,7 +34,7 @@
    * @default
    */
   Object.defineProperty(belhop, 'DEFAULT_URL', {
-    get: function() { return defaultURL; }
+    get: function() { return _defaultURL; }
   });
 
   /**
