@@ -48,10 +48,64 @@
   });
 
   /**
-   * Executes a completion on some input and returns the results.
+   * @namespace belhop.configuration
+   */
+  belhop.configuration = {};
+
+  /**
+   * Get the current configured API URL.
+   *
+   * @function
+   * @name belhop.complete.actions.delete
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {number} startPos - Starting position of the deletion range.
+   * @arg {number} endPos - Ending position of the deletion range.
+   *
+   * @example
+   * > // delete "JUNK" from input
+   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * > 'foobar'
+   * 'foobar'
+   *
+   * @returns {string} Input string after deletion operation.
+   */
+  belhop.configuration.getURL = function(completion, input) {
+    if (typeof(belhop.currentURL) === 'undefined' ||
+        belhop.currentURL === null) {
+      return belhop.DEFAULT_URL;
+    }
+    return belhop.currentURL;
+  };
+
+  /**
+   * Set the API URL.
+   *
+   * @function
+   * @name belhop.complete.actions.delete
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {number} startPos - Starting position of the deletion range.
+   * @arg {number} endPos - Ending position of the deletion range.
+   *
+   * @example
+   * > // delete "JUNK" from input
+   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * > 'foobar'
+   * 'foobar'
+   *
+   * @returns {string} Input string after deletion operation.
+   */
+  belhop.configuration.setURL = function(url) {
+    belhop.currentURL = url;
+  };
+
+  /**
+   * Completes some input and returns the results.
    * @namespace belhop.complete
    * @arg {object} completion - BEL API completion object.
    * @arg {string} input - BEL expression to autocomplete.
+   * @returns nothing yet
    */
   belhop.complete = function(completion, input) {
 
@@ -114,6 +168,62 @@
     var str3 = str.substr(position);
     var rslt = str1 + str2 + str3;
     return rslt;
+  };
+
+  /**
+   * Validates some input and returns the results.
+   * @namespace belhop.validate
+   * @arg {string} input - BEL expression to autocomplete.
+   * @returns nothing yet
+   */
+  belhop.validate = function(input) {
+    return {};
+  };
+
+  /**
+   * Insert the string value at position and return the result.
+   *
+   * @protected
+   * @function
+   * @name belhop.complete.actions.insert
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {string} value - String to insert.
+   * @arg {number} position - Insertion position.
+   *
+   * @example
+   * > // insert "bar" into input
+   * > belhop.complete.actions.insert('foo', 'bar', 3);
+   * > 'foobar'
+   * 'foobar'
+   *
+   * @returns {string} Input string after insertion operation.
+   */
+  belhop.validate.syntax = function(input) {
+    return {};
+  };
+
+  /**
+   * Insert the string value at position and return the result.
+   *
+   * @protected
+   * @function
+   * @name belhop.complete.actions.insert
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {string} value - String to insert.
+   * @arg {number} position - Insertion position.
+   *
+   * @example
+   * > // insert "bar" into input
+   * > belhop.complete.actions.insert('foo', 'bar', 3);
+   * > 'foobar'
+   * 'foobar'
+   *
+   * @returns {string} Input string after insertion operation.
+   */
+  belhop.validate.semantics = function(input) {
+    return {};
   };
 
 }.call(this));
