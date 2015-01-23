@@ -11,7 +11,7 @@ describe("belhop", function () {
     });
 
     it("defaults to using the default API URL", function() {
-      expect(belhop.configuration.getURL()).toEqual(belhop.defaultURL);
+      expect(belhop.configuration.getURL()).toEqual(belhop.DEFAULT_URL);
     });
 
     it("can change API URL", function() {
