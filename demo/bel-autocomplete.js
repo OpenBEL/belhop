@@ -1,112 +1,9 @@
 $(document).ready(function() {
+  var datums = [];
 
-  var lastQuery;
-
-  // Alternate autocompletion display including the "type" of completion, e.g.:
-  //   p() increases p() (template) - Protein-Protein Interaction (increase)
-  //var COMPLETION_TEMPLATE =
-  //  '<p>{{value}} (<em>{{type}}</em>) - <strong>{{label}}</strong></p>';
-
-  // Default autocompletion display w/out the "type" of completion, e.g.:
-  //   p() increases p() - Protein-Protein Interaction (increase)
+  // Each autocompletion suggestion renedered as the following...
   var COMPLETION_TEMPLATE =
     '<p>{{value}}<span class="completion-type">{{displayType}}</p>';
-
-  /**
-   * Tokenize the query before sending it to the API; currently only one token
-   * is sent: the query itself.
-   */
-  var tokenizer = function(query) {
-    lastQuery = query;
-    return [query];
-  };
-
-  /**
-   * Manipulate the URL prior to generating an autocompletion.
-   */
-  var replacer = function(url, query) {
-    var ret = url.replace('%QUERY', query);
-    var end = $('#expinput')[0].selectionEnd;
-    ret += ('?caret_position=' + end);
-    return ret;
-  };
-
-  /**
-   * Filters the API response into typeahead datums for use in the completion
-   * template.
-   */
-  var responseFilter = function(response) {
-    var datums = [];
-    function insertDatum(element) {
-      datum = {
-        value: applyActions(element.completion.actions, lastQuery),
-        displayType: displayCompletionType(element.completion.type),
-        label: element.completion.label,
-        actions: element.completion.actions
-      };
-      datums.push(datum);
-    }
-    response.forEach(insertDatum);
-    return datums;
-  };
-
-  var belExpressions = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-    queryTokenizer: tokenizer,
-    prefetch: 'data/templates.json',
-    remote: {
-      url: 'http://next.belframework.org/api/expressions/%QUERY/completions',
-      replace: replacer,
-      filter: responseFilter
-    }
-  });
-
-  belExpressions.initialize();
-
-  /**
-   * Delete the characters from startPos to endPos, inclusively, and return the
-   * result.
-   */
-  function deleteAction(str, startPos, endPos) {
-    var str1 = str.substr(0, startPos);
-    var str2 = str.substr(endPos + 1);
-    var ret = str1 + str2;
-    return ret;
-  }
-
-  /**
-   * Insert the string value at a position in str.
-   */
-  function insertAction(str, value, position) {
-    var str1 = str.substr(0, position);
-    var str2 = value;
-    var str3 = str.substr(position);
-    var rslt = str1 + str2 + str3;
-    return rslt;
-  }
-
-  /**
-   * Apply autocomplete actions to some input and return the result.
-   */
-  function applyActions(actions, input) {
-
-    /* applies a single action */
-    function actOn(action) {
-      if (action.delete) {
-        var startPos = action.delete.start_position;
-        var endPos = action.delete.end_position;
-        input = deleteAction(input, startPos, endPos);
-      } else if (action.insert) {
-        var value = action.insert.value;
-        var position = action.insert.position;
-        input = insertAction(input, value, position);
-      }
-    }
-
-    /* apply each action, mutating input */
-    actions.forEach(actOn);
-    return input;
-  }
 
   /**
    * Called when the user selects a completion from our dropdown.
@@ -129,21 +26,85 @@ $(document).ready(function() {
     }
   };
 
+  /**
+   * Convert BEL API representations of completions into datums usable by
+   * typeahead.
+   */
+  function convertCompletions(input, completions) {
+    datums = [];
+    /* convert completion to datum */
+    function addDatum(completion) {
+      // looks odd but "completion" is a key in the actual completion object
+      var completionType = completion.completion.type;
+      var displayType = displayCompletionType(completionType);
+      var value = belhop.complete.apply(completion, input);
+      var datum = {
+        value: value,
+        displayType: displayType,
+        actions: completion.completion.actions
+      };
+      datums.push(datum);
+    }
+    /* add a datum for each completion */
+    completions.forEach(addDatum);
+    return datums;
+  }
+
+  /**
+   * Get completions via belhop and supply datums to typeahead callback "cb".
+   */
+  function doQuery(query, cb) {
+    /* invoke callback without suggestions on error */
+    var onErr = function() { cb([]) };
+
+    /* invoke callback with converted completions on success */
+    var onSucc = function(completions) {
+      var datums = convertCompletions(query, completions);
+      cb(datums);
+    };
+
+    var _cb = {
+      error: onErr,
+      success: onSucc
+    };
+
+    // treat end of input element selection as API caret position
+    var selectionEnd = $("#expinput")[0].selectionEnd;
+    console.log('at position ' + selectionEnd + ' querying "' + query +'"');
+    belhop.complete.getCompletions(query, selectionEnd, _cb);
+  };
+
   $('#bel-expressions .typeahead').typeahead(null, {
     name: 'bel-expressions',
     displayKey: 'value',
-    source: belExpressions.ttAdapter(),
+    source: doQuery,
     templates: {
-      empty: [
-        '<div class="empty-message">',
-        'No completions for this expression.',
-        '</div>'
-      ].join('\n'),
+      empty: null,
       suggestion: Handlebars.compile(COMPLETION_TEMPLATE)
     }
   });
   $('#bel-expressions .typeahead').on('typeahead:selected', selected);
   $('#bel-expressions .typeahead').on('typeahead:autocompleted', selected);
+
+  // handle keydown on first input field
+  $("#expinput").keydown(function(ev) {
+    if (ev.keyCode !== 37 && ev.keyCode !== 39) {
+      return;
+    }
+    var ta = $("#expinput").data().ttTypeahead;
+    ta.dropdown.close();
+  });
+
+  // handle keydown on first input field
+  $("#expinput").keyup(function(ev) {
+    if (ev.keyCode !== 37 && ev.keyCode !== 39) {
+      return;
+    }
+    var ta = $("#expinput").data().ttTypeahead;
+    var curval = ta.getVal();
+    ta.dropdown.update(curval);
+    ta.dropdown.open();
+  });
 
   var haunt = ghostwriter.haunt({
     loop: false,

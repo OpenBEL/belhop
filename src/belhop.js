@@ -6,7 +6,7 @@
 (function() {
 
   var root = this;
-  const defaultURL = "http://next.belframework.org/api";
+  var _defaultURL = "http://next.belframework.org/api";
 
   /**
    * The BELHop module.
@@ -34,7 +34,7 @@
    * @default
    */
   Object.defineProperty(belhop, 'DEFAULT_URL', {
-    get: function() { return defaultURL; }
+    get: function() { return _defaultURL; }
   });
 
   /**
@@ -48,13 +48,124 @@
   });
 
   /**
-   * Executes a completion on some input and returns the results.
+   * @namespace belhop.configuration
+   */
+  belhop.configuration = {};
+
+  /**
+   * Get the current configured API URL.
+   *
+   * @function
+   * @name belhop.configuration.getURL
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {number} startPos - Starting position of the deletion range.
+   * @arg {number} endPos - Ending position of the deletion range.
+   *
+   * @example
+   * > belhop.configuration.getURL()
+   * 'http://next.belframework.org/api'
+   *
+   * @returns {string} Input string after deletion operation.
+   */
+  belhop.configuration.getURL = function(completion, input) {
+    if (typeof belhop.currentURL === 'undefined' ||
+        belhop.currentURL === null) {
+      return belhop.DEFAULT_URL;
+    }
+    return belhop.currentURL;
+  };
+
+  /**
+   * Set the API URL.
+   *
+   * @function
+   * @name belhop.configuration.setURL
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {number} startPos - Starting position of the deletion range.
+   * @arg {number} endPos - Ending position of the deletion range.
+   *
+   * @example
+   * > // reset to the default URL
+   * > belhop.configuration.setURL(null);
+   */
+  belhop.configuration.setURL = function(url) {
+    belhop.currentURL = url;
+  };
+
+  /**
    * @namespace belhop.complete
+   */
+  belhop.complete = {};
+
+  /**
+   * Applies a completion to the input and returns the result.
+   * @namespace belhop.complete
+   *
+   * @function
+   * @name belhop.complete.apply
+   *
    * @arg {object} completion - BEL API completion object.
    * @arg {string} input - BEL expression to autocomplete.
+   *
+   * @returns {string} Completed input string.
    */
-  belhop.complete = function(completion, input) {
+  belhop.complete.apply = function(completion, input) {
+    /* applies a single action */
+    function actOn(action) {
+      if (action.delete) {
+        var startPos = action.delete.start_position;
+        var endPos = action.delete.end_position;
+        input = belhop.complete.actions.delete(input, startPos, endPos);
+      } else if (action.insert) {
+        var value = action.insert.value;
+        var position = action.insert.position;
+        input = belhop.complete.actions.insert(input, value, position);
+      }
+    }
+    /* apply each action, mutating input */
+    // looks odd but "completion" is a key in the actual completion object
+    var actions = completion.completion.actions;
+    actions.forEach(actOn);
+    return input;
+  };
 
+  /**
+  * BELHop completion type definition.
+  * @name Completion
+  * @typedef {Completion} Completion
+  * @property {array} actions - The completion actions.
+  * @property {string} value - The completion value (the proposal).
+  * @property {string} label - Expanded representation of the value.
+  * @property {string} type - The type of the completion (provided by the API).
+  */
+
+  /**
+   * Gets completions for the given input and returns the results.
+   *
+   * @function
+   * @name belhop.complete.getCompletions
+   *
+   * @arg {string} input - BEL expression to autocomplete.
+   * @arg {number} caretPosition - optional caret position
+   * @arg {object} cb - callback with success and error functions
+   *
+   * @returns {Completion} zero or more completions
+   */
+  belhop.complete.getCompletions = function(input, caretPosition, cb) {
+    // ' ' -> %20, etc.
+    var path = encodeURI(path);
+    path = '/expressions/' + input + '/completions';
+    if (typeof caretPosition !== 'undefined' && caretPosition !== null) {
+      path += '?caret_position=' + caretPosition;
+    }
+    var url = belhop.configuration.getURL() + path;
+    var request = $.ajax({
+      url: url,
+      success: cb.success,
+      error: cb.error
+    });
   };
 
   /**
@@ -75,8 +186,8 @@
    * @arg {number} endPos - Ending position of the deletion range.
    *
    * @example
-   * // delete "JUNK" from input
-   * belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * > // delete "JUNK" from input
+   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
    * 'foobar'
    *
    * @returns {string} Input string after deletion operation.
@@ -99,60 +210,62 @@
    * @arg {string} value - String to insert.
    * @arg {number} position - Insertion position.
    *
+   * @example
+   * > // insert "bar" into input
+   * > belhop.complete.actions.insert('foo', 'bar', 3);
+   * 'foobar'
+   *
    * @returns {string} Input string after insertion operation.
    */
   belhop.complete.actions.insert = function(str, value, position) {
+    var str1 = str.substr(0, position);
+    var str2 = value;
+    var str3 = str.substr(position);
+    var rslt = str1 + str2 + str3;
+    return rslt;
+  };
 
+  /**
+   * Validates some input and returns the results.
+   * @namespace belhop.validate
+   * @arg {string} input - BEL expression to autocomplete.
+   *
+   * @returns {}
+   */
+  belhop.validate = function(input) {
+    return {};
+  };
+
+  /**
+   * Insert the string value at position and return the result.
+   *
+   * @function
+   * @name belhop.validate.syntax
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {string} value - String to insert.
+   * @arg {number} position - Insertion position.
+   *
+   * @returns {}
+   */
+  belhop.validate.syntax = function(input) {
+    return {};
+  };
+
+  /**
+   * Insert the string value at position and return the result.
+   *
+   * @function
+   * @name belhop.validate.semantics
+   *
+   * @arg {string} str - Input string to operate on.
+   * @arg {string} value - String to insert.
+   * @arg {number} position - Insertion position.
+   *
+   * @returns {}
+   */
+  belhop.validate.semantics = function(input) {
+    return {};
   };
 
 }.call(this));
-
-/*
- * Represents a book.
- * @constructor
- * @arg {string} title - The title of the book.
- * @arg {string} author - The author of the book.
- *
-function Book(title, author) {
-}
-
-window.BH = (function() {
-  function BELHop() {
-
-  }
-
-  BELHop.defaultURL = "http://next.belframework.org/api";
-  BELHop.url = BELHop.defaultURL;
-
-  var belhop = {
-    defaultURL: BELHop.defaultURL,
-
-    configuration: {
-      getURL: function() {
-        return BELHop.url;
-      },
-      setURL: function(url) {
-        BELHop.url = url;
-      }
-    },
-
-    /
-     * Executes a completion on some input and returns the results.
-     * @arg {object} completion - BEL API completion object.
-     * @arg {string} input - BEL expression to autocomplete.
-     *
-    complete: function(completion, input) {
-    },
-
-    validate: {
-      syntax: function() {
-        return {}
-      },
-      semantics: function() {
-        return {}
-      }
-    }
-  };
-  return belhop;
-}());
-*/
