@@ -1,11 +1,7 @@
 $(document).ready(function() {
-  // Alternate autocompletion display including the "type" of completion, e.g.:
-  //   p() increases p() (template) - Protein-Protein Interaction (increase)
-  //var COMPLETION_TEMPLATE =
-  //  '<p>{{value}} (<em>{{type}}</em>) - <strong>{{label}}</strong></p>';
+  var datums = [];
 
-  // Default autocompletion display w/out the "type" of completion, e.g.:
-  //   p() increases p() - Protein-Protein Interaction (increase)
+  // Each autocompletion suggestion renedered as the following...
   var COMPLETION_TEMPLATE =
     '<p>{{value}}<span class="completion-type">{{displayType}}</p>';
 
@@ -13,49 +9,77 @@ $(document).ready(function() {
    * Called when the user selects a completion from our dropdown.
    */
   function selected(event, datum, name) {
-    // var element = $('#expinput')[0];
-    // var actions = datum.actions;
-    // var cursorpos = -1;
+    var element = $('#expinput')[0];
+    var actions = datum.actions;
+    var cursorpos = -1;
 
-    // function moveCur(action) {
-    //   if (action.move_cursor) {
-    //     cursorpos = action.move_cursor.position;
-    //   }
-    // }
-    // actions.forEach(moveCur);
+    function moveCur(action) {
+      if (action.move_cursor) {
+        cursorpos = action.move_cursor.position;
+      }
+    }
+    actions.forEach(moveCur);
 
-    // if (cursorpos !== -1) {
-    //   element.selectionStart = cursorpos;
-    //   element.selectionEnd = cursorpos;
-    // }
+    if (cursorpos !== -1) {
+      element.selectionStart = cursorpos;
+      element.selectionEnd = cursorpos;
+    }
   };
 
   /**
-   * Transforms the completion into a string for the input control.
+   * Convert BEL API representations of completions into datums usable by
+   * typeahead.
    */
-  function convertCompletion(completion) {
-    console.log('converting completion');
-    var value = completion.value;
-    console.log('returning value: ' + value);
-    return value;
-  };
+  function convertCompletions(input, completions) {
+    datums = [];
+    /* convert completion to datum */
+    function addDatum(completion) {
+      // looks odd but "completion" is a key in the actual completion object
+      var completionType = completion.completion.type;
+      var displayType = displayCompletionType(completionType);
+      var value = belhop.complete.apply(completion, input);
+      var datum = {
+        value: value,
+        displayType: displayType,
+        actions: completion.completion.actions
+      };
+      datums.push(datum);
+    }
+    /* add a datum for each completion */
+    completions.forEach(addDatum);
+    return datums;
+  }
 
+  /**
+   * Get completions via belhop and supply datums to typeahead callback "cb".
+   */
   function doQuery(query, cb) {
+    /* invoke callback without suggestions on error */
+    var onErr = function() { cb([]) };
+
+    /* invoke callback with converted completions on success */
+    var onSucc = function(completions) {
+      var datums = convertCompletions(query, completions);
+      cb(datums);
+    };
+
+    var _cb = {
+      error: onErr,
+      success: onSucc
+    };
+
+    // treat end of input element selection as API caret position
     var selectionEnd = $("#expinput")[0].selectionEnd;
-    console.log("doQuery: query is " + query + " and cursor is: " + selectionEnd);
-    cb([{value: "$19.95", displayType: "Plus Shipping and Handling"}]);
+    console.log('at position ' + selectionEnd + ' querying "' + query +'"');
+    belhop.complete.getCompletions(query, selectionEnd, _cb);
   };
 
   $('#bel-expressions .typeahead').typeahead(null, {
     name: 'bel-expressions',
-    displayKey: convertCompletion,
+    displayKey: 'value',
     source: doQuery,
     templates: {
-      empty: [
-        '<div class="empty-message">',
-        'No completions for this expression.',
-        '</div>'
-      ].join('\n'),
+      empty: null,
       suggestion: Handlebars.compile(COMPLETION_TEMPLATE)
     }
   });
@@ -64,29 +88,22 @@ $(document).ready(function() {
 
   // handle keydown on first input field
   $("#expinput").keydown(function(ev) {
-    if (ev.keyCode == 37 || ev.keyCode == 39) {
-      // is the dropdown hidden?
-      var dropdown = $('#bel-expressions .tt-dropdown-menu');
-      if (dropdown.is(':hidden')) {
-        // force it open via down arrow keydown event
-        var ev = $.Event('keydown', {keyCode: 40});
-        var element = $('#expinput');
-        element.trigger(ev);
-      }
+    if (ev.keyCode !== 37 && ev.keyCode !== 39) {
+      return;
     }
+    var ta = $("#expinput").data().ttTypeahead;
+    ta.dropdown.close();
   });
 
-  // handle focus on first input field
-  $("#expinput").on('focus', function() {
-    console.log('focused');
-    // is the dropdown hidden?
-    var dropdown = $('#bel-expressions .tt-dropdown-menu');
-    if (dropdown.is(':hidden')) {
-      // force it open via down arrow keydown event
-      var ev = $.Event('keydown', {keyCode: 40});
-      var element = $('#expinput');
-      element.trigger(ev);
+  // handle keydown on first input field
+  $("#expinput").keyup(function(ev) {
+    if (ev.keyCode !== 37 && ev.keyCode !== 39) {
+      return;
     }
+    var ta = $("#expinput").data().ttTypeahead;
+    var curval = ta.getVal();
+    ta.dropdown.update(curval);
+    ta.dropdown.open();
   });
 
   var haunt = ghostwriter.haunt({
