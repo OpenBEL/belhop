@@ -1,7 +1,4 @@
 $(document).ready(function() {
-
-  var lastQuery;
-
   // Alternate autocompletion display including the "type" of completion, e.g.:
   //   p() increases p() (template) - Protein-Protein Interaction (increase)
   //var COMPLETION_TEMPLATE =
@@ -16,30 +13,42 @@ $(document).ready(function() {
    * Called when the user selects a completion from our dropdown.
    */
   function selected(event, datum, name) {
-    var element = $('#expinput')[0];
-    var actions = datum.actions;
-    var cursorpos = -1;
+    // var element = $('#expinput')[0];
+    // var actions = datum.actions;
+    // var cursorpos = -1;
 
-    function moveCur(action) {
-      if (action.move_cursor) {
-        cursorpos = action.move_cursor.position;
-      }
-    }
-    actions.forEach(moveCur);
+    // function moveCur(action) {
+    //   if (action.move_cursor) {
+    //     cursorpos = action.move_cursor.position;
+    //   }
+    // }
+    // actions.forEach(moveCur);
 
-    if (cursorpos !== -1) {
-      element.selectionStart = cursorpos;
-      element.selectionEnd = cursorpos;
-    }
+    // if (cursorpos !== -1) {
+    //   element.selectionStart = cursorpos;
+    //   element.selectionEnd = cursorpos;
+    // }
+  };
+
+  /**
+   * Transforms the completion into a string for the input control.
+   */
+  function convertCompletion(completion) {
+    console.log('converting completion');
+    var value = completion.value;
+    console.log('returning value: ' + value);
+    return value;
   };
 
   function doQuery(query, cb) {
+    var selectionEnd = $("#expinput")[0].selectionEnd;
+    console.log("doQuery: query is " + query + " and cursor is: " + selectionEnd);
     cb([{value: "$19.95", displayType: "Plus Shipping and Handling"}]);
   };
 
   $('#bel-expressions .typeahead').typeahead(null, {
     name: 'bel-expressions',
-    displayKey: 'value',
+    displayKey: convertCompletion,
     source: doQuery,
     templates: {
       empty: [
@@ -52,6 +61,33 @@ $(document).ready(function() {
   });
   $('#bel-expressions .typeahead').on('typeahead:selected', selected);
   $('#bel-expressions .typeahead').on('typeahead:autocompleted', selected);
+
+  // handle keydown on first input field
+  $("#expinput").keydown(function(ev) {
+    if (ev.keyCode == 37 || ev.keyCode == 39) {
+      // is the dropdown hidden?
+      var dropdown = $('#bel-expressions .tt-dropdown-menu');
+      if (dropdown.is(':hidden')) {
+        // force it open via down arrow keydown event
+        var ev = $.Event('keydown', {keyCode: 40});
+        var element = $('#expinput');
+        element.trigger(ev);
+      }
+    }
+  });
+
+  // handle focus on first input field
+  $("#expinput").on('focus', function() {
+    console.log('focused');
+    // is the dropdown hidden?
+    var dropdown = $('#bel-expressions .tt-dropdown-menu');
+    if (dropdown.is(':hidden')) {
+      // force it open via down arrow keydown event
+      var ev = $.Event('keydown', {keyCode: 40});
+      var element = $('#expinput');
+      element.trigger(ev);
+    }
+  });
 
   var haunt = ghostwriter.haunt({
     loop: false,
