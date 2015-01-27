@@ -8,14 +8,16 @@ describe('belhop', function() {
 
     it('can handle deletion actions', function() {
       var completion = {
-        actions: [
-          {
-            delete: {
-              start_position: 0,
-              end_position: 2
+        completion: {
+          actions: [
+            {
+              delete: {
+                start_position: 0,
+                end_position: 2
+              }
             }
-          }
-        ]
+          ]
+        }
       };
       var input = 'fooHGNC:AKT1';
       input = belhop.complete.apply(completion, input);
@@ -26,14 +28,16 @@ describe('belhop', function() {
 
       it('that prepend text', function() {
         var completion = {
-          actions: [
-            {
-              insert: {
-                value: 'HGNC:',
-                position: 0
+          completion: {
+            actions: [
+              {
+                insert: {
+                  value: 'HGNC:',
+                  position: 0
+                }
               }
-            }
-          ]
+            ]
+          }
         };
         var input = 'AKT1';
         input = belhop.complete.apply(completion, input);
@@ -42,14 +46,16 @@ describe('belhop', function() {
 
       it('can insert text in the middle', function() {
         var completion = {
-          actions: [
-            {
-              insert: {
-                value: 'NC',
-                position: 2
+          completion: {
+            actions: [
+              {
+                insert: {
+                  value: 'NC',
+                  position: 2
+                }
               }
-            }
-          ]
+            ]
+          }
         };
         var input = 'HG:AKT1';
         input = belhop.complete.apply(completion, input);
@@ -58,14 +64,16 @@ describe('belhop', function() {
 
       it('can append text to the end', function() {
         var completion = {
-          actions: [
-            {
-              insert: {
-                value: 'AKT1',
-                position: 5
+          completion: {
+            actions: [
+              {
+                insert: {
+                  value: 'AKT1',
+                  position: 5
+                }
               }
-            }
-          ]
+            ]
+          }
         };
         var input = 'HGNC:';
         input = belhop.complete.apply(completion, input);
