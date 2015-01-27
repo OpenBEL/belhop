@@ -11,3 +11,6 @@ build
 
 *.pyc
 
+# ignore Tern's .tern-port files
+.tern-port
+
