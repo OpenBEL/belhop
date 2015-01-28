@@ -35,3 +35,4 @@ default BROWSERSYNC_PORT    3901
 
 ### THE GO SHELL ###
 default GOSH_SCRIPTS    "$DIR"/scripts
+default GOSH_CONTRIB    "$DIR"/scripts/gosh-contrib

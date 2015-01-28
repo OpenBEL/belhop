@@ -112,3 +112,13 @@ function require_cmd {
     fi
     return 0
 }
+
+# Pull in any GOSH_CONTRIB scripts found.
+function use_gosh_contrib {
+    assert_env GOSH_CONTRIB || return 1
+    for contrib in "$GOSH_CONTRIB"/*.sh; do
+        assert_source "$contrib" || return 1
+    done
+    return 0
+}
+

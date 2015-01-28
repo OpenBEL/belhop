@@ -8,7 +8,6 @@ export SCRIPT_HELP="Cleans all artifacts, effectively resetting the working tree
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-source "$SCRIPTS"/functions.sh || exit 1
 
 assert_env BUILD
 assert_env NPM_MODPATH

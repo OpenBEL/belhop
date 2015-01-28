@@ -8,7 +8,7 @@ export SCRIPT_HELP="Run tests once, via Karma."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-source "$SCRIPTS"/functions.sh || exit 1
+use_gosh_contrib
 assert_env NPM_MODPATH
 
 # Create the node environment if needed...
