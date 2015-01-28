@@ -8,7 +8,6 @@ export SCRIPT_HELP="Clean the build."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-source "$SCRIPTS"/functions.sh || exit 1
 
 assert_env BUILD
 rm -fr "$BUILD" || exit 1

@@ -8,7 +8,7 @@ export SCRIPT_HELP="Execute examples in JavaScript source via doctest."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-source "$SCRIPTS"/functions.sh || exit 1
+use_gosh_contrib
 assert_env NPM_MODPATH
 assert_env SRC
 

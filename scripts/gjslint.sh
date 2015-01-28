@@ -8,14 +8,14 @@ export SCRIPT_HELP="Lint JavaScript source via Google's Closure Linter."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-source "$SCRIPTS"/functions.sh || exit 1
+use_gosh_contrib
 assert_env TOOLS || exit 1
 assert_env GJSLINT_ENV || exit 1
 
 # Create the virtual environment if needed...
 export PYTHON_REQ_DEPS="$TOOLS"/gjslint-deps.req
 export ENV="$GJSLINT_ENV"
-create_env "python2" || exit 1
+create_python_env "python2" || exit 1
 # ... and enter it.
 . "$ENV"/bin/activate
 

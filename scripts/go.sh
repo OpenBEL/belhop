@@ -172,7 +172,7 @@ function script {
     local _SCRIPT="$1"
     if [ $# -gt 1 ]; then
         shift
-        export GOSH_SUBMENU_ARGS="$@"
+        export GOSH_SUBMENU_ARGS="$*"
     fi
     # output a script header
     local SCRIPT=$(basename "$_SCRIPT")
@@ -333,7 +333,7 @@ function process_input() {
             script_help "$CHOICE"
         elif [ "$submenu" -eq 1 ]; then
             # Run the submenu w/ args
-            script "$CHOICE" $ARGS
+            script "$CHOICE" "$ARGS"
         elif [ "$item" -eq 1 ]; then
             # Run the script...
             script "$CHOICE"
