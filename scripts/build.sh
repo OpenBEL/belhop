@@ -8,11 +8,11 @@ export SCRIPT_HELP="Compile with Google's Closure Compiler."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-use_gosh_contrib
+use_gosh_contrib || exit 1
 
-assert_env BUILD
-assert_env SRC
-assert_env MIN_JS
+assert_env BUILD || exit 1
+assert_env SRC || exit 1
+assert_env MIN_JS || exit 1
 
 mkdir -p "$BUILD" || exit 1
 cd "$BUILD" || exit 1
