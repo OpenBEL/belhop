@@ -8,7 +8,7 @@ export SCRIPT_HELP="Lint JavaScript source via Google's Closure Linter."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-use_gosh_contrib
+use_gosh_contrib || exit 1
 assert_env TOOLS || exit 1
 assert_env GJSLINT_ENV || exit 1
 
@@ -20,6 +20,6 @@ create_python_env "python2" || exit 1
 . "$ENV"/bin/activate
 
 cd "$DIR" || exit 1
-require_cmd "gjslint"
+require_cmd "gjslint" || exit 1
 gjslint $(find src spec -name "*.js")
 
