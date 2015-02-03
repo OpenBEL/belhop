@@ -4,9 +4,15 @@
  * @license Apache-2.0
 */
 (function() {
+  'use strict';
 
   var root = this;
-  var _defaultURL = "http://next.belframework.org/api";
+  /* eslint no-underscore-dangle:0 */
+  var _defaultURL = 'http://next.belframework.org/api';
+
+  // declare globals not recognized by eslint
+  /* global module */
+  /* global $ */
 
   /**
    * The BELHop module.
@@ -15,11 +21,7 @@
    * @author Nick Bargnesi <nbargnesi@selventa.com>
    * @version 0.1.0
    */
-  var belhop = function(obj) {
-    if (obj instanceof belhop) return obj;
-    if (!(this instanceof belhop)) return new belhop(obj);
-    belhop.init = true;
-  };
+  var belhop = {};
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = belhop;
@@ -58,17 +60,17 @@
    * @function
    * @name belhop.configuration.getURL
    *
-   * @arg {string} str - Input string to operate on.
-   * @arg {number} startPos - Starting position of the deletion range.
-   * @arg {number} endPos - Ending position of the deletion range.
+   * @param {string} str - Input string to operate on.
+   * @param {number} startPos - Starting position of the deletion range.
+   * @param {number} endPos - Ending position of the deletion range.
    *
    * @example
    * > belhop.configuration.getURL()
    * 'http://next.belframework.org/api'
    *
-   * @returns {string} Input string after deletion operation.
+   * @return {string} Input string after deletion operation.
    */
-  belhop.configuration.getURL = function(completion, input) {
+  belhop.configuration.getURL = function() {
     if (typeof belhop.currentURL === 'undefined' ||
         belhop.currentURL === null) {
       return belhop.DEFAULT_URL;
@@ -82,9 +84,9 @@
    * @function
    * @name belhop.configuration.setURL
    *
-   * @arg {string} str - Input string to operate on.
-   * @arg {number} startPos - Starting position of the deletion range.
-   * @arg {number} endPos - Ending position of the deletion range.
+   * @param {string} str - Input string to operate on.
+   * @param {number} startPos - Starting position of the deletion range.
+   * @param {number} endPos - Ending position of the deletion range.
    *
    * @example
    * > // reset to the default URL
@@ -106,10 +108,10 @@
    * @function
    * @name belhop.complete.apply
    *
-   * @arg {object} completion - BEL API completion object.
-   * @arg {string} input - BEL expression to autocomplete.
+   * @param {object} completion - BEL API completion object.
+   * @param {string} input - BEL expression to autocomplete.
    *
-   * @returns {string} Completed input string.
+   * @return {string} Completed input string.
    */
   belhop.complete.apply = function(completion, input) {
     /* applies a single action */
@@ -147,11 +149,11 @@
    * @function
    * @name belhop.complete.getCompletions
    *
-   * @arg {string} input - BEL expression to autocomplete.
-   * @arg {number} caretPosition - optional caret position
-   * @arg {object} cb - callback with success and error functions
+   * @param {string} input - BEL expression to autocomplete.
+   * @param {number} caretPosition - optional caret position
+   * @param {object} cb - callback with success and error functions
    *
-   * @returns {Completion} zero or more completions
+   * @return {Completion} zero or more completions
    */
   belhop.complete.getCompletions = function(input, caretPosition, cb) {
     // ' ' -> %20, etc.
@@ -161,7 +163,7 @@
       path += '?caret_position=' + caretPosition;
     }
     var url = belhop.configuration.getURL() + path;
-    var request = $.ajax({
+    $.ajax({
       url: url,
       success: cb.success,
       error: cb.error
@@ -181,16 +183,16 @@
    * @function
    * @name belhop.complete.actions.delete
    *
-   * @arg {string} str - Input string to operate on.
-   * @arg {number} startPos - Starting position of the deletion range.
-   * @arg {number} endPos - Ending position of the deletion range.
+   * @param {string} str - Input string to operate on.
+   * @param {number} startPos - Starting position of the deletion range.
+   * @param {number} endPos - Ending position of the deletion range.
    *
    * @example
    * > // delete "JUNK" from input
    * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
    * 'foobar'
    *
-   * @returns {string} Input string after deletion operation.
+   * @return {string} Input string after deletion operation.
    */
   belhop.complete.actions.delete = function(str, startPos, endPos) {
     var str1 = str.substr(0, startPos);
@@ -206,16 +208,16 @@
    * @function
    * @name belhop.complete.actions.insert
    *
-   * @arg {string} str - Input string to operate on.
-   * @arg {string} value - String to insert.
-   * @arg {number} position - Insertion position.
+   * @param {string} str - Input string to operate on.
+   * @param {string} value - String to insert.
+   * @param {number} position - Insertion position.
    *
    * @example
    * > // insert "bar" into input
    * > belhop.complete.actions.insert('foo', 'bar', 3);
    * 'foobar'
    *
-   * @returns {string} Input string after insertion operation.
+   * @return {string} Input string after insertion operation.
    */
   belhop.complete.actions.insert = function(str, value, position) {
     var str1 = str.substr(0, position);
@@ -228,9 +230,9 @@
   /**
    * Validates some input and returns the results.
    * @namespace belhop.validate
-   * @arg {string} input - BEL expression to autocomplete.
+   * @param {string} input - BEL expression to autocomplete.
    *
-   * @returns {}
+   * @return {Object}
    */
   belhop.validate = function(input) {
     return {};
@@ -242,11 +244,11 @@
    * @function
    * @name belhop.validate.syntax
    *
-   * @arg {string} str - Input string to operate on.
-   * @arg {string} value - String to insert.
-   * @arg {number} position - Insertion position.
+   * @param {string} str - Input string to operate on.
+   * @param {string} value - String to insert.
+   * @param {number} position - Insertion position.
    *
-   * @returns {}
+   * @return {Object}
    */
   belhop.validate.syntax = function(input) {
     return {};
@@ -258,11 +260,11 @@
    * @function
    * @name belhop.validate.semantics
    *
-   * @arg {string} str - Input string to operate on.
-   * @arg {string} value - String to insert.
-   * @arg {number} position - Insertion position.
+   * @param {string} str - Input string to operate on.
+   * @param {string} value - String to insert.
+   * @param {number} position - Insertion position.
    *
-   * @returns {}
+   * @return {Object}
    */
   belhop.validate.semantics = function(input) {
     return {};
