@@ -1,0 +1,16 @@
+rules:
+    # ERRORS
+
+    # WARNINGS
+    no-unused-vars: [1]
+    max-len: [1, 80, 2]
+
+    # DISABLED. These aren't compatible with our style
+    # We use underscores to indicate privata/internal vars
+    no-underscore-dangle: 0
+
+    # We allow compact conditionals
+    curly: 0
+
+    # We require single-quoted strings
+    quotes: [2, 'single']
