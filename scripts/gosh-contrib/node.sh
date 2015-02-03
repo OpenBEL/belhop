@@ -25,6 +25,15 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 
+# This contrib uses the following env vars:
+#
+# GOSH_CONTRIB_NODE_NPM_MODPATH
+#   Path to node_modules directory, e.g., $DIR.
+#
+# GOSH_CONTRIB_NODE_NPM_PKGJSON
+#   Path to package.json, e.g., $DIR/package.json.
+#
+
 # Installs dependencies into the node_modules of the current directory.
 # E.g.,
 #    install_node_deps
@@ -33,69 +42,65 @@ function install_node_deps {
     echo -en "Running npm install... "
     # redirect stdout/stderr to mimic silent behavior
     # (npm currently lacks this functionality as of 2014-10-20)
-    NODE_OUTPUT=$(mktemp)
+    NODE_OUTPUT=$(mktemp) || return 1
     npm install >"$NODE_OUTPUT" 2>&1
     EC=$?
     if [ $EC -ne 0 ]; then
         echo "failed"
         cat "$NODE_OUTPUT" || return 1
         rm "$NODE_OUTPUT" || return 1
+        return 1
     fi
+    rm "$NODE_OUTPUT" || return 1
     echo "okay"
     return 0
 }
 
-# Determines whether the node_modules of the current directory need updating.
+# Determines whether the node_modules need updating.
 # E.g.,
 #    if $(node_env_needs_update); then
 #        # update it
 #    fi
 function node_env_needs_update {
-    if [ -z "$NPM_MODPATH" ]; then
-        echo "node_env_needs_update: called without NPM_MODPATH" >&2
-        return 1
-    elif [ -z "$NPM_PKGJSON" ]; then
-        echo "node_env_needs_update: called without NPM_PKGJSON" >&2
-        return 1
-    fi
-    # node_modules directory doesn't exist?
-    if [ ! -d "$NPM_MODPATH" ]; then return 0; fi
+    # returning 0 indicates an update is needed
+    assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || return 0
+    assert_env GOSH_CONTRIB_NODE_NPM_PKGJSON || return 0
+
+    # E.g., $DIR -> $DIR/node_modules
+    local nm_dir="$GOSH_CONTRIB_NODE_NPM_MODPATH"/node_modules
+
+    # directory doesn't exist?
+    if [ ! -d "$nm_dir" ]; then return 0; fi
     # package.json has changed?
-    if [ "$NPM_PKGJSON" -nt "$NPM_MODPATH" ]; then return 0; fi
+    if [ "$GOSH_CONTRIB_NODE_NPM_PKGJSON" -nt "$nm_dir" ]; then return 0; fi
     # previous npm install failed?
-    if [ ! -f "$NPM_MODPATH"/.ts ]; then return 0; fi
+    if [ ! -f "$nm_dir"/.ts ]; then return 0; fi
     return 1
 }
 
-# Marks the virtual environment $ENV as complete. Call this function once a
-# virtual environment has been configured and all of the necessary dependencies
-# have been installed.
+# Marks the node environment GOSH_CONTRIB_NODE_NPM_MODPATH as complete. Call
+# this function once a node envrionment has been configured and all of the
+# necessary dependencies have been installed.
 function complete_node_env {
-    if [ -z "$NPM_MODPATH" ]; then
-        echo "complete_node_env: called without NPM_MODPATH" >&2
-        return 1
-    elif [ -z "$NPM_PKGJSON" ]; then
-        echo "complete_node_env: called without NPM_PKGJSON" >&2
-        return 1
-    fi
-    date > "$NPM_MODPATH"/.ts
+    assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || return 1
+    # E.g., $DIR -> $DIR/node_modules
+    local nm_dir="$GOSH_CONTRIB_NODE_NPM_MODPATH"/node_modules
+    date > "$nm_dir"/.ts || return 1
     return 0
 }
 
 # Creates a node environment using npm.
-# This function needs $NPM_MODPATH and $NPM_PKGJSON set.
+# This function needs GOSH_CONTRIB_NODE_NPM_MODPATH and
+# GOSH_CONTRIB_NODE_NPM_PKGJSON set.
 function create_node_env {
-    if [ -z "$NPM_MODPATH" ]; then
-        echo "create_node_env: called without NPM_MODPATH" >&2
-        return 1
-    elif [ -z "$NPM_PKGJSON" ]; then
-        echo "create_node_env: called without NPM_PKGJSON" >&2
-        return 1
-    fi
+    assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || exit 1
+    assert_env GOSH_CONTRIB_NODE_NPM_PKGJSON || exit 1
     if node_env_needs_update; then
         echo "Node environment out-of-date - it will be created."
-        echo "($(pwd)/$NPM_MODPATH)"
-        rm -fr "$NPM_MODPATH"
+        echo "($GOSH_CONTRIB_NODE_NPM_MODPATH)"
+        # E.g., $DIR -> $DIR/node_modules
+        local nm_dir="$GOSH_CONTRIB_NODE_NPM_MODPATH"/node_modules
+        rm -fr "$nm_dir"
         install_node_deps || exit 1
         complete_node_env || exit 1
         echo
