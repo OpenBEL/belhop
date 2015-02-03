@@ -1,4 +1,4 @@
-describe('belhop', function () {
+describe('belhop', function() {
 
   beforeEach(function(done) {
     $.ajax({

@@ -1,4 +1,4 @@
-describe('belhop', function () {
+describe('belhop', function() {
 
   describe('configuration', function() {
 
