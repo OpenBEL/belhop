@@ -13,13 +13,16 @@ assert_env TOOLS || exit 1
 assert_env GJSLINT_ENV || exit 1
 
 # Create the virtual environment if needed...
-export PYTHON_REQ_DEPS="$TOOLS"/gjslint-deps.req
-export ENV="$GJSLINT_ENV"
-create_python_env "python2" || exit 1
+export GOSH_CONTRIB_PYTHON_REQ_DEPS="$TOOLS"/gjslint/gjslint-deps.req
+export GOSH_CONTRIB_PYTHON_OPT_DEPS="$TOOLS"/gjslint/gjslint-deps.opt
+export GOSH_CONTRIB_PYTHON_VENV="$GJSLINT_ENV"
+create_python_env "python2"
 # ... and enter it.
-. "$ENV"/bin/activate
+. "$GJSLINT_ENV"/bin/activate
+
+JSDOC_TAGS="function,namespace,default,example,property,name,file,exports,
+version,readonly"
 
 cd "$DIR" || exit 1
 require_cmd "gjslint" || exit 1
-gjslint $(find src spec -name "*.js")
-
+gjslint --custom_jsdoc_tags="$JSDOC_TAGS" $(find src spec -name "*.js")

@@ -10,10 +10,10 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
 
 assert_env BUILD || exit 1
-assert_env NPM_MODPATH || exit 1
+assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || exit 1
 assert_env PYTHON_ENVS || exit 1
 rm -fr "$BUILD" || exit 1
-rm -fr "$NPM_MODPATH" || exit 1
+rm -fr "$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules" || exit 1
 rm -fr "$PYTHON_ENVS"/* || exit 1
 
 
