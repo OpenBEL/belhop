@@ -276,7 +276,7 @@
    * Evidence factory.
    *
    * @function
-   * @name belhop.factory.Evidence
+   * @name belhop.factory.evidence
    *
    * @param {string} stmt - The source/relationship/target string
    * @param {object} citation - Source of the biological knowledge
@@ -286,7 +286,7 @@
    *
    * @return {Evidence}
    */
-  belhop.factory.Evidence = function(stmt, citation, ctxt, summary, meta) {
+  belhop.factory.evidence = function(stmt, citation, ctxt, summary, meta) {
     return {
       evidence: {
         bel_statement: stmt,
@@ -432,7 +432,7 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
-    var evidence = belhop.factory.Evidence(
+    var evidence = belhop.factory.evidence(
       stmt, citation, ctxt, summary, meta);
     belhop.evidence.createEvidence(evidence, cb);
   };
