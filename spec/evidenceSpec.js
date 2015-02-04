@@ -57,7 +57,7 @@ describe('belhop', function() {
       var summary = 'Found this on a post-it near a sciency looking person.';
       var meta = {status: 'draft'};
       var args = [statement, citation, ctxt, summary, meta];
-      var evidence = belhop.factory.Evidence(
+      var evidence = belhop.factory.evidence(
         statement, citation, ctxt, summary, meta);
       belhop.evidence.createEvidence(evidence, cb);
     });
