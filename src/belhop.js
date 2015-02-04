@@ -7,8 +7,8 @@
   'use strict';
 
   var root = this;
-  /* eslint no-underscore-dangle:0 */
-  var _defaultURL = 'http://next.belframework.org/api';
+  var _defaultAPIURL = 'http://next.belframework.org/api';
+  var _defaultSchemaURL = 'http://next.belframework.org/schema';
 
   // declare globals not recognized by eslint
   /* global module */
@@ -30,13 +30,23 @@
   }
 
   /**
-   * @name DEFAULT_URL
+   * @name DEFAULT_API_URL
    * @readonly
    * @type {string}
    * @default
    */
-  Object.defineProperty(belhop, 'DEFAULT_URL', {
-    get: function() { return _defaultURL; }
+  Object.defineProperty(belhop, 'DEFAULT_API_URL', {
+    get: function() { return _defaultAPIURL; }
+  });
+
+  /**
+   * @name DEFAULT_SCHEMA_URL
+   * @readonly
+   * @type {string}
+   * @default
+   */
+  Object.defineProperty(belhop, 'DEFAULT_SCHEMA_URL', {
+    get: function() { return _defaultSchemaURL; }
   });
 
   /**
@@ -49,51 +59,144 @@
     get: function() { return '0.1.0'; }
   });
 
+  // [path, cb|query, cb|n/a]
+  function apiGET(arglist) {
+    var path = arglist[0];
+    path = encodeURI(path);
+    var url = belhop.configuration.getAPIURL();
+    var cb;
+
+    if (arglist.length === 2) {
+      // [path, cb]
+      cb = arglist[1];
+      url += path;
+      $.ajax({
+        url: url,
+        success: cb.success,
+        error: cb.error
+      });
+    } else if (arglist.length === 3) {
+      // [path, queryParams, cb]
+      var queryParams = arglist[1];
+      cb = arglist[2];
+      url += path + '?' + queryParams;
+      $.ajax({
+        url: url,
+        success: cb.success,
+        error: cb.error
+      });
+    }
+  }
+
+  // [path, data, cb|query, cb|n/a]
+  function apiPOST(arglist) {
+    var path = arglist[0];
+    path = encodeURI(path);
+    var data = arglist[1];
+    var url = belhop.configuration.getAPIURL();
+    var cb;
+
+    if (arglist.length === 3) {
+      // [path, cb]
+      cb = arglist[2];
+      url += path;
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: data,
+        success: cb.success,
+        error: cb.error
+      });
+    } else if (arglist.length === 4) {
+      // [path, queryParams, cb]
+      var queryParams = arglist[2];
+      cb = arglist[3];
+      url += path + '?' + queryParams;
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: data,
+        success: cb.success,
+        error: cb.error
+      });
+    }
+  }
+
   /**
    * @namespace belhop.configuration
    */
   belhop.configuration = {};
 
   /**
-   * Get the current configured API URL.
+   * Get the current API URL.
    *
    * @function
-   * @name belhop.configuration.getURL
-   *
-   * @param {string} str - Input string to operate on.
-   * @param {number} startPos - Starting position of the deletion range.
-   * @param {number} endPos - Ending position of the deletion range.
+   * @name belhop.configuration.getAPIURL
    *
    * @example
-   * > belhop.configuration.getURL()
+   * > belhop.configuration.getAPIURL()
    * 'http://next.belframework.org/api'
    *
-   * @return {string} Input string after deletion operation.
+   * @return {string} Current API URL
    */
-  belhop.configuration.getURL = function() {
-    if (typeof belhop.currentURL === 'undefined' ||
-        belhop.currentURL === null) {
-      return belhop.DEFAULT_URL;
+  belhop.configuration.getAPIURL = function() {
+    var url = belhop.currentAPIURL;
+    if (typeof url === 'undefined' || url === null) {
+      return belhop.DEFAULT_API_URL;
     }
-    return belhop.currentURL;
+    return belhop.currentAPIURL;
   };
 
   /**
    * Set the API URL.
    *
    * @function
-   * @name belhop.configuration.setURL
+   * @name belhop.configuration.setAPIURL
    *
-   * @param {string} str - Input string to operate on.
-   * @param {number} startPos - Starting position of the deletion range.
-   * @param {number} endPos - Ending position of the deletion range.
+   * @param {string} url - The API URL to use
    *
    * @example
    * > // reset to the default URL
-   * > belhop.configuration.setURL(null);
+   * > belhop.configuration.setAPIURL(null);
    */
-  belhop.configuration.setURL = function(url) {
-    belhop.currentURL = url;
+  belhop.configuration.setAPIURL = function(url) {
+    belhop.currentAPIURL = url;
+  };
+
+  /**
+   * Get the current schema URL.
+   *
+   * @function
+   * @name belhop.configuration.getSchemaURL
+   *
+   * @example
+   * > belhop.configuration.getSchemaURL()
+   * 'http://next.belframework.org/schema'
+   *
+   * @return {string} Current schema URL
+   */
+  belhop.configuration.getSchemaURL = function() {
+    var url = belhop.currentSchemaURL;
+    if (typeof url === 'undefined' || url === null) {
+      return belhop.DEFAULT_SCHEMA_URL;
+    }
+    return belhop.currentSchemaURL;
+  };
+
+  /**
+   * Set the schema URL.
+   *
+   * @function
+   * @name belhop.configuration.setSchemaURL
+   *
+   * @param {string} url - The schema URL to use
+   *
+   * @example
+   * > // reset to the default URL
+   * > belhop.configuration.setSchemaURL(null);
+   */
+  belhop.configuration.setSchemaURL = function(url) {
+    belhop.currentSchemaURL = url;
   };
 
   /**
@@ -144,6 +247,27 @@
   */
 
   /**
+   * BELHop callback type definition.
+   * @name Callback
+   * @typedef {Callback} Callback
+   * @property {function} success - Function called on success
+   * @property {function} error - Function called on error
+   */
+
+  /**
+   * BELHop evdience type definition.
+   * @name Evidence
+   * @typedef {Evidence} Evidence
+   * @property {string} id - The evidence identifier (if previously created)
+   * @property {string} bel_statement - Represents the biological knowledge
+   * @property {object} citation - Source of the biological knowledge
+   * @property {object} biological_context - Details on where the interaction
+   * was observed
+   * @property {string} summary_text - Abstract from source text
+   * @property {object} metadata - Additional details about the evidence
+   */
+
+  /**
    * Gets completions for the given input and returns the results.
    *
    * @function
@@ -151,23 +275,20 @@
    *
    * @param {string} input - BEL expression to autocomplete.
    * @param {number} caretPosition - optional caret position
-   * @param {object} cb - callback with success and error functions
+   * @param {Callback} cb - callback with success and error functions
    *
    * @return {Completion} zero or more completions
    */
   belhop.complete.getCompletions = function(input, caretPosition, cb) {
-    // ' ' -> %20, etc.
-    var path = encodeURI(path);
-    path = '/expressions/' + input + '/completions';
+    var path = '/expressions/' + input + '/completions';
+    var arglist = [path];
     if (typeof caretPosition !== 'undefined' && caretPosition !== null) {
-      path += '?caret_position=' + caretPosition;
+      var queryParams = 'caret_position=' + caretPosition;
+      arglist.push(queryParams);
     }
-    var url = belhop.configuration.getURL() + path;
-    $.ajax({
-      url: url,
-      success: cb.success,
-      error: cb.error
-    });
+    arglist.push(cb);
+    // pack up path, query, and cb and defer to apiGET
+    apiGET(arglist);
   };
 
   /**
@@ -228,15 +349,9 @@
   };
 
   /**
-   * Validates some input and returns the results.
    * @namespace belhop.validate
-   * @param {string} input - BEL expression to autocomplete.
-   *
-   * @return {Object}
    */
-  belhop.validate = function(input) {
-    return {};
-  };
+  belhop.validate = {};
 
   /**
    * Insert the string value at position and return the result.
@@ -268,6 +383,91 @@
    */
   belhop.validate.semantics = function(input) {
     return {};
+  };
+
+  /**
+   * @namespace belhop.evidence
+   */
+  belhop.evidence = {};
+
+  /**
+   * Create new evidence by its component parts.
+   *
+   * @function
+   * @name belhop.evidence.create
+   *
+   * @param {string} stmt - The source/relationship/target string
+   * @param {object} citation - Source of the biological knowledge
+   * @param {object} ctxt - Details on where the interaction was observed
+   * @param {string} summary - Abstract from source text
+   * @param {object} meta - Additional details about the evidence
+   * @param {Callback} cb - callback with success and error functions
+   */
+  belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
+    var evidence = {
+      evidence: {
+        bel_statement: stmt,
+        citation: citation,
+        biological_context: ctxt,
+        summary_text: summary,
+        metadata: meta
+      }
+    };
+    var path = '/evidence';
+    var arglist = [path, evidence, cb];
+    apiPOST(arglist);
+  };
+
+  /**
+   * Create or update evidence, depending on whether it has an id.
+   *
+   * @function
+   * @name belhop.evidence.createEvidence
+   *
+   * @param {Evidence} evidence - Evidence to create or update
+   * @param {Callback} cb - callback with success and error functions
+   */
+  belhop.evidence.createEvidence = function(evidence, cb) {
+
+  };
+
+  /**
+   * Get evidence by its id. On success, the callback's success function will
+   *
+   * @function
+   * @name belhop.evidence.get
+   *
+   * @property {string} id - The evidence identifier to remove
+   * @param {Callback} cb - callback with success and error functions
+   */
+  belhop.evidence.get = function(id, cb) {
+
+  };
+
+  /**
+   * Remove evidence by its id.
+   *
+   * @function
+   * @name belhop.evidence.remove
+   *
+   * @property {string} id - The evidence identifier to remove
+   * @param {Callback} cb - callback with success and error functions
+   */
+  belhop.evidence.remove = function(id, cb) {
+
+  };
+
+  /**
+   * Remove evidence.
+   *
+   * @function
+   * @name belhop.evidence.removeEvidence
+   *
+   * @param {Evidence} evidence - Evidence to create or update
+   * @param {Callback} cb - callback with success and error functions
+   */
+  belhop.evidence.removeEvidence = function(evidence, cb) {
+
   };
 
 }.call(this));
