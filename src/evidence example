@@ -1,0 +1,19 @@
+{
+    "evidence": {
+        "bel_statement": <string>,
+        "citation": {
+            "type": {
+
+            },
+            "id": <string>,
+            "name": <string>
+
+        },
+        "biological_context": {
+        },
+        "summary_text": <string>,
+        "metadata": {
+
+        }
+    }
+}

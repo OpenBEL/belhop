@@ -90,7 +90,7 @@ describe('belhop', function() {
 
     beforeEach(function(done) {
       var onSuccess = function(response) {
-        completions = response;
+        completions = response.completions;
         done();
       };
       var onErr = function(arg1, arg2) {
@@ -106,8 +106,8 @@ describe('belhop', function() {
     it('can get completions', function(done) {
       expect(completions.length).toBeDefined();
       expect(completions.length).toBeGreaterThan(0);
-      expect(completions[0].completion).toBeDefined();
-      expect(completions[0].completion.actions).toBeDefined();
+      expect(completions[0]).toBeDefined();
+      expect(completions[0].actions).toBeDefined();
       done();
     });
 
