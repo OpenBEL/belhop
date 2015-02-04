@@ -12,5 +12,8 @@ rules:
     # We allow compact conditionals
     curly: 0
 
+    # The OpenBEL server API does not use camelcase
+    camelcase: 0
+
     # We require single-quoted strings
     quotes: [2, 'single']
