@@ -432,27 +432,9 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
-    var path = '/evidence';
-    var evidence = {
-      // Suppress API lint issues
-      /* eslint camelcase:0 */
-      evidence: {
-        bel_statement: stmt,
-        citation: citation,
-        biological_context: ctxt,
-        summary_text: summary,
-        metadata: meta
-      }
-    };
-    var data = JSON.stringify(evidence);
-
-    var schemaURL = belhop.configuration.getSchemaURL();
-    var profile = schemaURL + '/evidence.schema.json';
-    var contentType = 'application/json;profile=' + profile;
-    var options = {
-      contentType: contentType
-    };
-    apiPOST(path, data, cb, options);
+    var evidence = belhop.factory.Evidence(
+      stmt, citation, ctxt, summary, meta);
+    belhop.evidence.createEvidence(evidence, cb);
   };
 
   /**
@@ -465,7 +447,16 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.createEvidence = function(evidence, cb) {
+    var path = '/evidence';
+    var data = JSON.stringify(evidence);
 
+    var schemaURL = belhop.configuration.getSchemaURL();
+    var profile = schemaURL + '/evidence.schema.json';
+    var contentType = 'application/json;profile=' + profile;
+    var options = {
+      contentType: contentType
+    };
+    apiPOST(path, data, cb, options);
   };
 
   /**
