@@ -268,6 +268,37 @@
    */
 
   /**
+   * @namespace belhop.factory
+   */
+  belhop.factory = {};
+
+  /**
+   * Evidence factory.
+   *
+   * @function
+   * @name belhop.factory.Evidence
+   *
+   * @param {string} stmt - The source/relationship/target string
+   * @param {object} citation - Source of the biological knowledge
+   * @param {object} ctxt - Details on where the interaction was observed
+   * @param {string} summary - Abstract from source text
+   * @param {object} meta - Additional details about the evidence
+   *
+   * @return {Evidence}
+   */
+  belhop.factory.Evidence = function(stmt, citation, ctxt, summary, meta) {
+    return {
+      evidence: {
+        bel_statement: stmt,
+        citation: citation,
+        biological_context: ctxt,
+        summary_text: summary,
+        metadata: meta
+      }
+    };
+  };
+
+  /**
    * Gets completions for the given input and returns the results.
    *
    * @function
