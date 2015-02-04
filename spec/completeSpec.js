@@ -93,14 +93,14 @@ describe('belhop', function() {
         completions = response;
         done();
       };
-      var onErr = function() {
+      var onErr = function(arg1, arg2) {
         done();
       };
       var cb = {success: onSuccess, error: onErr};
       var input = 'p(HGNC:A)';
       var caretPos = 8;
       expect(belhop.complete.getCompletions).toBeDefined();
-      completions = belhop.complete.getCompletions(input, caretPos, cb);
+      belhop.complete.getCompletions(input, caretPos, cb);
     });
 
     it('can get completions', function(done) {
