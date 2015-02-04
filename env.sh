@@ -20,19 +20,24 @@ default MIN_JS          "$BUILD"/belhop.min.js
 default DOCS            "$DIR"/docs
 default DOCS_BUILD      "$DOCS"/build
 
-### NODE/NPM ENV VARS ###
-default NPM_MODPATH     "$DIR"/node_modules
-default NPM_PKGJSON     "$DIR"/package.json
-
 ### PYTHON ENV VARS ###
 default PYTHON_ENVS     "$TOOLS"/envs
 default GJSLINT_ENV     "$PYTHON_ENVS"/gjslint
-default PYTHON_REQ_DEPS "deps.req"
-default PYTHON_OPT_DEPS "deps.opt"
 
 ### BROWSERSYNC CONFIGURATION ###
 default BROWSERSYNC_PORT    3901
 
+### ESLINT CONFIGURATION ###
+default ESLINT_CFG      "$TOOLS"/eslint/eslint.yml
+
+### JSCS CONFIGURATION ###
+default JSCS_CFG        "$TOOLS"/jscs/jscsrc
+
 ### THE GO SHELL ###
 default GOSH_SCRIPTS    "$DIR"/scripts
 default GOSH_CONTRIB    "$DIR"/scripts/gosh-contrib
+
+### GOSH CONTRIB ENV VARS ###
+default GOSH_CONTRIB_PYTHON_VIRTUALENV  "$VIRTUALENV"
+default GOSH_CONTRIB_NODE_NPM_PKGJSON   "$DIR"/package.json
+default GOSH_CONTRIB_NODE_NPM_MODPATH   "$DIR"
