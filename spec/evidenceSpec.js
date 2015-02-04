@@ -2,18 +2,17 @@ describe('belhop', function() {
 
   describe('evidence', function() {
 
-    var evidence;
+    var evidenceLocation;
 
     beforeEach(function(done) {
-      var onSuccess = function(response) {
-        console.log(response);
-        evidence = response;
+      var onSuccess = function(response, status, xhr) {
+        evidenceLocation = xhr.getResponseHeader('location');
+        console.log(xhr.getAllResponseHeaders());
         done();
       };
       var onErr = function(xhr, status) {
-        console.log(typeof xhr);
-        console.log(xhr.getAllResponseHeaders());
-        console.log(xhr.statusCode());
+        console.log('evidence creation failed');
+        console.log(status);
         done();
       };
       var cb = {success: onSuccess, error: onErr};
@@ -27,7 +26,7 @@ describe('belhop', function() {
     });
 
     it('can be created', function() {
-      expect(evidence).toBeDefined();
+      expect(evidenceLocation).toBeDefined();
     });
 
   });
