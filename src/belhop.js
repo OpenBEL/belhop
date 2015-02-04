@@ -268,8 +268,6 @@
    */
 
   /**
-<<<<<<< HEAD
-=======
    * @namespace belhop.factory
    */
   belhop.factory = {};
@@ -301,7 +299,6 @@
   };
 
   /**
->>>>>>> next
    * Gets completions for the given input and returns the results.
    *
    * @function
@@ -435,33 +432,9 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
-<<<<<<< HEAD
-    var path = '/evidence';
-    var evidence = {
-      // Suppress API lint issues
-      /* eslint camelcase:0 */
-      evidence: {
-        bel_statement: stmt,
-        citation: citation,
-        biological_context: ctxt,
-        summary_text: summary,
-        metadata: meta
-      }
-    };
-    var data = JSON.stringify(evidence);
-
-    var schemaURL = belhop.configuration.getSchemaURL();
-    var profile = schemaURL + '/evidence.schema.json';
-    var contentType = 'application/json;profile=' + profile;
-    var options = {
-      contentType: contentType
-    };
-    apiPOST(path, data, cb, options);
-=======
     var evidence = belhop.factory.evidence(
       stmt, citation, ctxt, summary, meta);
     belhop.evidence.createEvidence(evidence, cb);
->>>>>>> next
   };
 
   /**
@@ -474,9 +447,6 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.createEvidence = function(evidence, cb) {
-<<<<<<< HEAD
-
-=======
     var path = '/evidence';
     var data = JSON.stringify(evidence);
 
@@ -487,7 +457,6 @@
       contentType: contentType
     };
     apiPOST(path, data, cb, options);
->>>>>>> next
   };
 
   /**
