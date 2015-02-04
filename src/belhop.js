@@ -59,67 +59,67 @@
     get: function() { return '0.1.0'; }
   });
 
-  // [path, cb|query, cb|n/a]
-  function apiGET(arglist) {
-    var path = arglist[0];
-    path = encodeURI(path);
+  /*
+   * The options hash can handle a queryParams key.
+   */
+  function apiGET(path, cb, options) {
     var url = belhop.configuration.getAPIURL();
-    var cb;
+    // append the path
+    path = encodeURI(path);
+    url += path;
 
-    if (arglist.length === 2) {
-      // [path, cb]
-      cb = arglist[1];
-      url += path;
-      $.ajax({
-        url: url,
-        success: cb.success,
-        error: cb.error
-      });
-    } else if (arglist.length === 3) {
-      // [path, queryParams, cb]
-      var queryParams = arglist[1];
-      cb = arglist[2];
-      url += path + '?' + queryParams;
-      $.ajax({
-        url: url,
-        success: cb.success,
-        error: cb.error
-      });
+    // setup the options to our AJAX get
+    var defaultOptions = {
+      queryParams: null
+    };
+    var argOptions = $.extend(defaultOptions, options || {});
+
+    if (argOptions.queryParams !== null) {
+      // append query parameters
+      url += '?' + argOptions.queryParams;
     }
+
+    var ajaxOptions = {
+      url: url,
+      success: cb.success,
+      error: cb.error
+    };
+    $.ajax(ajaxOptions);
   }
 
-  // [path, data, cb|query, cb|n/a]
-  function apiPOST(arglist) {
-    var path = arglist[0];
-    path = encodeURI(path);
-    var data = arglist[1];
+  /*
+   * The options hash can handle queryParams and contentType keys.
+   */
+  function apiPOST(path, data, cb, options) {
     var url = belhop.configuration.getAPIURL();
-    var cb;
+    // append the path
+    path = encodeURI(path);
+    url += path;
 
-    if (arglist.length === 3) {
-      // [path, cb]
-      cb = arglist[2];
-      url += path;
-      $.ajax({
-        type: 'POST',
-        url: url,
-        data: data,
-        success: cb.success,
-        error: cb.error
-      });
-    } else if (arglist.length === 4) {
-      // [path, queryParams, cb]
-      var queryParams = arglist[2];
-      cb = arglist[3];
-      url += path + '?' + queryParams;
-      $.ajax({
-        type: 'POST',
-        url: url,
-        data: data,
-        success: cb.success,
-        error: cb.error
-      });
+    // setup the options to our AJAX post
+    var defaultOptions = {
+      queryParams: null,
+      contentType: null
+    };
+    var argOptions = $.extend(defaultOptions, options || {});
+
+    if (argOptions.queryParams !== null) {
+      // append query parameters
+      url += '?' + queryParams;
     }
+
+    var ajaxOptions = {
+      type: 'POST',
+      url: url,
+      data: data,
+      success: cb.success,
+      error: cb.error
+    };
+
+    if (argOptions.contentType !== null) {
+      ajaxOptions.contentType = argOptions.contentType;
+    }
+    $.ajax(ajaxOptions);
   }
 
   /**
