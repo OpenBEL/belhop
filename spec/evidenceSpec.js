@@ -7,7 +7,6 @@ describe('belhop', function() {
     beforeEach(function(done) {
       var onSuccess = function(response, status, xhr) {
         evidenceLocation = xhr.getResponseHeader('location');
-        console.log(xhr.getAllResponseHeaders());
         done();
       };
       var onErr = function(xhr, status) {
@@ -27,6 +26,7 @@ describe('belhop', function() {
 
     it('can be created', function() {
       expect(evidenceLocation).toBeDefined();
+      expect(evidenceLocation).not.toBeNull();
     });
 
   });
