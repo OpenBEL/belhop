@@ -105,7 +105,7 @@
 
     if (argOptions.queryParams !== null) {
       // append query parameters
-      url += '?' + queryParams;
+      url += '?' + argOptions.queryParams;
     }
 
     var ajaxOptions = {
@@ -403,6 +403,8 @@
   belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
     var path = '/evidence';
     var evidence = {
+      // Suppress API lint issues
+      /* eslint camelcase:0 */
       evidence: {
         bel_statement: stmt,
         citation: citation,
