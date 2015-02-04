@@ -281,14 +281,11 @@
    */
   belhop.complete.getCompletions = function(input, caretPosition, cb) {
     var path = '/expressions/' + input + '/completions';
-    var arglist = [path];
+    var options = {};
     if (typeof caretPosition !== 'undefined' && caretPosition !== null) {
-      var queryParams = 'caret_position=' + caretPosition;
-      arglist.push(queryParams);
+      options.queryParams = 'caret_position=' + caretPosition;
     }
-    arglist.push(cb);
-    // pack up path, query, and cb and defer to apiGET
-    apiGET(arglist);
+    apiGET(path, cb, options);
   };
 
   /**
@@ -404,6 +401,7 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
+    var path = '/evidence';
     var evidence = {
       evidence: {
         bel_statement: stmt,
@@ -413,9 +411,15 @@
         metadata: meta
       }
     };
-    var path = '/evidence';
-    var arglist = [path, evidence, cb];
-    apiPOST(arglist);
+    var data = JSON.stringify(evidence);
+
+    var schemaURL = belhop.configuration.getSchemaURL();
+    var profile = schemaURL + '/evidence.schema.json';
+    var contentType = 'application/json;profile=' + profile;
+    var options = {
+      contentType: contentType
+    };
+    apiPOST(path, data, cb, options);
   };
 
   /**
