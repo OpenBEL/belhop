@@ -30,8 +30,8 @@ default BROWSERSYNC_PORT    3901
 ### ESLINT CONFIGURATION ###
 default ESLINT_CFG      "$TOOLS"/eslint/eslint.yml
 
-### JSCS CONFIGURATION ###
-default JSCS_CFG        "$TOOLS"/jscs/jscsrc
+### TESTING CONFIGURATION ###
+default TEST_HEADLESS   "yes"
 
 ### THE GO SHELL ###
 default GOSH_SCRIPTS    "$DIR"/scripts
