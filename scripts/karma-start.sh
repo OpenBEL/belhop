@@ -17,4 +17,16 @@ export PATH="$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules/.bin":$PATH
 
 cd "$DIR" || exit 1
 require_cmd "karma" || exit 1
-karma start belhop.conf.js
+
+CMD="karma"
+CMD_ARGS="start belhop.conf.js"
+if [ "$TEST_HEADLESS" == "yes" ]; then
+    echo "(headless)"
+    require_cmd "xvfb-run" || exit 1
+    # shellcheck disable=SC2086
+    xvfb-run $CMD $CMD_ARGS
+else
+    # shellcheck disable=SC2086
+    $CMD $CMD_ARGS
+fi
+
