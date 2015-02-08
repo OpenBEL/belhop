@@ -17,5 +17,6 @@ export PATH="$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules/.bin":$PATH
 
 cd "$DIR" || exit 1
 require_cmd "doctest" || exit 1
+# shellcheck disable=SC2046
 doctest $(find "$SRC" -name "*.js")
 

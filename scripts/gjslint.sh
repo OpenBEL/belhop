@@ -25,4 +25,5 @@ version,readonly"
 
 cd "$DIR" || exit 1
 require_cmd "gjslint" || exit 1
+# shellcheck disable=SC2046
 gjslint --custom_jsdoc_tags="$JSDOC_TAGS" $(find src spec -name "*.js")

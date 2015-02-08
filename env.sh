@@ -41,3 +41,4 @@ default GOSH_CONTRIB    "$DIR"/scripts/gosh-contrib
 default GOSH_CONTRIB_PYTHON_VIRTUALENV  "$VIRTUALENV"
 default GOSH_CONTRIB_NODE_NPM_PKGJSON   "$DIR"/package.json
 default GOSH_CONTRIB_NODE_NPM_MODPATH   "$DIR"
+

@@ -37,6 +37,7 @@ CLOSURE_COMPILER_ARGS="--language_in ECMASCRIPT5_STRICT \
 
 echo -n "Executing the compiler... "
 CC_OUTPUT=$(mktemp)
+# shellcheck disable=SC2086
 java -jar compiler.jar $CLOSURE_COMPILER_ARGS >"$CC_OUTPUT" 2>&1
 if [ $? -eq 0 ]; then
     status=0
