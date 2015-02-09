@@ -39,8 +39,8 @@
 # E.g.,
 #    bundle_install_gems
 function bundle_install_gems {
-    assert_env GOSH_CONTRIB_RUBY_GEMFILE || return 1
-    assert_env GOSH_CONTRIB_RUBY_GEMPATH || return 1
+    assert-env GOSH_CONTRIB_RUBY_GEMFILE || return 1
+    assert-env GOSH_CONTRIB_RUBY_GEMPATH || return 1
     vdefault BUNDLE_OPTS "--quiet"
     echo -en "Running bundle install... "
     # shellcheck disable=SC2086
@@ -58,8 +58,8 @@ function bundle_install_gems {
 # E.g.,
 #     gem_install_bundler
 function gem_install_bundler {
-    assert_env GOSH_CONTRIB_RUBY_GEMPATH || return 1
-    require_cmd "gem" || return 1
+    assert-env GOSH_CONTRIB_RUBY_GEMPATH || return 1
+    require-cmd "gem" || return 1
     echo -en "Running gem install bundler... "
     # redirect stdout/stderr to make gem really quiet
     GEM_OUTPUT=$(mktemp) || return 1
@@ -83,8 +83,8 @@ function gem_install_bundler {
 #    fi
 function gem_path_needs_updating {
     # returning 0 indicates an update is needed
-    assert_env GOSH_CONTRIB_RUBY_GEMFILE || return 0
-    assert_env GOSH_CONTRIB_RUBY_GEMPATH || return 0
+    assert-env GOSH_CONTRIB_RUBY_GEMFILE || return 0
+    assert-env GOSH_CONTRIB_RUBY_GEMPATH || return 0
     # gem path doesn't exist?
     if [ ! -d "$GOSH_CONTRIB_RUBY_GEMPATH" ]; then return 0; fi
     # gemfile changed?
@@ -100,7 +100,7 @@ function gem_path_needs_updating {
 # once a gem path has been configured and all of the necessary dependencies
 # have been installed.
 function complete_gem_path {
-    assert_env GOSH_CONTRIB_RUBY_GEMPATH || return 1
+    assert-env GOSH_CONTRIB_RUBY_GEMPATH || return 1
     date > "$GOSH_CONTRIB_RUBY_GEMPATH"/.ts || return 1
     return 0
 }
@@ -109,8 +109,8 @@ function complete_gem_path {
 # This function needs GOSH_CONTRIB_RUBY_GEMFILE and GOSH_CONTRIB_RUBY_GEMPATH
 # set.
 function create_gem_path {
-    assert_env GOSH_CONTRIB_RUBY_GEMFILE || return 1
-    assert_env GOSH_CONTRIB_RUBY_GEMPATH || return 1
+    assert-env GOSH_CONTRIB_RUBY_GEMFILE || return 1
+    assert-env GOSH_CONTRIB_RUBY_GEMPATH || return 1
     if gem_path_needs_updating; then
         echo "Gem path out-of-date - it will be created."
         echo "($GOSH_CONTRIB_RUBY_GEMPATH)"
@@ -120,4 +120,7 @@ function create_gem_path {
         complete_gem_path || exit 1
         echo
     fi
+
+    local gem_binpath="$GOSH_CONTRIB_RUBY_GEMPATH/bin":$PATH
+    _g_add_path "$gem_binpath"
 }

@@ -9,9 +9,9 @@ export SCRIPT_HELP="Cleans all artifacts, effectively resetting the working tree
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
 
-assert_env BUILD || exit 1
-assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || exit 1
-assert_env PYTHON_ENVS || exit 1
+assert-env-or-die BUILD
+assert-env-or-die GOSH_CONTRIB_NODE_NPM_MODPATH
+assert-env-or-die PYTHON_ENVS
 rm -fr "$BUILD" || exit 1
 rm -fr "$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules" || exit 1
 rm -fr "$PYTHON_ENVS"/* || exit 1
