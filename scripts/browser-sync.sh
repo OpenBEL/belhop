@@ -8,7 +8,7 @@ export SCRIPT_HELP="Start BrowserSync."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-use_gosh_contrib || exit 1
+use-gosh-contrib-or-die
 
 # Create the node environment if needed...
 create_node_env || exit 1
@@ -16,8 +16,8 @@ create_node_env || exit 1
 export PATH="$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules/.bin":$PATH
 
 cd "$DIR" || exit 1
-require_cmd "browser-sync" || exit 1
-assert_env BROWSERSYNC_PORT || exit 1
+require-cmd-or-die "browser-sync"
+assert-env-or-die BROWSERSYNC_PORT
 browser-sync start --files "demo/*.css, demo/*.js, demo/*.html" \
                    --port="$BROWSERSYNC_PORT" \
                    --server \

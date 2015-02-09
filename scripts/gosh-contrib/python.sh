@@ -47,9 +47,9 @@
 # something failed to install. Tries installing GOSH_CONTRIB_PYTHON_OPT_DEPS but
 # does not fail if something failed to install.
 function install_python_deps {
-    assert_env GOSH_CONTRIB_PYTHON_REQ_DEPS || return 1
-    assert_env GOSH_CONTRIB_PYTHON_OPT_DEPS || return 1
-    assert_env GOSH_CONTRIB_PYTHON_VENV || return 1
+    assert-env GOSH_CONTRIB_PYTHON_REQ_DEPS || return 1
+    assert-env GOSH_CONTRIB_PYTHON_OPT_DEPS || return 1
+    assert-env GOSH_CONTRIB_PYTHON_VENV || return 1
     . "$GOSH_CONTRIB_PYTHON_VENV"/bin/activate
     vdefault GOSH_CONTRIB_PYTHON_PIP_OPTS "--quiet"
     if [ -r "$GOSH_CONTRIB_PYTHON_REQ_DEPS" ]; then
@@ -84,7 +84,7 @@ function install_python_deps {
 #    fi
 function python_env_needs_update {
     # returning 0 indicates an update is needed
-    assert_env GOSH_CONTRIB_PYTHON_VENV || return 0
+    assert-env GOSH_CONTRIB_PYTHON_VENV || return 0
     local venv_dir="$GOSH_CONTRIB_PYTHON_VENV"
 
     # directory doesn't exist?
@@ -102,7 +102,7 @@ function python_env_needs_update {
 # virtual environment has been configured and all of the necessary dependencies
 # have been installed.
 function complete_python_env {
-    assert_env GOSH_CONTRIB_PYTHON_VENV || return 1
+    assert-env GOSH_CONTRIB_PYTHON_VENV || return 1
     date > "$GOSH_CONTRIB_PYTHON_VENV"/.ts || return 1
     return 0
 }
@@ -113,8 +113,8 @@ function complete_python_env {
 # is set, it the value will be passed to virtualenv when creating the
 # environment.
 function create_python_env {
-    assert_env GOSH_CONTRIB_PYTHON_VENV || exit 1
-    assert_env GOSH_CONTRIB_PYTHON_VIRTUALENV || exit 1
+    assert-env GOSH_CONTRIB_PYTHON_VENV || exit 1
+    assert-env GOSH_CONTRIB_PYTHON_VIRTUALENV || exit 1
     if [ $# -ne 1 ]; then
         echo "create_python_env: called without \$1" >&2
         exit 1
@@ -132,4 +132,7 @@ function create_python_env {
         complete_python_env || exit 1
         echo
     fi
+
+    . "$GOSH_CONTRIB_PYTHON_VENV"/bin/activate
 }
+
