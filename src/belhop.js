@@ -568,7 +568,8 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.getEvidence = function(evidence, cb) {
-    if (_invalid(id, cb)) { throw _ex('need evidence, cb', arguments); }
+    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
+    var id = evidence.id;
     var path = '/evidence/' + id;
     apiGET(path, cb);
   };
