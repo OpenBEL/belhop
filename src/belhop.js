@@ -294,11 +294,23 @@
 
   /**
    * BELHop callback type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
    * @name Callback
    * @typedef {Callback} Callback
-   * @property {function} success - Function called on success
-   * @property {function} error - Function called on error
-   * @property {function} invalid - Invalid call
+   * @property {function} success - Function called on success. This function
+   * is called with the response data, status string, and original request (in
+   * that order).
+   * @property {function} error - Function called on error. This function
+   * is called with the original request, error string, and exception object
+   * if one occurred (in that order).
+   *
+   * @example
+   * // no-op callback, w/ function arguments for clarity
+   * var cb = {
+   *   success: function(responseData, statusString, request) {},
+   *   error: function(request, errorString, exception) {}
+   * };
    */
 
   /**
