@@ -335,6 +335,27 @@
   belhop.factory = {};
 
   /**
+   * Callback factory.
+   *
+   * @function
+   * @name belhop.factory.callback
+   *
+   * @param {string} stmt - The source/relationship/target string
+   * @param {object} citation - Source of the biological knowledge
+   * @param {object} ctxt - Details on where the interaction was observed
+   * @param {string} summary - Abstract from source text
+   * @param {object} meta - Additional details about the evidence
+   *
+   * @return {Callback}
+   */
+  belhop.factory.callback = function(success, error) {
+    return {
+      success: success,
+      erorr: error
+    };
+  };
+
+  /**
    * Evidence factory.
    *
    * @function
