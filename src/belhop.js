@@ -583,10 +583,7 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.remove = function(id, cb) {
-    if (typeof id === 'undefined' || id === null) {
-      cb.invalid();
-      return;
-    }
+    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
     var path = '/evidence/' + id;
     apiDELETE(path, cb);
   };
@@ -601,6 +598,7 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.removeEvidence = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
     var id = evidence.id;
     belhop.evidence.remove(id, cb);
   };
