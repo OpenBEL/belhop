@@ -314,7 +314,9 @@
    */
 
   /**
-   * BELHop evdience type definition.
+   * BELHop evidence type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
    * @name Evidence
    * @typedef {Evidence} Evidence
    * @property {string} id - The evidence identifier (if previously created)
@@ -324,6 +326,7 @@
    * was observed
    * @property {string} summary_text - Abstract from source text
    * @property {object} metadata - Additional details about the evidence
+   * @see belhop.evidence
    */
 
   /**
