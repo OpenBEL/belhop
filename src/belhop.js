@@ -10,6 +10,35 @@
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
 
+  function _invalid() {
+    var x, i;
+    for (i = 0; i < arguments.length; i++) {
+      x = arguments[i];
+      if (typeof x === 'undefined' || x === null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function _valid() {
+    var x, i;
+    for (i = 0; i < arguments.length; i++) {
+      x = arguments[i];
+      if (typeof x === 'undefined' || x === null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function _ex(message, args) {
+    return {
+      message: message,
+      args: args
+    };
+  }
+
   // declare globals not recognized by eslint
   /* global module */
   /* global $ */
