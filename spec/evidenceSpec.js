@@ -1,6 +1,5 @@
 describe('belhop', function() {
 
-  // TODO: cleanup after we make a mess ;)
   var locations = [];
   var evidenceLocation = null;
 
@@ -30,6 +29,18 @@ describe('belhop', function() {
 
     it('parts', function() {
       expect(evidenceLocation).not.toBeNull();
+    });
+
+    afterEach(function(done) {
+      locations.forEach(function(location) {
+        var id = location.split('/').slice(-1)
+        var cb = {
+          success: function() { done(); },
+          error: function() {},
+          invalid: function() {}
+        };
+        belhop.evidence.remove(id, cb);
+      });
     });
 
   });
