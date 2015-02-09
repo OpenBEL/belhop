@@ -122,6 +122,23 @@
     $.ajax(ajaxOptions);
   }
 
+  /*
+   */
+  function apiDELETE(path, cb) {
+    var url = belhop.configuration.getAPIURL();
+    // append the path
+    path = encodeURI(path);
+    url += path;
+
+    var ajaxOptions = {
+      type: 'DELETE',
+      url: url,
+      success: cb.success,
+      error: cb.error
+    };
+    $.ajax(ajaxOptions);
+  }
+
   /**
    * @namespace belhop.configuration
    */
@@ -252,6 +269,7 @@
    * @typedef {Callback} Callback
    * @property {function} success - Function called on success
    * @property {function} error - Function called on error
+   * @property {function} invalid - Invalid call
    */
 
   /**
@@ -469,7 +487,8 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.get = function(id, cb) {
-
+    var path = '/evidence/' + id;
+    apiGET(path, cb);
   };
 
   /**
@@ -482,7 +501,12 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.remove = function(id, cb) {
-
+    if (typeof id === 'undefined' || id === null) {
+      cb.invalid();
+      return;
+    }
+    var path = '/evidence/' + id;
+    apiDELETE(path, cb);
   };
 
   /**
@@ -495,7 +519,8 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.removeEvidence = function(evidence, cb) {
-
+    var id = evidence.id;
+    belhop.evidence.remove(id, cb);
   };
 
 }.call(this));
