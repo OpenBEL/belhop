@@ -498,6 +498,7 @@
 
   /**
    * @namespace belhop.evidence
+   * @see Evidence The type used by this namespace.
    */
   belhop.evidence = {};
 
@@ -552,6 +553,22 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.get = function(id, cb) {
+    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
+    var path = '/evidence/' + id;
+    apiGET(path, cb);
+  };
+
+  /**
+   * Get evidence. On success, the callback's success function will
+   *
+   * @function
+   * @name belhop.evidence.get
+   *
+   * @property {string} id - The evidence identifier to remove
+   * @param {Callback} cb - callback with success and error functions
+   */
+  belhop.evidence.getEvidence = function(evidence, cb) {
+    if (_invalid(id, cb)) { throw _ex('need evidence, cb', arguments); }
     var path = '/evidence/' + id;
     apiGET(path, cb);
   };
