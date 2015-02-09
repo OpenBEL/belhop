@@ -33,7 +33,7 @@ describe('belhop', function() {
 
     afterEach(function(done) {
       locations.forEach(function(location) {
-        var id = location.split('/').slice(-1)
+        var id = location.split('/').slice(-1);
         var cb = {
           success: function() { done(); },
           error: function() {},
