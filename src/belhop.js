@@ -10,6 +10,8 @@
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
 
+  function _NO_OP() {}
+
   function _invalid() {
     var x, i;
     for (i = 0; i < arguments.length; i++) {
@@ -335,23 +337,60 @@
   belhop.factory = {};
 
   /**
-   * Callback factory.
+   * Create a callback.
    *
    * @function
    * @name belhop.factory.callback
    *
-   * @param {string} stmt - The source/relationship/target string
-   * @param {object} citation - Source of the biological knowledge
-   * @param {object} ctxt - Details on where the interaction was observed
-   * @param {string} summary - Abstract from source text
-   * @param {object} meta - Additional details about the evidence
+   * @param {function} success - Function to call on success
+   * @param {function} error - Function to call on error
    *
    * @return {Callback}
+   * @see belhop.factory.callbackNoErrors
+   * @see belhop.factory.callbackNoSuccess
    */
   belhop.factory.callback = function(success, error) {
     return {
       success: success,
-      erorr: error
+      error: error
+    };
+  };
+
+  /**
+   * Create a callback that treats errors as a no-op.
+   *
+   * @function
+   * @name belhop.factory.callbackNoErrors
+   *
+   * @param {function} success - Function to call on success
+   *
+   * @return {Callback}
+   * @see belhop.factory.callback
+   * @see belhop.factory.callbackNoSuccess
+   */
+  belhop.factory.callbackNoErrors = function(success) {
+    return {
+      success: success,
+      error: _NO_OP
+    };
+  };
+
+  /**
+   * Create a callback that treats success as a no-op.
+   *
+   * @function
+   * @name belhop.factory.callbackNoSuccess
+   *
+   * @param {function} error - Function to call on error
+   *
+   * @return {Callback}
+   * @see belhop.factory.callback
+   * @see belhop.factory.callbackNoErrors
+   */
+  belhop.factory.callbackNoSuccess = function(error) {
+    return {
+      success: _NO_OP,
+      error: error
     };
   };
 
