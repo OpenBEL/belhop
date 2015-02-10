@@ -616,6 +616,35 @@
   };
 
   /**
+   * Update evidence by its id.
+   * Invokes the callback functions in the <b>cb</b> parameter.
+   *
+   * @function
+   * @name belhop.evidence.update
+   *
+   * @param {string} id - The evidence identifier
+   * @param {Evidence} evidence - The evidence to update
+   * @param {Callback} cb - callback invoked once complete
+   */
+  belhop.evidence.update = function(id, evidence, cb) {
+
+  };
+
+  /**
+   * Update evidence.
+   * Invokes the callback functions in the <b>cb</b> parameter.
+   *
+   * @function
+   * @name belhop.evidence.updateEvidence
+   *
+   * @param {Evidence} evidence - The evidence to update
+   * @param {Callback} cb - callback invoked once complete
+   */
+  belhop.evidence.updateEvidence = function(evidence, cb) {
+
+  };
+
+  /**
    * Remove evidence by its id.
    *
    * @function
