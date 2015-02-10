@@ -1,8 +1,35 @@
-# BELHop
+## BELHop
 
 This is a library for working with the Biological Expression Language ([BEL](
-http://www.openbel.org)) in JavaScript.
+http://www.openbel.org)) in JavaScript. The library is open source and
+available on [GitHub](https://github.com/OpenBEL/belhop).
 
-See [https://github.com/OpenBEL/belhop](https://github.com/OpenBEL/belhop) for
-more.
+<a href="https://github.com/you">
+<img style="position: absolute; top: 0; right: 0; border: 0;"
+     src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67"
+     alt="Fork me on GitHub"
+     data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png">
+</a>
 
+## Getting Started
+
+**Start** with the [belhop namespace](belhop.html) to get an idea of what
+the library can do.
+
+**Read** the growing suite of
+[behavioral tests](https://github.com/OpenBEL/belhop/tree/next/spec)
+to see how to interact with the library in JavaScript.
+
+**Understand** the [types and globals](global.html) to use it effectively.
+
+## Builds
+
+Builds of the library are tested in Google Chrome before being published.
+These builds are available on the
+[OpenBEL Build Server](http://build.openbel.org). If you want to work with
+stable integration builds of features in development, the
+[OpenBEL Discuss Google Group](https://groups.google.com/forum/#!forum/openbel-discuss) is where to go and get started.
+
+## Reporting Bugs
+
+Report any bugs you find on [GitHub](https://github.com/OpenBEL/belhop/issues).

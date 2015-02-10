@@ -10,6 +10,37 @@
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
 
+  function _NO_OP() {}
+
+  function _invalid() {
+    var x, i;
+    for (i = 0; i < arguments.length; i++) {
+      x = arguments[i];
+      if (typeof x === 'undefined' || x === null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function _valid() {
+    var x, i;
+    for (i = 0; i < arguments.length; i++) {
+      x = arguments[i];
+      if (typeof x === 'undefined' || x === null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function _ex(message, args) {
+    return {
+      message: message,
+      args: args
+    };
+  }
+
   // declare globals not recognized by eslint
   /* global module */
   /* global $ */
@@ -119,6 +150,58 @@
     if (argOptions.contentType !== null) {
       ajaxOptions.contentType = argOptions.contentType;
     }
+    $.ajax(ajaxOptions);
+  }
+
+  /*
+   * The options hash can handle queryParams and contentType keys.
+   */
+  function apiPUT(path, data, cb, options) {
+    var url = belhop.configuration.getAPIURL();
+    // append the path
+    path = encodeURI(path);
+    url += path;
+
+    // setup the options to our AJAX post
+    var defaultOptions = {
+      queryParams: null,
+      contentType: null
+    };
+    var argOptions = $.extend(defaultOptions, options || {});
+
+    if (argOptions.queryParams !== null) {
+      // append query parameters
+      url += '?' + argOptions.queryParams;
+    }
+
+    var ajaxOptions = {
+      type: 'PUT',
+      url: url,
+      data: data,
+      success: cb.success,
+      error: cb.error
+    };
+
+    if (argOptions.contentType !== null) {
+      ajaxOptions.contentType = argOptions.contentType;
+    }
+    $.ajax(ajaxOptions);
+  }
+
+  /*
+   */
+  function apiDELETE(path, cb) {
+    var url = belhop.configuration.getAPIURL();
+    // append the path
+    path = encodeURI(path);
+    url += path;
+
+    var ajaxOptions = {
+      type: 'DELETE',
+      url: url,
+      success: cb.success,
+      error: cb.error
+    };
     $.ajax(ajaxOptions);
   }
 
@@ -248,14 +331,29 @@
 
   /**
    * BELHop callback type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
    * @name Callback
    * @typedef {Callback} Callback
-   * @property {function} success - Function called on success
-   * @property {function} error - Function called on error
+   * @property {function} success - Function called on success. This function
+   * is called with the response data, status string, and original request (in
+   * that order).
+   * @property {function} error - Function called on error. This function
+   * is called with the original request, error string, and exception object
+   * if one occurred (in that order).
+   *
+   * @example
+   * // no-op callback, w/ function arguments for clarity
+   * var cb = {
+   *   success: function(responseData, statusString, request) {},
+   *   error: function(request, errorString, exception) {}
+   * };
    */
 
   /**
-   * BELHop evdience type definition.
+   * BELHop evidence type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
    * @name Evidence
    * @typedef {Evidence} Evidence
    * @property {string} id - The evidence identifier (if previously created)
@@ -265,12 +363,71 @@
    * was observed
    * @property {string} summary_text - Abstract from source text
    * @property {object} metadata - Additional details about the evidence
+   * @see belhop.evidence
    */
 
   /**
    * @namespace belhop.factory
    */
   belhop.factory = {};
+
+  /**
+   * Create a callback.
+   *
+   * @function
+   * @name belhop.factory.callback
+   *
+   * @param {function} success - Function to call on success
+   * @param {function} error - Function to call on error
+   *
+   * @return {Callback}
+   * @see belhop.factory.callbackNoErrors
+   * @see belhop.factory.callbackNoSuccess
+   */
+  belhop.factory.callback = function(success, error) {
+    return {
+      success: success,
+      error: error
+    };
+  };
+
+  /**
+   * Create a callback that treats errors as a no-op.
+   *
+   * @function
+   * @name belhop.factory.callbackNoErrors
+   *
+   * @param {function} success - Function to call on success
+   *
+   * @return {Callback}
+   * @see belhop.factory.callback
+   * @see belhop.factory.callbackNoSuccess
+   */
+  belhop.factory.callbackNoErrors = function(success) {
+    return {
+      success: success,
+      error: _NO_OP
+    };
+  };
+
+  /**
+   * Create a callback that treats success as a no-op.
+   *
+   * @function
+   * @name belhop.factory.callbackNoSuccess
+   *
+   * @param {function} error - Function to call on error
+   *
+   * @return {Callback}
+   * @see belhop.factory.callback
+   * @see belhop.factory.callbackNoErrors
+   */
+  belhop.factory.callbackNoSuccess = function(error) {
+    return {
+      success: _NO_OP,
+      error: error
+    };
+  };
 
   /**
    * Evidence factory.
@@ -415,6 +572,7 @@
 
   /**
    * @namespace belhop.evidence
+   * @see Evidence The type used by this namespace.
    */
   belhop.evidence = {};
 
@@ -438,7 +596,7 @@
   };
 
   /**
-   * Create or update evidence, depending on whether it has an id.
+   * Create new evidence.
    *
    * @function
    * @name belhop.evidence.createEvidence
@@ -460,15 +618,64 @@
   };
 
   /**
-   * Get evidence by its id. On success, the callback's success function will
+   * Get evidence by its id.
+   * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
    * @name belhop.evidence.get
    *
-   * @property {string} id - The evidence identifier to remove
-   * @param {Callback} cb - callback with success and error functions
+   * @property {string} id - The evidence identifier to get
+   * @param {Callback} cb - callback invoked once complete
    */
   belhop.evidence.get = function(id, cb) {
+    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
+    var path = '/evidence/' + id;
+    apiGET(path, cb);
+  };
+
+  /**
+   * Get evidence.
+   * Invokes the callback functions in the <b>cb</b> parameter.
+   *
+   * @function
+   * @name belhop.evidence.getEvidence
+   *
+   * @param {Evidence} evidence - The evidence to get
+   * @param {Callback} cb - callback invoked once complete
+   */
+  belhop.evidence.getEvidence = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
+    var id = evidence.id;
+    var path = '/evidence/' + id;
+    apiGET(path, cb);
+  };
+
+  /**
+   * Update evidence by its id.
+   * Invokes the callback functions in the <b>cb</b> parameter.
+   *
+   * @function
+   * @name belhop.evidence.update
+   *
+   * @param {string} id - The evidence identifier
+   * @param {Evidence} evidence - The evidence to update
+   * @param {Callback} cb - callback invoked once complete
+   */
+  belhop.evidence.update = function(id, evidence, cb) {
+
+  };
+
+  /**
+   * Update evidence.
+   * Invokes the callback functions in the <b>cb</b> parameter.
+   *
+   * @function
+   * @name belhop.evidence.updateEvidence
+   *
+   * @param {Evidence} evidence - The evidence to update
+   * @param {Callback} cb - callback invoked once complete
+   */
+  belhop.evidence.updateEvidence = function(evidence, cb) {
 
   };
 
@@ -482,7 +689,9 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.remove = function(id, cb) {
-
+    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
+    var path = '/evidence/' + id;
+    apiDELETE(path, cb);
   };
 
   /**
@@ -495,7 +704,9 @@
    * @param {Callback} cb - callback with success and error functions
    */
   belhop.evidence.removeEvidence = function(evidence, cb) {
-
+    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
+    var id = evidence.id;
+    belhop.evidence.remove(id, cb);
   };
 
 }.call(this));

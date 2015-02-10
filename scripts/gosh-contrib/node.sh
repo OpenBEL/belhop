@@ -39,6 +39,7 @@
 #    install_node_deps
 # Runs npm install in the current directory.
 function install_node_deps {
+    require-cmd "npm" || return 1
     echo -en "Running npm install... "
     # redirect stdout/stderr to mimic silent behavior
     # (npm currently lacks this functionality as of 2014-10-20)
@@ -63,8 +64,8 @@ function install_node_deps {
 #    fi
 function node_env_needs_update {
     # returning 0 indicates an update is needed
-    assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || return 0
-    assert_env GOSH_CONTRIB_NODE_NPM_PKGJSON || return 0
+    assert-env GOSH_CONTRIB_NODE_NPM_MODPATH || return 0
+    assert-env GOSH_CONTRIB_NODE_NPM_PKGJSON || return 0
 
     # E.g., $DIR -> $DIR/node_modules
     local nm_dir="$GOSH_CONTRIB_NODE_NPM_MODPATH"/node_modules
@@ -82,7 +83,7 @@ function node_env_needs_update {
 # this function once a node envrionment has been configured and all of the
 # necessary dependencies have been installed.
 function complete_node_env {
-    assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || return 1
+    assert-env GOSH_CONTRIB_NODE_NPM_MODPATH || return 1
     # E.g., $DIR -> $DIR/node_modules
     local nm_dir="$GOSH_CONTRIB_NODE_NPM_MODPATH"/node_modules
     date > "$nm_dir"/.ts || return 1
@@ -93,8 +94,8 @@ function complete_node_env {
 # This function needs GOSH_CONTRIB_NODE_NPM_MODPATH and
 # GOSH_CONTRIB_NODE_NPM_PKGJSON set.
 function create_node_env {
-    assert_env GOSH_CONTRIB_NODE_NPM_MODPATH || exit 1
-    assert_env GOSH_CONTRIB_NODE_NPM_PKGJSON || exit 1
+    assert-env GOSH_CONTRIB_NODE_NPM_MODPATH || exit 1
+    assert-env GOSH_CONTRIB_NODE_NPM_PKGJSON || exit 1
     if node_env_needs_update; then
         echo "Node environment out-of-date - it will be created."
         echo "($GOSH_CONTRIB_NODE_NPM_MODPATH)"
@@ -105,4 +106,8 @@ function create_node_env {
         complete_node_env || exit 1
         echo
     fi
+
+    local node_binpath="$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules/.bin"
+    _g_add_path "$node_binpath"
 }
+

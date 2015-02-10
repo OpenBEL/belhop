@@ -8,11 +8,11 @@ export SCRIPT_HELP="Compile with Google's Closure Compiler."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-use_gosh_contrib || exit 1
+use-gosh-contrib-or-die
 
-assert_env BUILD || exit 1
-assert_env SRC || exit 1
-assert_env MIN_JS || exit 1
+assert-env-or-die BUILD
+assert-env-or-die SRC
+assert-env-or-die MIN_JS
 
 mkdir -p "$BUILD" || exit 1
 cd "$BUILD" || exit 1
@@ -37,6 +37,7 @@ CLOSURE_COMPILER_ARGS="--language_in ECMASCRIPT5_STRICT \
 
 echo -n "Executing the compiler... "
 CC_OUTPUT=$(mktemp)
+# shellcheck disable=SC2086
 java -jar compiler.jar $CLOSURE_COMPILER_ARGS >"$CC_OUTPUT" 2>&1
 if [ $? -eq 0 ]; then
     status=0

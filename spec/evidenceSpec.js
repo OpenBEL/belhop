@@ -1,13 +1,12 @@
 describe('belhop', function() {
 
-  // TODO: cleanup after we make a mess ;)
   var locations = [];
   var evidenceLocation = null;
 
   describe('evidence can be created from', function() {
 
     beforeEach(function(done) {
-      var onSuccess = function(response, status, xhr) {
+      var onSucc = function(response, status, xhr) {
         evidenceLocation = xhr.getResponseHeader('location');
         locations.push(evidenceLocation);
         done();
@@ -18,7 +17,7 @@ describe('belhop', function() {
         console.log(status);
         done();
       };
-      var cb = {success: onSuccess, error: onErr};
+      var cb = belhop.factory.callback(onSucc, onErr);
       expect(belhop.evidence.create).toBeDefined();
       var statement = 'p(belhopEvidence) increases p(createdFromParts)';
       var citation = {type: 'PubMed', name: 'None', id: '10022765'};
@@ -32,12 +31,21 @@ describe('belhop', function() {
       expect(evidenceLocation).not.toBeNull();
     });
 
+    afterEach(function(done) {
+      locations.forEach(function(location) {
+        var id = location.split('/').slice(-1);
+        var success = function() { done(); };
+        var cb = belhop.factory.callbackNoErrors(success);
+        belhop.evidence.remove(id, cb);
+      });
+    });
+
   });
 
   describe('evidence can be created from', function() {
 
     beforeEach(function(done) {
-      var onSuccess = function(response, status, xhr) {
+      var onSucc = function(response, status, xhr) {
         evidenceLocation = xhr.getResponseHeader('location');
         locations.push(evidenceLocation);
         done();
@@ -48,7 +56,7 @@ describe('belhop', function() {
         console.log(status);
         done();
       };
-      var cb = {success: onSuccess, error: onErr};
+      var cb = belhop.factory.callback(onSucc, onErr);
       expect(belhop.evidence.createEvidence).toBeDefined();
 
       var statement = 'p(belhopEvidence) increases p(createdFromObjects)';

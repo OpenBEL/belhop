@@ -8,14 +8,13 @@ export SCRIPT_HELP="Execute examples in JavaScript source via doctest."
 # Normal script execution starts here.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"/../
 source "$DIR"/env.sh || exit 1
-use_gosh_contrib || exit 1
+use-gosh-contrib-or-die
 
-# Create the node environment if needed...
-create_node_env || exit 1
-# ... and use it.
-export PATH="$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules/.bin":$PATH
+# Create the node environment if needed.
+create_node_env
 
 cd "$DIR" || exit 1
-require_cmd "doctest" || exit 1
+require-cmd-or-die "doctest"
+# shellcheck disable=SC2046
 doctest $(find "$SRC" -name "*.js")
 
