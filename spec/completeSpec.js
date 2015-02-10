@@ -89,14 +89,14 @@ describe('belhop', function() {
     var completions;
 
     beforeEach(function(done) {
-      var onSuccess = function(response) {
+      var onSucc = function(response) {
         completions = response.completions;
         done();
       };
       var onErr = function(arg1, arg2) {
         done();
       };
-      var cb = {success: onSuccess, error: onErr};
+      var cb = belhop.factory.callback(onSucc, onErr);
       var input = 'p(HGNC:A)';
       var caretPos = 8;
       expect(belhop.complete.getCompletions).toBeDefined();
