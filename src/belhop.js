@@ -154,6 +154,41 @@
   }
 
   /*
+   * The options hash can handle queryParams and contentType keys.
+   */
+  function apiPUT(path, data, cb, options) {
+    var url = belhop.configuration.getAPIURL();
+    // append the path
+    path = encodeURI(path);
+    url += path;
+
+    // setup the options to our AJAX post
+    var defaultOptions = {
+      queryParams: null,
+      contentType: null
+    };
+    var argOptions = $.extend(defaultOptions, options || {});
+
+    if (argOptions.queryParams !== null) {
+      // append query parameters
+      url += '?' + argOptions.queryParams;
+    }
+
+    var ajaxOptions = {
+      type: 'PUT',
+      url: url,
+      data: data,
+      success: cb.success,
+      error: cb.error
+    };
+
+    if (argOptions.contentType !== null) {
+      ajaxOptions.contentType = argOptions.contentType;
+    }
+    $.ajax(ajaxOptions);
+  }
+
+  /*
    */
   function apiDELETE(path, cb) {
     var url = belhop.configuration.getAPIURL();
