@@ -561,7 +561,7 @@
   };
 
   /**
-   * Create or update evidence, depending on whether it has an id.
+   * Create new evidence.
    *
    * @function
    * @name belhop.evidence.createEvidence
@@ -583,13 +583,14 @@
   };
 
   /**
-   * Get evidence by its id. On success, the callback's success function will
+   * Get evidence by its id.
+   * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
    * @name belhop.evidence.get
    *
-   * @property {string} id - The evidence identifier to remove
-   * @param {Callback} cb - callback with success and error functions
+   * @property {string} id - The evidence identifier to get
+   * @param {Callback} cb - callback invoked once complete
    */
   belhop.evidence.get = function(id, cb) {
     if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
@@ -598,13 +599,14 @@
   };
 
   /**
-   * Get evidence. On success, the callback's success function will
+   * Get evidence.
+   * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.get
+   * @name belhop.evidence.getEvidence
    *
-   * @property {string} id - The evidence identifier to remove
-   * @param {Callback} cb - callback with success and error functions
+   * @param {Evidence} evidence - The evidence to get
+   * @param {Callback} cb - callback invoked once complete
    */
   belhop.evidence.getEvidence = function(evidence, cb) {
     if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
