@@ -91,6 +91,24 @@
   });
 
   /*
+   * No further options are available.
+   */
+  function apiHEAD(path, cb) {
+    var url = belhop.configuration.getAPIURL();
+    // append the path
+    path = encodeURI(path);
+    url += path;
+
+    var ajaxOptions = {
+      type: 'HEAD',
+      url: url,
+      success: cb.success,
+      error: cb.error
+    };
+    $.ajax(ajaxOptions);
+  }
+
+  /*
    * The options hash can handle a queryParams key.
    */
   function apiGET(path, cb, options) {
@@ -280,6 +298,18 @@
    */
   belhop.configuration.setSchemaURL = function(url) {
     belhop.currentSchemaURL = url;
+  };
+
+  /**
+   * Verify the library configuration and server availability.
+   *
+   * @function
+   * @name belhop.configuration.test
+   *
+   * @param {Callback} cb - callback with success and error functions
+   */
+  belhop.configuration.test = function(cb) {
+    apiHEAD('', cb);
   };
 
   /**
