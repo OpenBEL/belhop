@@ -50,6 +50,11 @@ describe('belhop', function() {
       expect(belhop.configuration.getSchemaURL()).toEqual(expected);
     });
 
+    it('can be tested', function(done) {
+      var cb = belhop.factory.callbackNoErrors(done);
+      belhop.configuration.test(cb);
+    });
+
   });
 
 });
