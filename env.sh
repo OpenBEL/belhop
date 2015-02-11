@@ -18,6 +18,7 @@ default BUILD           "$DIR"/build
 default SRC             "$DIR"/src
 default MIN_JS          "$BUILD"/belhop.min.js
 default DOCS            "$DIR"/docs
+default TUTS            "$DOCS"/tuts
 default DOCS_BUILD      "$DOCS"/build
 
 ### PYTHON ENV VARS ###

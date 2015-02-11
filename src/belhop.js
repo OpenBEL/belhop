@@ -61,6 +61,53 @@
   }
 
   /**
+  * BELHop completion type definition.
+  * @name Completion
+  * @typedef {Completion} Completion
+  * @property {array} actions - The completion actions.
+  * @property {string} value - The completion value (the proposal).
+  * @property {string} label - Expanded representation of the value.
+  * @property {string} type - The type of the completion (provided by the API).
+  */
+
+  /**
+   * BELHop callback type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
+   * @name Callback
+   * @typedef {Callback} Callback
+   * @property {function} success - Function called on success. This function
+   * is called with the response data, status string, and original request (in
+   * that order).
+   * @property {function} error - Function called on error. This function
+   * is called with the original request, error string, and exception object
+   * if one occurred (in that order).
+   *
+   * @example
+   * // no-op callback, w/ function arguments for clarity
+   * var cb = {
+   *   success: function(responseData, statusString, request) {},
+   *   error: function(request, errorString, exception) {}
+   * };
+   */
+
+  /**
+   * BELHop evidence type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
+   * @name Evidence
+   * @typedef {Evidence} Evidence
+   * @property {string} id - The evidence identifier (if previously created)
+   * @property {string} bel_statement - Represents the biological knowledge
+   * @property {object} citation - Source of the biological knowledge
+   * @property {object} biological_context - Details on where the interaction
+   * was observed
+   * @property {string} summary_text - Abstract from source text
+   * @property {object} metadata - Additional details about the evidence
+   * @see belhop.evidence
+   */
+
+  /**
    * @name DEFAULT_API_URL
    * @readonly
    * @type {string}
@@ -348,53 +395,6 @@
     actions.forEach(actOn);
     return input;
   };
-
-  /**
-  * BELHop completion type definition.
-  * @name Completion
-  * @typedef {Completion} Completion
-  * @property {array} actions - The completion actions.
-  * @property {string} value - The completion value (the proposal).
-  * @property {string} label - Expanded representation of the value.
-  * @property {string} type - The type of the completion (provided by the API).
-  */
-
-  /**
-   * BELHop callback type definition.
-   * These types can be created in {@link belhop.factory the factory}.
-   *
-   * @name Callback
-   * @typedef {Callback} Callback
-   * @property {function} success - Function called on success. This function
-   * is called with the response data, status string, and original request (in
-   * that order).
-   * @property {function} error - Function called on error. This function
-   * is called with the original request, error string, and exception object
-   * if one occurred (in that order).
-   *
-   * @example
-   * // no-op callback, w/ function arguments for clarity
-   * var cb = {
-   *   success: function(responseData, statusString, request) {},
-   *   error: function(request, errorString, exception) {}
-   * };
-   */
-
-  /**
-   * BELHop evidence type definition.
-   * These types can be created in {@link belhop.factory the factory}.
-   *
-   * @name Evidence
-   * @typedef {Evidence} Evidence
-   * @property {string} id - The evidence identifier (if previously created)
-   * @property {string} bel_statement - Represents the biological knowledge
-   * @property {object} citation - Source of the biological knowledge
-   * @property {object} biological_context - Details on where the interaction
-   * was observed
-   * @property {string} summary_text - Abstract from source text
-   * @property {object} metadata - Additional details about the evidence
-   * @see belhop.evidence
-   */
 
   /**
    * @namespace belhop.factory
