@@ -21,7 +21,6 @@
     "karma-junit-reporter": "^0.2.2",
     "karma-chrome-launcher": "^0.1.7",
     "eslint": ">=0.11.0",
-    "jscs": ">=1.9.0",
     "browser-sync": ">=1.9.0",
     "jsdoc": "=3.3.0-beta1",
     "doctest": ">=0.7.1"
