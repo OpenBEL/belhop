@@ -34,19 +34,19 @@ $(document).ready(function() {
     datums = [];
     /* convert completion to datum */
     function addDatum(completion) {
-      // looks odd but "completion" is a key in the actual completion object
-      var completionType = completion.completion.type;
+      var completionType = completion.type;
       var displayType = displayCompletionType(completionType);
       var value = belhop.complete.apply(completion, input);
       var datum = {
         value: value,
         displayType: displayType,
-        actions: completion.completion.actions
+        actions: completion.actions
       };
       datums.push(datum);
     }
     /* add a datum for each completion */
-    completions.forEach(addDatum);
+    // looks odd but "completion" is a key in the actual completion object
+    completions.completions.forEach(addDatum);
     return datums;
   }
 

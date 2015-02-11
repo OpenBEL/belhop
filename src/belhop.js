@@ -488,8 +488,7 @@
       }
     }
     /* apply each action, mutating input */
-    // looks odd but "completion" is a key in the actual completion object
-    var actions = completion.completion.actions;
+    var actions = completion.actions;
     actions.forEach(actOn);
     return input;
   };
