@@ -354,6 +354,7 @@
    * @name belhop.configuration.test
    *
    * @param {Callback} cb - callback with success and error functions
+   * @tutorial configuration-test
    */
   belhop.configuration.test = function(cb) {
     apiHEAD('', cb);
