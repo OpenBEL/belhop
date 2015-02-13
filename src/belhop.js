@@ -747,95 +747,116 @@
   };
 
   /**
-   * Get evidence by its id.
+   * Get evidence.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
    * @name belhop.evidence.get
    *
-   * @property {string} id - The evidence identifier to get
-   * @param {Callback} cb - callback invoked once complete
+   * @param {?string} id Evidence to get
+   * @param {number} [start=0] Page to start from
+   * @param {number} [size=<em>all</em>] Number to retrieve
+   * @param {Callback} cb
    */
-  belhop.evidence.get = function(id, cb) {
-    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
-    var path = '/evidence/' + id;
-    apiGET(path, cb);
+  belhop.evidence.get = function(id, start, size, cb) {
+    if (_invalid(cb)) { throw new _Ex(_badfcall, arguments, 1); }
+    var path = '/evidence';
+    if (id !== null) path += '/' + id;
+    var options = {
+      accept: _haljson
+    };
+
+    // intercept on success...
+    function success(data, status, request) {
+      // ... dig into evidence, we only want the content.
+      var evidenceArr = data.evidence;
+      cb.success(evidenceArr, status, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, cb.error);
+    apiGET(null, path, _cb, options);
   };
 
   /**
-   * Get evidence.
-   * Invokes the callback functions in the <b>cb</b> parameter.
-   *
-   * @function
-   * @name belhop.evidence.getEvidence
-   *
-   * @param {Evidence} evidence - The evidence to get
-   * @param {Callback} cb - callback invoked once complete
-   */
-  belhop.evidence.getEvidence = function(evidence, cb) {
-    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
-    var id = evidence.id;
-    var path = '/evidence/' + id;
-    apiGET(path, cb);
-  };
-
-  /**
-   * Update evidence by its id.
+   * Update evidence, saving changes.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
    * @name belhop.evidence.update
    *
-   * @param {string} id - The evidence identifier
-   * @param {Evidence} evidence - The evidence to update
-   * @param {Callback} cb - callback invoked once complete
+   * @param {!Evidence} evidence The evidence to update
+   * @param {!Callback} cb
    */
-  belhop.evidence.update = function(id, evidence, cb) {
+  belhop.evidence.update = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    // self: what are we updating (PUT href)
+    var self = belhop.__.self(evidence);
+    var stmt = evidence.bel_statement;
+    var citation = evidence.citation;
+    var ctxt = evidence.biological_context;
+    var summary = evidence.summary_text;
+    var meta = evidence.metadata;
 
+    var update = belhop.factory.evidence(stmt, citation, ctxt, summary, meta);
+    var data = JSON.stringify(update);
+
+    var schemaURL = belhop.configuration.getSchemaURL();
+    var profile = schemaURL + '/evidence.schema.json';
+    var contentType = 'application/json;profile=' + profile;
+    var options = {
+      contentType: contentType
+    };
+    apiPUT(self, null, data, cb, options);
   };
 
   /**
-   * Update evidence.
+   * Reset evidence, reverting unsaved changes.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.updateEvidence
+   * @name belhop.evidence.reset
    *
-   * @param {Evidence} evidence - The evidence to update
-   * @param {Callback} cb - callback invoked once complete
+   * @param {!Evidence} evidence The evidence to reset
+   * @param {!Callback} cb
    */
-  belhop.evidence.updateEvidence = function(evidence, cb) {
+  belhop.evidence.reset = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    // self: what are we getting (GET href)
+    var self = belhop.__.self(evidence);
 
+    // intercept on success and reset evidence prior to cb
+    function success(data, status, request) {
+      var evidenceArr = data.evidence;
+      var freshev = evidenceArr[0];
+      evidence._links = freshev._links;
+      evidence.bel_statement = freshev.bel_statement;
+      evidence.biological_context = freshev.biological_context;
+      evidence.citation = freshev.citation;
+      evidence.metadata = freshev.metadata;
+      cb.success(evidence, status, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, cb.error);
+    var options = {
+      accept: _haljson
+    };
+    apiGET(self, null, _cb, options);
   };
 
   /**
-   * Remove evidence by its id.
+   * Delete evidence.
+   * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.remove
+   * @name belhop.evidence.delete
    *
-   * @property {string} id - The evidence identifier to remove
-   * @param {Callback} cb - callback with success and error functions
+   * @param {!Evidence} evidence The evidence to delete
+   * @param {!Callback} cb
    */
-  belhop.evidence.remove = function(id, cb) {
-    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
-    var path = '/evidence/' + id;
-    apiDELETE(path, cb);
-  };
-
-  /**
-   * Remove evidence.
-   *
-   * @function
-   * @name belhop.evidence.removeEvidence
-   *
-   * @param {Evidence} evidence - Evidence to create or update
-   * @param {Callback} cb - callback with success and error functions
-   */
-  belhop.evidence.removeEvidence = function(evidence, cb) {
-    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
-    var id = evidence.id;
-    belhop.evidence.remove(id, cb);
+  belhop.evidence.delete = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    var self = belhop.__.self(evidence);
+    apiDELETE(self, null, cb);
   };
 
 }.call(this));
