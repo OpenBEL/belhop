@@ -16,11 +16,14 @@ create_node_env || exit 1
 export PATH="$GOSH_CONTRIB_NODE_NPM_MODPATH/node_modules/.bin":$PATH
 
 assert-env-or-die SRC
+assert-env-or-die DOCS
+assert-env-or-die TUTS
 assert-env-or-die DOCS_BUILD
 
 cd "$DIR" || exit 1
 require-cmd-or-die "jsdoc"
-jsdoc --readme docs/readme \
+jsdoc --readme "$DOCS"/readme \
       --destination "$DOCS_BUILD" \
+      --tutorials "$TUTS" \
       "$SRC" \
       --verbose

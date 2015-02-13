@@ -9,6 +9,9 @@
   var root = this;
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
+  var _badfcall = 'invalid function call';
+  var _ufo = 'unidentified object';
+  var _haljson = 'application/hal+json';
 
   function _NO_OP() {}
 
@@ -34,11 +37,70 @@
     return true;
   }
 
-  function _ex(message, args) {
-    return {
-      message: message,
-      args: args
-    };
+  function _Ex(message, args, required) {
+    this.name = 'BELHopException';
+    var msg = message;
+    var cause = null;
+    if (required >= args.length) {
+      msg += ' (bad arity: ';
+      msg += args.length + ' of ' + required + ' given)';
+    }
+    this.message = msg;
+    this.args = args;
+    this.required = required;
+    this.given = args.length;
+  }
+  _Ex.prototype = Object.create(Error.prototype);
+  _Ex.prototype.constructor = _Ex;
+
+  function _hasself(obj) {
+    // the openbel server API uses HAL so...
+    // ... does obj support HAL?
+    var _links = obj._links;
+    if (typeof _links === 'undefined' || _links === null) {
+      // ... nope it's a UFO.
+      return false;
+    }
+    // ... does obj know itself?
+    var self = _links.self;
+    if (typeof self === 'undefined' || self === null) {
+      // ... know thyself... Socrates?
+      return false;
+    }
+    // ... does self href?
+    var href = self.href;
+    if (typeof href === 'undefined' || href === null) {
+      return false;
+    }
+    return true;
+  }
+
+  function _self(apiurl, obj) {
+    var errmsg = '';
+    if (!_hasself(obj)) {
+      throw _Ex(_ufo, arguments, 1);
+    }
+    var self = obj._links.self.href;
+
+    // We're very pedantic about the 'self' of an object to force proper use
+    // of the API with single objects (vice collections, etc.). The self is
+    // broken apart here to make sure it identifies a single object in the API.
+    // root resource?
+    if (self.slice(-1) === '/') {
+      // prevent dereferencing as self
+      errmsg = 'unexpected self: ' + self;
+      throw _Ex(errmsg, arguments, 1);
+    }
+    // 'http://host/api/resource/id' -> '/resource/id'
+    var path = self.replace(apiurl, '');
+    // '/resource/id' -> ['', 'resource', 'id']
+    var tokens = path.split('/');
+    if (tokens.length < 3) {
+      // prevent dereferencing as self
+      errmsg = 'unexpected self: ' + self;
+      throw _Ex(errmsg, arguments, 1);
+    }
+    return self;
   }
 
   // declare globals not recognized by eslint
@@ -59,6 +121,67 @@
   } else {
     root.belhop = belhop;
   }
+
+  /**
+  * BELHop completion type definition.
+  * @name Completion
+  * @typedef {Completion} Completion
+  * @property {array} actions - The completion actions.
+  * @property {string} value - The completion value (the proposal).
+  * @property {string} label - Expanded representation of the value.
+  * @property {string} type - The type of the completion (provided by the API).
+  */
+
+  /**
+   * BELHop callback type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
+   * @name Callback
+   * @typedef {Callback} Callback
+   * @property {function} success - Function called on success. This function
+   * is called with the response data, status string, and original request (in
+   * that order).
+   * @property {function} error - Function called on error. This function
+   * is called with the original request, error string, and exception object
+   * if one occurred (in that order).
+   *
+   * @example
+   * // no-op callback, w/ function arguments for clarity
+   * var cb = {
+   *   success: function(responseData, statusString, request) {},
+   *   error: function(request, errorString, exception) {}
+   * };
+   */
+
+  /**
+   * BELHop evidence type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
+   * @name Evidence
+   * @typedef {Evidence} Evidence
+   * @property {?string} id The evidence identifier (if previously created)
+   * @property {string} bel_statement Represents the biological knowledge
+   * @property {Citation} citation Source of the biological knowledge
+   * @property {object} [biological_context] Where the interaction was observed
+   * @property {string} [summary_text] Abstract from source text
+   * @property {object} [metadata] Additional key-value details
+   * @see belhop.evidence
+   */
+
+   /**
+    * BELHop evidence citation type definition.
+    * These types can be created in {@link belhop.factory the factory}.
+    *
+    * @name Citation
+    * @typedef {Citation} Citation
+    * @property {string} id Identifies the citation
+    * @property {string} type One of the following: PubMed, Book, Journal,
+    * Online Resource, or Other
+    * @property {string} [name] Name of the citation
+    * @property {string} [date] Date of the citation
+    * (in {@link https://en.wikipedia.org/wiki/ISO_8601 ISO 8601 format})
+    * @property {string} [comment] Citation comment
+    */
 
   /**
    * @name DEFAULT_API_URL
@@ -91,17 +214,39 @@
   });
 
   /*
-   * The options hash can handle a queryParams key.
+   * No further options are available.
    */
-  function apiGET(path, cb, options) {
+  function apiHEAD(path, cb) {
     var url = belhop.configuration.getAPIURL();
     // append the path
     path = encodeURI(path);
     url += path;
 
+    var ajaxOptions = {
+      type: 'HEAD',
+      url: url,
+      success: cb.success,
+      error: cb.error
+    };
+    $.ajax(ajaxOptions);
+  }
+
+  /*
+   * The options hash can handle queryParams and accept keys.
+   * (call with url OR path, not both)
+   */
+  function apiGET(url, path, cb, options) {
+    if (url === null) {
+      url = belhop.configuration.getAPIURL();
+      // append the path
+      path = encodeURI(path);
+      url += path;
+    }
+
     // setup the options to our AJAX get
     var defaultOptions = {
-      queryParams: null
+      queryParams: null,
+      accept: null
     };
     var argOptions = $.extend(defaultOptions, options || {});
 
@@ -115,6 +260,10 @@
       success: cb.success,
       error: cb.error
     };
+
+    if (argOptions.accept !== null) {
+      ajaxOptions.headers = { Accept: argOptions.accept };
+    }
     $.ajax(ajaxOptions);
   }
 
@@ -155,12 +304,15 @@
 
   /*
    * The options hash can handle queryParams and contentType keys.
+   * (call with url OR path, not both)
    */
-  function apiPUT(path, data, cb, options) {
-    var url = belhop.configuration.getAPIURL();
-    // append the path
-    path = encodeURI(path);
-    url += path;
+  function apiPUT(url, path, data, cb, options) {
+    if (url === null) {
+      url = belhop.configuration.getAPIURL();
+      // append the path
+      path = encodeURI(path);
+      url += path;
+    }
 
     // setup the options to our AJAX post
     var defaultOptions = {
@@ -189,12 +341,15 @@
   }
 
   /*
+   * (call with url OR path, not both)
    */
-  function apiDELETE(path, cb) {
-    var url = belhop.configuration.getAPIURL();
-    // append the path
-    path = encodeURI(path);
-    url += path;
+  function apiDELETE(url, path, cb) {
+    if (url === null) {
+      url = belhop.configuration.getAPIURL();
+      // append the path
+      path = encodeURI(path);
+      url += path;
+    }
 
     var ajaxOptions = {
       type: 'DELETE',
@@ -204,6 +359,13 @@
     };
     $.ajax(ajaxOptions);
   }
+
+  belhop.__ = {};
+
+  belhop.__.self = function(obj) {
+    var apiurl = belhop.configuration.getAPIURL();
+    return _self(apiurl, obj);
+  };
 
   /**
    * @namespace belhop.configuration
@@ -283,6 +445,19 @@
   };
 
   /**
+   * Verify the library configuration and server availability.
+   *
+   * @function
+   * @name belhop.configuration.test
+   *
+   * @param {Callback} cb
+   * @tutorial configuration-test
+   */
+  belhop.configuration.test = function(cb) {
+    apiHEAD('', cb);
+  };
+
+  /**
    * @namespace belhop.complete
    */
   belhop.complete = {};
@@ -320,59 +495,13 @@
   };
 
   /**
-  * BELHop completion type definition.
-  * @name Completion
-  * @typedef {Completion} Completion
-  * @property {array} actions - The completion actions.
-  * @property {string} value - The completion value (the proposal).
-  * @property {string} label - Expanded representation of the value.
-  * @property {string} type - The type of the completion (provided by the API).
-  */
-
-  /**
-   * BELHop callback type definition.
-   * These types can be created in {@link belhop.factory the factory}.
-   *
-   * @name Callback
-   * @typedef {Callback} Callback
-   * @property {function} success - Function called on success. This function
-   * is called with the response data, status string, and original request (in
-   * that order).
-   * @property {function} error - Function called on error. This function
-   * is called with the original request, error string, and exception object
-   * if one occurred (in that order).
-   *
-   * @example
-   * // no-op callback, w/ function arguments for clarity
-   * var cb = {
-   *   success: function(responseData, statusString, request) {},
-   *   error: function(request, errorString, exception) {}
-   * };
-   */
-
-  /**
-   * BELHop evidence type definition.
-   * These types can be created in {@link belhop.factory the factory}.
-   *
-   * @name Evidence
-   * @typedef {Evidence} Evidence
-   * @property {string} id - The evidence identifier (if previously created)
-   * @property {string} bel_statement - Represents the biological knowledge
-   * @property {object} citation - Source of the biological knowledge
-   * @property {object} biological_context - Details on where the interaction
-   * was observed
-   * @property {string} summary_text - Abstract from source text
-   * @property {object} metadata - Additional details about the evidence
-   * @see belhop.evidence
-   */
-
-  /**
    * @namespace belhop.factory
    */
   belhop.factory = {};
 
   /**
    * Create a callback.
+   * See the {@link Callback type} this factory produces for more.
    *
    * @function
    * @name belhop.factory.callback
@@ -412,6 +541,7 @@
 
   /**
    * Create a callback that treats success as a no-op.
+   * See the {@link Callback type} this factory produces for more.
    *
    * @function
    * @name belhop.factory.callbackNoSuccess
@@ -431,15 +561,16 @@
 
   /**
    * Evidence factory.
+   * See the {@link Evidence type} this factory produces for more.
    *
    * @function
    * @name belhop.factory.evidence
    *
-   * @param {string} stmt - The source/relationship/target string
-   * @param {object} citation - Source of the biological knowledge
-   * @param {object} ctxt - Details on where the interaction was observed
-   * @param {string} summary - Abstract from source text
-   * @param {object} meta - Additional details about the evidence
+   * @param {!string} stmt Soure/Relationship/Target string
+   * @param {!Citation} citation
+   * @param {?object} ctxt
+   * @param {?string} summary
+   * @param {?object} meta
    *
    * @return {Evidence}
    */
@@ -456,6 +587,23 @@
   };
 
   /**
+   * Citation factory.
+   * See the {@link Citation type} this factory produces for more.
+   *
+   * @function
+   * @name belhop.factory.citation
+   *
+   * @param {!string} type
+   * @param {?object} arg2 Argument two
+   * @param {object} [arg3] Argument three
+   *
+   * @return {Citation}
+   */
+  belhop.factory.citation = function() {
+
+  };
+
+  /**
    * Gets completions for the given input and returns the results.
    *
    * @function
@@ -463,7 +611,7 @@
    *
    * @param {string} input - BEL expression to autocomplete.
    * @param {number} caretPosition - optional caret position
-   * @param {Callback} cb - callback with success and error functions
+   * @param {Callback} cb
    *
    * @return {Completion} zero or more completions
    */
@@ -473,7 +621,7 @@
     if (typeof caretPosition !== 'undefined' && caretPosition !== null) {
       options.queryParams = 'caret_position=' + caretPosition;
     }
-    apiGET(path, cb, options);
+    apiGET(null, path, cb, options);
   };
 
   /**
@@ -577,34 +725,15 @@
   belhop.evidence = {};
 
   /**
-   * Create new evidence by its component parts.
+   * Create new evidence.
    *
    * @function
    * @name belhop.evidence.create
    *
-   * @param {string} stmt - The source/relationship/target string
-   * @param {object} citation - Source of the biological knowledge
-   * @param {object} ctxt - Details on where the interaction was observed
-   * @param {string} summary - Abstract from source text
-   * @param {object} meta - Additional details about the evidence
-   * @param {Callback} cb - callback with success and error functions
+   * @param {!Evidence} evidence Evidence to create
+   * @param {!Callback} cb
    */
-  belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
-    var evidence = belhop.factory.evidence(
-      stmt, citation, ctxt, summary, meta);
-    belhop.evidence.createEvidence(evidence, cb);
-  };
-
-  /**
-   * Create new evidence.
-   *
-   * @function
-   * @name belhop.evidence.createEvidence
-   *
-   * @param {Evidence} evidence - Evidence to create or update
-   * @param {Callback} cb - callback with success and error functions
-   */
-  belhop.evidence.createEvidence = function(evidence, cb) {
+  belhop.evidence.create = function(evidence, cb) {
     var path = '/evidence';
     var data = JSON.stringify(evidence);
 
@@ -618,95 +747,116 @@
   };
 
   /**
-   * Get evidence by its id.
+   * Get evidence.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
    * @name belhop.evidence.get
    *
-   * @property {string} id - The evidence identifier to get
-   * @param {Callback} cb - callback invoked once complete
+   * @param {?string} id Evidence to get
+   * @param {number} [start=0] Page to start from
+   * @param {number} [size=<em>all</em>] Number to retrieve
+   * @param {Callback} cb
    */
-  belhop.evidence.get = function(id, cb) {
-    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
-    var path = '/evidence/' + id;
-    apiGET(path, cb);
+  belhop.evidence.get = function(id, start, size, cb) {
+    if (_invalid(cb)) { throw new _Ex(_badfcall, arguments, 1); }
+    var path = '/evidence';
+    if (id !== null) path += '/' + id;
+    var options = {
+      accept: _haljson
+    };
+
+    // intercept on success...
+    function success(data, status, request) {
+      // ... dig into evidence, we only want the content.
+      var evidenceArr = data.evidence;
+      cb.success(evidenceArr, status, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, cb.error);
+    apiGET(null, path, _cb, options);
   };
 
   /**
-   * Get evidence.
-   * Invokes the callback functions in the <b>cb</b> parameter.
-   *
-   * @function
-   * @name belhop.evidence.getEvidence
-   *
-   * @param {Evidence} evidence - The evidence to get
-   * @param {Callback} cb - callback invoked once complete
-   */
-  belhop.evidence.getEvidence = function(evidence, cb) {
-    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
-    var id = evidence.id;
-    var path = '/evidence/' + id;
-    apiGET(path, cb);
-  };
-
-  /**
-   * Update evidence by its id.
+   * Update evidence, saving changes.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
    * @name belhop.evidence.update
    *
-   * @param {string} id - The evidence identifier
-   * @param {Evidence} evidence - The evidence to update
-   * @param {Callback} cb - callback invoked once complete
+   * @param {!Evidence} evidence The evidence to update
+   * @param {!Callback} cb
    */
-  belhop.evidence.update = function(id, evidence, cb) {
+  belhop.evidence.update = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    // self: what are we updating (PUT href)
+    var self = belhop.__.self(evidence);
+    var stmt = evidence.bel_statement;
+    var citation = evidence.citation;
+    var ctxt = evidence.biological_context;
+    var summary = evidence.summary_text;
+    var meta = evidence.metadata;
 
+    var update = belhop.factory.evidence(stmt, citation, ctxt, summary, meta);
+    var data = JSON.stringify(update);
+
+    var schemaURL = belhop.configuration.getSchemaURL();
+    var profile = schemaURL + '/evidence.schema.json';
+    var contentType = 'application/json;profile=' + profile;
+    var options = {
+      contentType: contentType
+    };
+    apiPUT(self, null, data, cb, options);
   };
 
   /**
-   * Update evidence.
+   * Reset evidence, reverting unsaved changes.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.updateEvidence
+   * @name belhop.evidence.reset
    *
-   * @param {Evidence} evidence - The evidence to update
-   * @param {Callback} cb - callback invoked once complete
+   * @param {!Evidence} evidence The evidence to reset
+   * @param {!Callback} cb
    */
-  belhop.evidence.updateEvidence = function(evidence, cb) {
+  belhop.evidence.reset = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    // self: what are we getting (GET href)
+    var self = belhop.__.self(evidence);
 
+    // intercept on success and reset evidence prior to cb
+    function success(data, status, request) {
+      var evidenceArr = data.evidence;
+      var freshev = evidenceArr[0];
+      evidence._links = freshev._links;
+      evidence.bel_statement = freshev.bel_statement;
+      evidence.biological_context = freshev.biological_context;
+      evidence.citation = freshev.citation;
+      evidence.metadata = freshev.metadata;
+      cb.success(evidence, status, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, cb.error);
+    var options = {
+      accept: _haljson
+    };
+    apiGET(self, null, _cb, options);
   };
 
   /**
-   * Remove evidence by its id.
+   * Delete evidence.
+   * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.remove
+   * @name belhop.evidence.delete
    *
-   * @property {string} id - The evidence identifier to remove
-   * @param {Callback} cb - callback with success and error functions
+   * @param {!Evidence} evidence The evidence to delete
+   * @param {!Callback} cb
    */
-  belhop.evidence.remove = function(id, cb) {
-    if (_invalid(id, cb)) { throw _ex('need id, cb', arguments); }
-    var path = '/evidence/' + id;
-    apiDELETE(path, cb);
-  };
-
-  /**
-   * Remove evidence.
-   *
-   * @function
-   * @name belhop.evidence.removeEvidence
-   *
-   * @param {Evidence} evidence - Evidence to create or update
-   * @param {Callback} cb - callback with success and error functions
-   */
-  belhop.evidence.removeEvidence = function(evidence, cb) {
-    if (_invalid(evidence, cb)) { throw _ex('need evidence, cb', arguments); }
-    var id = evidence.id;
-    belhop.evidence.remove(id, cb);
+  belhop.evidence.delete = function(evidence, cb) {
+    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    var self = belhop.__.self(evidence);
+    apiDELETE(self, null, cb);
   };
 
 }.call(this));
