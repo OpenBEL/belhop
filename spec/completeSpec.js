@@ -28,7 +28,6 @@ describe('belhop', function() {
 
       it('that prepend text', function() {
         var completion = {
-          completion: {
             actions: [
               {
                 insert: {
