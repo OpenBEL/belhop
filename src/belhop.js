@@ -159,15 +159,29 @@
    *
    * @name Evidence
    * @typedef {Evidence} Evidence
-   * @property {string} id - The evidence identifier (if previously created)
-   * @property {string} bel_statement - Represents the biological knowledge
-   * @property {object} citation - Source of the biological knowledge
-   * @property {object} biological_context - Details on where the interaction
-   * was observed
-   * @property {string} summary_text - Abstract from source text
-   * @property {object} metadata - Additional details about the evidence
+   * @property {?string} id The evidence identifier (if previously created)
+   * @property {string} bel_statement Represents the biological knowledge
+   * @property {Citation} citation Source of the biological knowledge
+   * @property {object} [biological_context] Where the interaction was observed
+   * @property {string} [summary_text] Abstract from source text
+   * @property {object} [metadata] Additional key-value details
    * @see belhop.evidence
    */
+
+   /**
+    * BELHop evidence citation type definition.
+    * These types can be created in {@link belhop.factory the factory}.
+    *
+    * @name Citation
+    * @typedef {Citation} Citation
+    * @property {string} id Identifies the citation
+    * @property {string} type One of the following: PubMed, Book, Journal,
+    * Online Resource, or Other
+    * @property {string} [name] Name of the citation
+    * @property {string} [date] Date of the citation
+    * (in {@link https://en.wikipedia.org/wiki/ISO_8601 ISO 8601 format})
+    * @property {string} [comment] Citation comment
+    */
 
   /**
    * @name DEFAULT_API_URL
