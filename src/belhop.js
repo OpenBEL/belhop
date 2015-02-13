@@ -450,7 +450,7 @@
    * @function
    * @name belhop.configuration.test
    *
-   * @param {Callback} cb - callback with success and error functions
+   * @param {Callback} cb
    * @tutorial configuration-test
    */
   belhop.configuration.test = function(cb) {
@@ -501,6 +501,7 @@
 
   /**
    * Create a callback.
+   * See the {@link Callback type} this factory produces for more.
    *
    * @function
    * @name belhop.factory.callback
@@ -540,6 +541,7 @@
 
   /**
    * Create a callback that treats success as a no-op.
+   * See the {@link Callback type} this factory produces for more.
    *
    * @function
    * @name belhop.factory.callbackNoSuccess
@@ -559,15 +561,16 @@
 
   /**
    * Evidence factory.
+   * See the {@link Evidence type} this factory produces for more.
    *
    * @function
    * @name belhop.factory.evidence
    *
-   * @param {string} stmt - The source/relationship/target string
-   * @param {object} citation - Source of the biological knowledge
-   * @param {object} ctxt - Details on where the interaction was observed
-   * @param {string} summary - Abstract from source text
-   * @param {object} meta - Additional details about the evidence
+   * @param {!string} stmt Soure/Relationship/Target string
+   * @param {!Citation} citation
+   * @param {?object} ctxt
+   * @param {?string} summary
+   * @param {?object} meta
    *
    * @return {Evidence}
    */
@@ -584,6 +587,23 @@
   };
 
   /**
+   * Citation factory.
+   * See the {@link Citation type} this factory produces for more.
+   *
+   * @function
+   * @name belhop.factory.citation
+   *
+   * @param {!string} type
+   * @param {?object} arg2 Argument two
+   * @param {object} [arg3] Argument three
+   *
+   * @return {Citation}
+   */
+  belhop.factory.citation = function() {
+
+  };
+
+  /**
    * Gets completions for the given input and returns the results.
    *
    * @function
@@ -591,7 +611,7 @@
    *
    * @param {string} input - BEL expression to autocomplete.
    * @param {number} caretPosition - optional caret position
-   * @param {Callback} cb - callback with success and error functions
+   * @param {Callback} cb
    *
    * @return {Completion} zero or more completions
    */
@@ -601,7 +621,7 @@
     if (typeof caretPosition !== 'undefined' && caretPosition !== null) {
       options.queryParams = 'caret_position=' + caretPosition;
     }
-    apiGET(path, cb, options);
+    apiGET(null, path, cb, options);
   };
 
   /**
@@ -705,34 +725,15 @@
   belhop.evidence = {};
 
   /**
-   * Create new evidence by its component parts.
+   * Create new evidence.
    *
    * @function
    * @name belhop.evidence.create
    *
-   * @param {string} stmt - The source/relationship/target string
-   * @param {object} citation - Source of the biological knowledge
-   * @param {object} ctxt - Details on where the interaction was observed
-   * @param {string} summary - Abstract from source text
-   * @param {object} meta - Additional details about the evidence
-   * @param {Callback} cb - callback with success and error functions
+   * @param {!Evidence} evidence Evidence to create
+   * @param {!Callback} cb
    */
-  belhop.evidence.create = function(stmt, citation, ctxt, summary, meta, cb) {
-    var evidence = belhop.factory.evidence(
-      stmt, citation, ctxt, summary, meta);
-    belhop.evidence.createEvidence(evidence, cb);
-  };
-
-  /**
-   * Create new evidence.
-   *
-   * @function
-   * @name belhop.evidence.createEvidence
-   *
-   * @param {Evidence} evidence - Evidence to create or update
-   * @param {Callback} cb - callback with success and error functions
-   */
-  belhop.evidence.createEvidence = function(evidence, cb) {
+  belhop.evidence.create = function(evidence, cb) {
     var path = '/evidence';
     var data = JSON.stringify(evidence);
 
