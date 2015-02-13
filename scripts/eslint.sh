@@ -17,5 +17,5 @@ cd "$DIR" || exit 1
 require-cmd-or-die "eslint"
 assert-env-or-die ESLINT_CFG
 eslint --config "$ESLINT_CFG" \
-       src/belhop.js
+       $(find src spec -name "*.js")
 

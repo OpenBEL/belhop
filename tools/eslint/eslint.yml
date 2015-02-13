@@ -1,5 +1,6 @@
 rules:
     # ERRORS
+    indent: [2, 2]
 
     # WARNINGS
     no-unused-vars: [1]
