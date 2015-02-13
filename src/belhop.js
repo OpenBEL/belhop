@@ -360,6 +360,13 @@
     $.ajax(ajaxOptions);
   }
 
+  belhop.__ = {};
+
+  belhop.__.self = function(obj) {
+    var apiurl = belhop.configuration.getAPIURL();
+    return _self(apiurl, obj);
+  };
+
   /**
    * @namespace belhop.configuration
    */
