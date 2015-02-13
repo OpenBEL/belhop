@@ -1,77 +1,100 @@
 describe('belhop', function() {
 
   var locations = [];
-  var evidenceLocation = null;
+  var evidence = null;
 
-  describe('evidence can be created from', function() {
+  describe('evidence can be', function() {
 
-    beforeEach(function(done) {
+    it('created', function(done) {
       var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(201);
         evidenceLocation = xhr.getResponseHeader('location');
         locations.push(evidenceLocation);
         done();
       };
       var onErr = function(xhr, status) {
-        evidenceLocation = null;
-        console.log('evidence creation failed');
-        console.log(status);
+        expect(xhr.status).toEqual(201);
         done();
       };
       var cb = belhop.factory.callback(onSucc, onErr);
       expect(belhop.evidence.create).toBeDefined();
-      var statement = 'p(belhopEvidence) increases p(createdFromParts)';
+      var statement = 'p(evidence) increases p(canBeCreated)';
       var citation = {type: 'PubMed', name: 'None', id: '10022765'};
       var ctxt = {Species: 9606, Cell: 'fibroblast'};
       var summary = 'Found this on a post-it near a sciency looking person.';
       var meta = {status: 'draft'};
-      belhop.evidence.create(statement, citation, ctxt, summary, meta, cb);
+      var evidence = belhop.factory.evidence(statement, citation, ctxt,
+          summary, meta);
+      belhop.evidence.create(evidence, cb);
     });
 
-    it('parts', function() {
-      expect(evidenceLocation).not.toBeNull();
-    });
-
-    afterEach(function(done) {
-      locations.forEach(function(location) {
-        var id = location.split('/').slice(-1);
-        var success = function() { done(); };
-        var cb = belhop.factory.callbackNoErrors(success);
-        belhop.evidence.remove(id, cb);
-      });
-    });
-
-  });
-
-  describe('evidence can be created from', function() {
-
-    beforeEach(function(done) {
+    it('retrieved', function(done) {
+      expect(locations.length).toEqual(1);
       var onSucc = function(response, status, xhr) {
-        evidenceLocation = xhr.getResponseHeader('location');
-        locations.push(evidenceLocation);
+        expect(xhr.status).toEqual(200);
+        evidence = response[0];
         done();
       };
       var onErr = function(xhr, status) {
-        evidenceLocation = null;
-        console.log('evidence creation failed');
-        console.log(status);
+        expect(xhr.status).toEqual(200);
         done();
       };
       var cb = belhop.factory.callback(onSucc, onErr);
-      expect(belhop.evidence.createEvidence).toBeDefined();
-
-      var statement = 'p(belhopEvidence) increases p(createdFromObjects)';
-      var citation = {type: 'PubMed', name: 'None', id: '10022765'};
-      var ctxt = {Species: 9606, Cell: 'fibroblast'};
-      var summary = 'Found this on a post-it near a sciency looking person.';
-      var meta = {status: 'draft'};
-      var args = [statement, citation, ctxt, summary, meta];
-      var evidence = belhop.factory.evidence(
-        statement, citation, ctxt, summary, meta);
-      belhop.evidence.createEvidence(evidence, cb);
+      expect(belhop.evidence.get).toBeDefined();
+      var tokens = locations[0].split('/');
+      var id = tokens.slice(-1)[0];
+      belhop.evidence.get(id, null, null, cb);
     });
 
-    it('objects', function() {
-      expect(evidenceLocation).not.toBeNull();
+    it('reset', function(done) {
+      expect(evidence).not.toBeNull();
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        expect(evidence.bel_statement).toEqual(oldstmt);
+        done();
+      };
+      var onErr = function(xhr, status) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var oldstmt = evidence.bel_statement;
+      var newstmt = 'a foo that bars';
+      evidence.bel_statement = newstmt;
+      var cb = belhop.factory.callback(onSucc, onErr);
+      expect(belhop.evidence.reset).toBeDefined();
+      belhop.evidence.reset(evidence, cb);
+    });
+
+    it('updated', function(done) {
+      expect(evidence).not.toBeNull();
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(202);
+        done();
+      };
+      var onErr = function(xhr, status) {
+        expect(xhr.status).toEqual(202);
+        done();
+      };
+      var newstmt = 'p(evidence) increases p(canBeUpdated)';
+      evidence.bel_statement = newstmt;
+      var cb = belhop.factory.callback(onSucc, onErr);
+      expect(belhop.evidence.update).toBeDefined();
+      belhop.evidence.update(evidence, cb);
+    });
+
+    it('deleted', function(done) {
+      expect(evidence).not.toBeNull();
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(202);
+        done();
+      };
+      var onErr = function(xhr, status) {
+        expect(xhr.status).toEqual(202);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+      expect(belhop.evidence.delete).toBeDefined();
+      belhop.evidence.delete(evidence, cb);
     });
 
   });
