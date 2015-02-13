@@ -9,6 +9,9 @@
   var root = this;
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
+  var _badfcall = 'invalid function call';
+  var _ufo = 'unidentified object';
+  var _haljson = 'application/hal+json';
 
   function _NO_OP() {}
 
@@ -34,11 +37,70 @@
     return true;
   }
 
-  function _ex(message, args) {
-    return {
-      message: message,
-      args: args
-    };
+  function _Ex(message, args, required) {
+    this.name = 'BELHopException';
+    var msg = message;
+    var cause = null;
+    if (required >= args.length) {
+      msg += ' (bad arity: ';
+      msg += args.length + ' of ' + required + ' given)';
+    }
+    this.message = msg;
+    this.args = args;
+    this.required = required;
+    this.given = args.length;
+  }
+  _Ex.prototype = Object.create(Error.prototype);
+  _Ex.prototype.constructor = _Ex;
+
+  function _hasself(obj) {
+    // the openbel server API uses HAL so...
+    // ... does obj support HAL?
+    var _links = obj._links;
+    if (typeof _links === 'undefined' || _links === null) {
+      // ... nope it's a UFO.
+      return false;
+    }
+    // ... does obj know itself?
+    var self = _links.self;
+    if (typeof self === 'undefined' || self === null) {
+      // ... know thyself... Socrates?
+      return false;
+    }
+    // ... does self href?
+    var href = self.href;
+    if (typeof href === 'undefined' || href === null) {
+      return false;
+    }
+    return true;
+  }
+
+  function _self(apiurl, obj) {
+    var errmsg = '';
+    if (!_hasself(obj)) {
+      throw _Ex(_ufo, arguments, 1);
+    }
+    var self = obj._links.self.href;
+
+    // We're very pedantic about the 'self' of an object to force proper use
+    // of the API with single objects (vice collections, etc.). The self is
+    // broken apart here to make sure it identifies a single object in the API.
+    // root resource?
+    if (self.slice(-1) === '/') {
+      // prevent dereferencing as self
+      errmsg = 'unexpected self: ' + self;
+      throw _Ex(errmsg, arguments, 1);
+    }
+    // 'http://host/api/resource/id' -> '/resource/id'
+    var path = self.replace(apiurl, '');
+    // '/resource/id' -> ['', 'resource', 'id']
+    var tokens = path.split('/');
+    if (tokens.length < 3) {
+      // prevent dereferencing as self
+      errmsg = 'unexpected self: ' + self;
+      throw _Ex(errmsg, arguments, 1);
+    }
+    return self;
   }
 
   // declare globals not recognized by eslint
@@ -156,17 +218,21 @@
   }
 
   /*
-   * The options hash can handle a queryParams key.
+   * The options hash can handle queryParams and accept keys.
+   * (call with url OR path, not both)
    */
-  function apiGET(path, cb, options) {
-    var url = belhop.configuration.getAPIURL();
-    // append the path
-    path = encodeURI(path);
-    url += path;
+  function apiGET(url, path, cb, options) {
+    if (url === null) {
+      url = belhop.configuration.getAPIURL();
+      // append the path
+      path = encodeURI(path);
+      url += path;
+    }
 
     // setup the options to our AJAX get
     var defaultOptions = {
-      queryParams: null
+      queryParams: null,
+      accept: null
     };
     var argOptions = $.extend(defaultOptions, options || {});
 
@@ -180,6 +246,10 @@
       success: cb.success,
       error: cb.error
     };
+
+    if (argOptions.accept !== null) {
+      ajaxOptions.headers = { Accept: argOptions.accept };
+    }
     $.ajax(ajaxOptions);
   }
 
@@ -220,12 +290,15 @@
 
   /*
    * The options hash can handle queryParams and contentType keys.
+   * (call with url OR path, not both)
    */
-  function apiPUT(path, data, cb, options) {
-    var url = belhop.configuration.getAPIURL();
-    // append the path
-    path = encodeURI(path);
-    url += path;
+  function apiPUT(url, path, data, cb, options) {
+    if (url === null) {
+      url = belhop.configuration.getAPIURL();
+      // append the path
+      path = encodeURI(path);
+      url += path;
+    }
 
     // setup the options to our AJAX post
     var defaultOptions = {
@@ -254,12 +327,15 @@
   }
 
   /*
+   * (call with url OR path, not both)
    */
-  function apiDELETE(path, cb) {
-    var url = belhop.configuration.getAPIURL();
-    // append the path
-    path = encodeURI(path);
-    url += path;
+  function apiDELETE(url, path, cb) {
+    if (url === null) {
+      url = belhop.configuration.getAPIURL();
+      // append the path
+      path = encodeURI(path);
+      url += path;
+    }
 
     var ajaxOptions = {
       type: 'DELETE',
