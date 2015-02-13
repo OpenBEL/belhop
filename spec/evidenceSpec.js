@@ -1,3 +1,4 @@
+/* global describe it expect belhop */
 describe('belhop', function() {
 
   var locations = [];

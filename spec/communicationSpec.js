@@ -1,3 +1,4 @@
+/* global describe it expect belhop console */
 describe('belhop', function() {
 
   describe('can', function() {
