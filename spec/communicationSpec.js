@@ -1,5 +1,6 @@
-/* global describe it expect belhop console */
+/* global describe it belhop console $ */
 describe('belhop', function() {
+  'use strict';
 
   describe('can', function() {
 

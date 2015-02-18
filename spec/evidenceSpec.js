@@ -1,5 +1,6 @@
 /* global describe it expect belhop */
 describe('belhop', function() {
+  'use strict';
 
   var locations = [];
   var evidence = null;
@@ -9,11 +10,11 @@ describe('belhop', function() {
     it('created', function(done) {
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(201);
-        evidenceLocation = xhr.getResponseHeader('location');
+        var evidenceLocation = xhr.getResponseHeader('location');
         locations.push(evidenceLocation);
         done();
       };
-      var onErr = function(xhr, status) {
+      var onErr = function(xhr) {
         expect(xhr.status).toEqual(201);
         done();
       };
@@ -24,9 +25,9 @@ describe('belhop', function() {
       var ctxt = {Species: 9606, Cell: 'fibroblast'};
       var summary = 'Found this on a post-it near a sciency looking person.';
       var meta = {status: 'draft'};
-      var evidence = belhop.factory.evidence(statement, citation, ctxt,
-          summary, meta);
-      belhop.evidence.create(evidence, cb);
+      var factory = belhop.factory.evidence;
+      var ev = factory(statement, citation, ctxt, summary, meta);
+      belhop.evidence.create(ev, cb);
     });
 
     it('retrieved', function(done) {
@@ -36,7 +37,7 @@ describe('belhop', function() {
         evidence = response[0];
         done();
       };
-      var onErr = function(xhr, status) {
+      var onErr = function(xhr) {
         expect(xhr.status).toEqual(200);
         done();
       };
@@ -49,16 +50,16 @@ describe('belhop', function() {
 
     it('reset', function(done) {
       expect(evidence).not.toBeNull();
+      var oldstmt = evidence.bel_statement;
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(200);
         expect(evidence.bel_statement).toEqual(oldstmt);
         done();
       };
-      var onErr = function(xhr, status) {
+      var onErr = function(xhr) {
         expect(xhr.status).toEqual(200);
         done();
       };
-      var oldstmt = evidence.bel_statement;
       var newstmt = 'a foo that bars';
       evidence.bel_statement = newstmt;
       var cb = belhop.factory.callback(onSucc, onErr);
@@ -72,7 +73,7 @@ describe('belhop', function() {
         expect(xhr.status).toEqual(202);
         done();
       };
-      var onErr = function(xhr, status) {
+      var onErr = function(xhr) {
         expect(xhr.status).toEqual(202);
         done();
       };
@@ -89,7 +90,7 @@ describe('belhop', function() {
         expect(xhr.status).toEqual(202);
         done();
       };
-      var onErr = function(xhr, status) {
+      var onErr = function(xhr) {
         expect(xhr.status).toEqual(202);
         done();
       };

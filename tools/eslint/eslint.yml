@@ -10,6 +10,9 @@ rules:
     # We use underscores to indicate privata/internal vars
     no-underscore-dangle: 0
 
+    # We support node and use the console
+    no-console: 0
+
     # We allow compact conditionals
     curly: 0
 
