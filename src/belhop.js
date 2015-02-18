@@ -979,15 +979,76 @@
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.delete
+   * @memberof belhop.evidence
    *
    * @param {!Evidence} evidence The evidence to delete
    * @param {!Callback} cb
    */
   belhop.evidence.delete = function(evidence, cb) {
-    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    _assert_args(arguments, 2);
     var self = belhop.__.self(evidence);
     apiDELETE(self, null, cb);
   };
+
+  /**
+   * @namespace belhop.evidence.annotation
+   */
+  belhop.evidence.annotation = {};
+
+  /**
+   * Add {@link NameValueAnnotation} to {@link Evidence evidence}.
+   *
+   * @function
+   * @memberof belhop.evidence.annotation
+   *
+   * @param {!Evidence} evidence The evidence to add to
+   * @param {!NameValueAnnotation} nameValueAnnotation The annotation to add
+   */
+  belhop.evidence.annotation.addNameValue =
+    function(evidence, nameValueAnnotation) {
+      _assert_args(arguments, 2);
+      var ctxt = evidence.biological_context || {};
+      var annotation = ctxt[nameValueAnnotation.name] || [];
+      annotation.push(nameValueAnnotation.value);
+      evidence.biological_context = ctxt;
+    };
+
+  /**
+   * Add {@link AnnotationType} value to {@link Evidence evidence}.
+   *
+   * @function
+   * @memberof belhop.evidence.annotation
+   *
+   * @param {!Evidence} evidence The evidence to add to
+   * @param {!AnnotationType} annotationType The annotation type to add
+   * @param {!string} value The annotation value to add
+   */
+  belhop.evidence.annotation.addType =
+    function(evidence, annotationType, value) {
+      // extract annotation name from type
+      var name = annotationType.prefix;
+      // and defer to name-value function
+      belhop.evidence.annotation.addNameValue(evidence, name, value);
+    };
+
+  /**
+   * Add a {@link AnnotationValue} to {@link Evidence evidence}.
+   *
+   * @function
+   * @memberof belhop.evidence.annotation
+   *
+   * @param {!Evidence} evidence The evidence to add to
+   * @param {!AnnotationValue} annotationValue The annotation to add
+   */
+  belhop.evidence.annotation.addAnnotation =
+    function(evidence, annotationValue) {
+      _assert_args(arguments, 2);
+      // extract name-value from annotation value
+      // FIXME currently can't access prefix on annotation value
+      var name = annotationValue.prefix;
+      var value = annotationValue.identifier;
+      // and defer to name-value function
+      belhop.evidence.annotation.addNameValue(evidence, name, value);
+    };
 
 }.call(this));
