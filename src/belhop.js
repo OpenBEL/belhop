@@ -184,15 +184,48 @@
   /**
    * BELHop annotation type definition.
    *
-   * @name Annotation
-   * @typedef {Annotation} Annotation
+   * These types are controlled by the BEL API and are well-defined definitions
+   * of a reusable class of common annotations. Examples of these types include
+   * species and anatomy.
+   *
+   * @name AnnotationType
+   * @typedef {AnnotationType} AnnotationType
    * @property {string} name The annotation's name
-   * @property {string} prefix The annotation's prefix
+   * @property {string} prefix The annotation's prefix uniquely identifying
+   * this annotation type
    * @property {string} domain The annotation's domain
    * @property {string} rdf_uri The annotation's RDF URI
    * @see belhop.annotations
    */
 
+  /**
+   * BELHop generic name/value annotation type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
+   * Only the form of these types is defined. No constraints are placed on the
+   * name and value properties.
+   *
+   * @name NameValueAnnotation
+   * @typedef {NameValueAnnotation} NameValueAnnotation
+   * @property {string} name The annotation's name
+   * @property {string} value The annotation's value
+   */
+
+  /**
+   * BELHop annotation value definition.
+   *
+   * These types are controlled by the BEL API and are specific values
+   * of a annotation types. An example here is the 9606 taxonomy identifier
+   * found in the "taxon" annotation type.
+   *
+   * @name AnnotationValue
+   * @typedef {AnnotationValue} AnnotationValue
+   * @property {string} identifier The annotation value's identifier
+   * @property {string} name The annotation value's name
+   * @property {string} type The annotation value's type
+   * FIXME - hoping to have prefix here
+   * @property {string} prefix The annotation type's prefix
+   */
 
   /**
    * BELHop evidence type definition.
