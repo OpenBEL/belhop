@@ -10,38 +10,16 @@
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
   var _badfcall = 'invalid function call';
+  var _badcb = 'invalid callback';
   var _ufo = 'unidentified object';
   var _haljson = 'application/hal+json';
 
   function _NO_OP() {}
 
-  function _invalid() {
-    var x, i;
-    for (i = 0; i < arguments.length; i++) {
-      x = arguments[i];
-      if (typeof x === 'undefined' || x === null) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function _valid() {
-    var x, i;
-    for (i = 0; i < arguments.length; i++) {
-      x = arguments[i];
-      if (typeof x === 'undefined' || x === null) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   function _Ex(message, args, required) {
     this.name = 'BELHopException';
     var msg = message;
-    var cause = null;
-    if (required >= args.length) {
+    if (required !== args.length) {
       msg += ' (bad arity: ';
       msg += args.length + ' of ' + required + ' given)';
     }
@@ -52,6 +30,56 @@
   }
   _Ex.prototype = Object.create(Error.prototype);
   _Ex.prototype.constructor = _Ex;
+
+  function _Callback(success, error) {
+    var msg = 'is not a function';
+    if (!success instanceof Function) {
+      msg = 'success ' + msg + '(' + typeof success + ')';
+      throw new Error(msg);
+    }
+    if (!error instanceof Function) {
+      msg = 'error ' + msg + ' (' + typeof success + ')';
+      throw new Error(msg);
+    }
+    this.success = success;
+    this.error = error;
+  }
+
+  function _assert_args(args, required) {
+    //if (_invalid(cb)) throw new _Ex(_badfcall, arguments, 3);
+    var x, i;
+    var msg;
+    for (i = 0; i < required; i++) {
+      x = args[i];
+      if (typeof x === 'undefined' || x === null) {
+        // validate required argument
+        msg = _badfcall;
+        msg += ': argument ' + (i + 1) + ' is required';
+        throw new _Ex(msg, args, required);
+      } else if (x instanceof _Callback) {
+        // validate callback
+        if (typeof x.success === 'undefined') {
+          msg = _badcb;
+          msg += ': undefined success function';
+          throw new _Ex(msg, args, required);
+        } else if (!x.success instanceof Function) {
+          msg = _badcb;
+          msg += ': invalid success function';
+          msg += ' (' + typeof x.success + ')';
+          throw new _Ex(msg, args, required);
+        } else if (typeof x.error === 'undefined') {
+          msg = _badcb;
+          msg += ': undefined error function';
+          throw new _Ex(msg, args, required);
+        } else if (!x.error instanceof Function) {
+          msg = _badcb;
+          msg += ': invalid error function';
+          msg += ' (' + typeof x.error + ')';
+          throw new _Ex(msg, args, required);
+        }
+      }
+    }
+  }
 
   function _hasself(obj) {
     // the openbel server API uses HAL so...
