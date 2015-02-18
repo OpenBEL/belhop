@@ -154,6 +154,19 @@
    */
 
   /**
+   * BELHop annotation type definition.
+   *
+   * @name Annotation
+   * @typedef {Annotation} Annotation
+   * @property {string} name The annotation's name
+   * @property {string} prefix The annotation's prefix
+   * @property {string} domain The annotation's domain
+   * @property {string} rdf_uri The annotation's RDF URI
+   * @see belhop.annotations
+   */
+
+
+  /**
    * BELHop evidence type definition.
    * These types can be created in {@link belhop.factory the factory}.
    *
@@ -603,6 +616,22 @@
   };
 
   /**
+   * @namespace belhop.annotations
+   */
+  belhop.annotations = {};
+
+  /**
+   * Gets annotations.
+   *
+   * @function
+   * @name belhop.annotations.get
+   *
+   * @param {Callback} cb All {@link Annotation annotations}
+   */
+  belhop.annotations.get = function(cb) {
+  };
+
+  /**
    * Gets completions for the given input and returns the results.
    *
    * @function
@@ -610,9 +639,7 @@
    *
    * @param {string} input - BEL expression to autocomplete.
    * @param {number} caretPosition - optional caret position
-   * @param {Callback} cb
-   *
-   * @return {Completion} zero or more completions
+   * @param {Callback} cb Zero or more completions on success
    */
   belhop.complete.getCompletions = function(input, caretPosition, cb) {
     var path = '/expressions/' + input + '/completions';
