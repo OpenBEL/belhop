@@ -450,7 +450,7 @@
    * Get the current API URL.
    *
    * @function
-   * @name belhop.configuration.getAPIURL
+   * @memberof belhop.configuration
    *
    * @example
    * > belhop.configuration.getAPIURL()
@@ -470,7 +470,7 @@
    * Set the API URL.
    *
    * @function
-   * @name belhop.configuration.setAPIURL
+   * @memberof belhop.configuration
    *
    * @param {string} url - The API URL to use
    *
@@ -486,7 +486,7 @@
    * Get the current schema URL.
    *
    * @function
-   * @name belhop.configuration.getSchemaURL
+   * @memberof belhop.configuration
    *
    * @example
    * > belhop.configuration.getSchemaURL()
@@ -506,7 +506,7 @@
    * Set the schema URL.
    *
    * @function
-   * @name belhop.configuration.setSchemaURL
+   * @memberof belhop.configuration
    *
    * @param {string} url - The schema URL to use
    *
@@ -522,7 +522,7 @@
    * Verify the library configuration and server availability.
    *
    * @function
-   * @name belhop.configuration.test
+   * @memberof belhop.configuration
    *
    * @param {Callback} cb
    * @tutorial configuration-test
@@ -541,7 +541,7 @@
    * @namespace belhop.complete
    *
    * @function
-   * @name belhop.complete.apply
+   * @memberof belhop.complete
    *
    * @param {object} completion - BEL API completion object.
    * @param {string} input - BEL expression to autocomplete.
@@ -577,7 +577,7 @@
    * See the {@link Callback type} this factory produces for more.
    *
    * @function
-   * @name belhop.factory.callback
+   * @memberof belhop.factory
    *
    * @param {function} success - Function to call on success
    * @param {function} error - Function to call on error
@@ -587,17 +587,14 @@
    * @see belhop.factory.callbackNoSuccess
    */
   belhop.factory.callback = function(success, error) {
-    return {
-      success: success,
-      error: error
-    };
+    return new _Callback(success, error);
   };
 
   /**
    * Create a callback that treats errors as a no-op.
    *
    * @function
-   * @name belhop.factory.callbackNoErrors
+   * @memberof belhop.factory
    *
    * @param {function} success - Function to call on success
    *
@@ -606,10 +603,7 @@
    * @see belhop.factory.callbackNoSuccess
    */
   belhop.factory.callbackNoErrors = function(success) {
-    return {
-      success: success,
-      error: _NO_OP
-    };
+    return new _Callback(success, _NO_OP);
   };
 
   /**
@@ -617,7 +611,7 @@
    * See the {@link Callback type} this factory produces for more.
    *
    * @function
-   * @name belhop.factory.callbackNoSuccess
+   * @memberof belhop.factory
    *
    * @param {function} error - Function to call on error
    *
@@ -626,10 +620,7 @@
    * @see belhop.factory.callbackNoErrors
    */
   belhop.factory.callbackNoSuccess = function(error) {
-    return {
-      success: _NO_OP,
-      error: error
-    };
+    return new _Callback(_NO_OP, error);
   };
 
   /**
@@ -637,7 +628,7 @@
    * See the {@link Evidence type} this factory produces for more.
    *
    * @function
-   * @name belhop.factory.evidence
+   * @memberof belhop.factory
    *
    * @param {!string} stmt Soure/Relationship/Target string
    * @param {!Citation} citation
@@ -664,7 +655,7 @@
    * See the {@link Citation type} this factory produces for more.
    *
    * @function
-   * @name belhop.factory.citation
+   * @memberof belhop.factory
    *
    * @param {!string} type
    * @param {?object} arg2 Argument two
@@ -677,26 +668,79 @@
   };
 
   /**
+   * @namespace belhop.factory.annotations
+   */
+  belhop.factory.annotations = {};
+
+  /**
+   * Name/Value annotation factory.
+   * See the {@link NameValueAnnotation type} this factory produces for more.
+   *
+   * @function
+   * @memberof belhop.factory.annotations
+   *
+   * @param {!string} name The annotation's name
+   * @param {!string} value The annotation's value
+   *
+   * @return {NameValueAnnotation}
+   */
+  belhop.factory.annotations.nameValue = function(name, value) {
+    return {
+      name: name,
+      value: value
+    };
+  };
+
+  /**
    * @namespace belhop.annotations
    */
   belhop.annotations = {};
 
   /**
-   * Gets annotations.
+   * Get annotation types.
    *
    * @function
-   * @name belhop.annotations.get
+   * @memberof belhop.annotations
    *
-   * @param {Callback} cb All {@link Annotation annotations}
+   * @param {!Callback} cb Zero or more {@link AnnotationType annotation types}
    */
-  belhop.annotations.get = function(cb) {
+  belhop.annotations.getTypes = function(cb) {
+    _assert_args(arguments, 1);
+  };
+
+  /**
+   * Get an annotation type.
+   *
+   * @function
+   * @memberof belhop.annotations
+   *
+   * @param {!string} prefix The annotation type's prefix
+   * @param {!Callback} cb Zero or one {@link AnnotationType annotation type}
+   */
+  belhop.annotations.getType = function(prefix, cb) {
+    _assert_args(arguments, 2);
+  };
+
+  /**
+   * Get an annotation value.
+   *
+   * @function
+   * @memberof belhop.annotations
+   *
+   * @param {!string} prefix The annotation type's prefix
+   * @param {!string} value The annotation type's value
+   * @param {!Callback} cb {@link AnnotationValue} if it
+   * exists, <code>null</code> otherwise
+   */
+  belhop.annotations.getValue = function(prefix, value, cb) {
+    _assert_args(arguments, 3);
   };
 
   /**
    * Gets completions for the given input and returns the results.
    *
    * @function
-   * @name belhop.complete.getCompletions
+   * @memberof belhop.complete
    *
    * @param {string} input - BEL expression to autocomplete.
    * @param {number} caretPosition - optional caret position
@@ -722,7 +766,7 @@
    *
    * @protected
    * @function
-   * @name belhop.complete.actions.delete
+   * @memberof belhop.complete.actions
    *
    * @param {string} str - Input string to operate on.
    * @param {number} startPos - Starting position of the deletion range.
@@ -747,7 +791,7 @@
    *
    * @protected
    * @function
-   * @name belhop.complete.actions.insert
+   * @memberof belhop.complete.actions.insert
    *
    * @param {string} str - Input string to operate on.
    * @param {string} value - String to insert.
@@ -777,7 +821,7 @@
    * Insert the string value at position and return the result.
    *
    * @function
-   * @name belhop.validate.syntax
+   * @memberof belhop.validate
    *
    * @param {string} str - Input string to operate on.
    * @param {string} value - String to insert.
@@ -793,7 +837,7 @@
    * Insert the string value at position and return the result.
    *
    * @function
-   * @name belhop.validate.semantics
+   * @memberof belhop.validate
    *
    * @param {string} str - Input string to operate on.
    * @param {string} value - String to insert.
@@ -815,7 +859,7 @@
    * Create new evidence.
    *
    * @function
-   * @name belhop.evidence.create
+   * @memberof belhop.evidence
    *
    * @param {!Evidence} evidence Evidence to create
    * @param {!Callback} cb
@@ -838,7 +882,7 @@
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.get
+   * @memberof belhop.evidence
    *
    * @param {?string} id Evidence to get
    * @param {number} [start=0] Page to start from
@@ -846,7 +890,7 @@
    * @param {Callback} cb
    */
   belhop.evidence.get = function(id, start, size, cb) {
-    if (_invalid(cb)) { throw new _Ex(_badfcall, arguments, 1); }
+    _assert_args([id, cb], 2);
     var path = '/evidence';
     if (id !== null) path += '/' + id;
     var options = {
@@ -869,13 +913,13 @@
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.update
+   * @memberof belhop.evidence
    *
    * @param {!Evidence} evidence The evidence to update
    * @param {!Callback} cb
    */
   belhop.evidence.update = function(evidence, cb) {
-    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    _assert_args(arguments, 2);
     // self: what are we updating (PUT href)
     var self = belhop.__.self(evidence);
     var stmt = evidence.bel_statement;
@@ -901,13 +945,13 @@
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
    * @function
-   * @name belhop.evidence.reset
+   * @memberof belhop.evidence
    *
    * @param {!Evidence} evidence The evidence to reset
    * @param {!Callback} cb
    */
   belhop.evidence.reset = function(evidence, cb) {
-    if (_invalid(evidence, cb)) { throw _Ex(_badfcall, arguments, 2); }
+    _assert_args(arguments, 2);
     // self: what are we getting (GET href)
     var self = belhop.__.self(evidence);
 
