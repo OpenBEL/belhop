@@ -13,6 +13,7 @@
   var _badcb = 'invalid callback';
   var _ufo = 'unidentified object';
   var _haljson = 'application/hal+json';
+  var _not_found = 'not found';
 
   function _NO_OP() {}
 
@@ -190,11 +191,10 @@
    *
    * @name AnnotationType
    * @typedef {AnnotationType} AnnotationType
-   * @property {string} name The annotation's name
-   * @property {string} prefix The annotation's prefix uniquely identifying
-   * this annotation type
-   * @property {string} domain The annotation's domain
-   * @property {string} rdf_uri The annotation's RDF URI
+   * @property {string} name Name suitable for display
+   * @property {string} prefix Prefix uniquely identifying this type
+   * @property {string} domain The domain of the annotation
+   * @property {string} uri The type's URI
    * @see belhop.annotations
    */
 
@@ -220,11 +220,10 @@
    *
    * @name AnnotationValue
    * @typedef {AnnotationValue} AnnotationValue
-   * @property {string} identifier The annotation value's identifier
-   * @property {string} name The annotation value's name
-   * @property {string} type The annotation value's type
-   * FIXME - hoping to have prefix here
-   * @property {string} prefix The annotation type's prefix
+   * @property {string} identifier Identifies the value within the type
+   * @property {string} name Name suitable for display
+   * @property {string} type The type of the value
+   * @property {string} uri The value's URI
    */
 
   /**
@@ -692,6 +691,52 @@
   };
 
   /**
+   * Annotation type factory.
+   * See the {@link AnnotationType type} this factory produces for more.
+   *
+   * @function
+   * @memberof belhop.factory.annotations
+   *
+   * @param {!string} name The annotation type's name
+   * @param {!string} prefix The annotation type's prefix
+   * @param {!string} domain The annotation type's domain
+   * @param {!string} uri The annotation type's URI
+   *
+   * @return {AnnotationType}
+   */
+  belhop.factory.annotations.type = function(name, prefix, domain, uri) {
+    return {
+      name: name,
+      prefix: prefix,
+      domain: domain,
+      uri: uri
+    };
+  };
+
+  /**
+   * Annotation value factory.
+   * See the {@link AnnotationValue type} this factory produces for more.
+   *
+   * @function
+   * @memberof belhop.factory.annotations
+   *
+   * @param {!string} identifier The annotation value's name
+   * @param {!string} name The annotation value's name
+   * @param {!string} type The annotation value's type
+   * @param {!string} uri The annotation value's URI
+   *
+   * @return {AnnotationType}
+   */
+  belhop.factory.annotations.value = function(identifier, name, type, uri) {
+    return {
+      identifier: identifier,
+      name: name,
+      type: type,
+      uri: uri
+    };
+  };
+
+  /**
    * @namespace belhop.annotations
    */
   belhop.annotations = {};
@@ -706,6 +751,28 @@
    */
   belhop.annotations.getTypes = function(cb) {
     _assert_args(arguments, 1);
+    var path = '/annotations';
+    var options = {
+      accept: _haljson
+    };
+
+    // intercept on success...
+    function success(data, status, request) {
+      // ... dig into annotations, we only want the content.
+      var types = [];
+      data.annotations.forEach(function(x) {
+        var domain = x.domain;
+        var name = x.name;
+        var prefix = x.prefix;
+        var uri = belhop.__.self(x);
+        var type = belhop.factory.annotations.type(name, prefix, domain, uri);
+        types.push(type);
+      });
+      cb.success(types, status, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, cb.error);
+    apiGET(null, path, _cb, options);
   };
 
   /**
@@ -715,10 +782,40 @@
    * @memberof belhop.annotations
    *
    * @param {!string} prefix The annotation type's prefix
-   * @param {!Callback} cb Zero or one {@link AnnotationType annotation type}
+   * @param {!Callback} cb An {@link AnnotationType annotation type} or
+   * <code>null</code> if not found
    */
   belhop.annotations.getType = function(prefix, cb) {
     _assert_args(arguments, 2);
+    var path = '/annotations/' + prefix;
+    var options = {
+      accept: _haljson
+    };
+
+    // intercept on success...
+    function success(data, status, request) {
+      // ... dig into annotations, we only want the content.
+      var x = data.annotations[0];
+      var domain = x.domain;
+      var name = x.name;
+      var prefix = x.prefix;
+      var uri = belhop.__.self(x);
+      var type = belhop.factory.annotations.type(name, prefix, domain, uri);
+      cb.success(type, status, request);
+      return;
+    }
+    // intercept on error...
+    function error(request, error, exception) {
+      // not found? null
+      if (request.status === 404) {
+        cb.success(null, _not_found, request);
+        return;
+      }
+      cb.error(request, error, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, error);
+    apiGET(null, path, _cb, options);
   };
 
   /**
@@ -734,6 +831,35 @@
    */
   belhop.annotations.getValue = function(prefix, value, cb) {
     _assert_args(arguments, 3);
+    var path = '/annotations/' + prefix + '/values/' + value;
+    var options = {
+      accept: _haljson
+    };
+
+    // intercept on success...
+    function success(data, status, request) {
+      // ... dig into annotation_values, we only want the content.
+      var x = data.annotation_values[0];
+      var identifier = x.identifier;
+      var name = x.name;
+      var type = x.type;
+      var uri = belhop.__.self(x);
+      var value = belhop.factory.annotations.value(identifier, name, type, uri);
+      cb.success(value, status, request);
+      return;
+    }
+    // intercept on error...
+    function error(request, error, exception) {
+      // not found? null
+      if (request.status === 404) {
+        cb.success(null, _not_found, request);
+        return;
+      }
+      cb.error(request, error, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, error);
+    apiGET(null, path, _cb, options);
   };
 
   /**
@@ -1044,7 +1170,7 @@
     function(evidence, annotationValue) {
       _assert_args(arguments, 2);
       // extract name-value from annotation value
-      // FIXME currently can't access prefix on annotation value
+      // FIXME use URI
       var name = annotationValue.prefix;
       var value = annotationValue.identifier;
       // and defer to name-value function
