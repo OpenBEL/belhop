@@ -22,7 +22,10 @@ describe('belhop', function() {
       expect(belhop.evidence.create).toBeDefined();
       var statement = 'p(evidence) increases p(canBeCreated)';
       var citation = {type: 'PubMed', name: 'None', id: '10022765'};
-      var ctxt = {Species: 9606, Cell: 'fibroblast'};
+      var ctxt = [
+        {name: 'Species', value: [9606, 10090]},
+        {name: 'Cell', value: ['fibroblast', 'leukocyte']}
+      ];
       var summary = 'Found this on a post-it near a sciency looking person.';
       var meta = {status: 'draft'};
       var factory = belhop.factory.evidence;
