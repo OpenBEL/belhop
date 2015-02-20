@@ -798,20 +798,20 @@
       var x = data.annotations[0];
       var domain = x.domain;
       var name = x.name;
-      var prefix = x.prefix;
+      var xprefix = x.prefix;
       var uri = belhop.__.self(x);
-      var type = belhop.factory.annotations.type(name, prefix, domain, uri);
+      var type = belhop.factory.annotations.type(name, xprefix, domain, uri);
       cb.success(type, status, request);
       return;
     }
     // intercept on error...
-    function error(request, error, exception) {
+    function error(request, errorstr, exception) {
       // not found? null
       if (request.status === 404) {
         cb.success(null, _not_found, request);
         return;
       }
-      cb.error(request, error, request);
+      cb.error(request, errorstr, request);
       return;
     }
     var _cb = belhop.factory.callback(success, error);
@@ -844,18 +844,18 @@
       var name = x.name;
       var type = x.type;
       var uri = belhop.__.self(x);
-      var value = belhop.factory.annotations.value(identifier, name, type, uri);
-      cb.success(value, status, request);
+      var av = belhop.factory.annotations.value(identifier, name, type, uri);
+      cb.success(av, status, request);
       return;
     }
     // intercept on error...
-    function error(request, error, exception) {
+    function error(request, errorstr, exception) {
       // not found? null
       if (request.status === 404) {
         cb.success(null, _not_found, request);
         return;
       }
-      cb.error(request, error, request);
+      cb.error(request, errorstr, request);
       return;
     }
     var _cb = belhop.factory.callback(success, error);

@@ -1,4 +1,4 @@
-/* global describe it expect belhop */
+/* global describe it expect fail belhop */
 describe('belhop', function() {
   'use strict';
 
@@ -52,7 +52,7 @@ describe('belhop', function() {
           expect(annotations).toBeNull();
           done();
         };
-        var onErr = function(xhr) {
+        var onErr = function() {
           fail();
         };
         var cb = belhop.factory.callback(onSucc, onErr);
@@ -87,7 +87,7 @@ describe('belhop', function() {
           expect(annotations).toBeNull();
           done();
         };
-        var onErr = function(xhr) {
+        var onErr = function() {
           fail();
         };
         var cb = belhop.factory.callback(onSucc, onErr);
