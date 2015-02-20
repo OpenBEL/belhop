@@ -639,13 +639,11 @@
    */
   belhop.factory.evidence = function(stmt, citation, ctxt, summary, meta) {
     return {
-      evidence: {
-        bel_statement: stmt,
-        citation: citation,
-        biological_context: ctxt,
-        summary_text: summary,
-        metadata: meta
-      }
+      bel_statement: stmt,
+      citation: citation,
+      biological_context: ctxt,
+      summary_text: summary,
+      metadata: meta
     };
   };
 
@@ -992,6 +990,8 @@
    */
   belhop.evidence.create = function(evidence, cb) {
     var path = '/evidence';
+    // slot evidence into top-level key-value
+    evidence = {evidence: evidence};
     var data = JSON.stringify(evidence);
 
     var schemaURL = belhop.configuration.getSchemaURL();
@@ -1055,6 +1055,8 @@
     var meta = evidence.metadata;
 
     var update = belhop.factory.evidence(stmt, citation, ctxt, summary, meta);
+    // slot evidence into top-level key-value
+    update = {evidence: update};
     var data = JSON.stringify(update);
 
     var schemaURL = belhop.configuration.getSchemaURL();
