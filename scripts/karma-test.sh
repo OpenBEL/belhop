@@ -31,7 +31,7 @@ else
 fi
 
 # always "succeed" when returning on a build server
-if [ ! -z "$CI" ]; then
+if [ ! -z "$CI" -o ! -z "$bamboo_CI" ]; then
     exit 0
 fi
 
