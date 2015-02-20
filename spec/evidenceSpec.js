@@ -3,11 +3,14 @@ describe('belhop', function() {
   'use strict';
 
   var locations = [];
-  var evidence = null;
+  var createdEvidence = null;
+  var retrievedEvidence = null;
+  var expected = null;
+  var actual = null;
 
-  describe('evidence can be', function() {
+  describe('evidence', function() {
 
-    it('created', function(done) {
+    it('can be created', function(done) {
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(201);
         var evidenceLocation = xhr.getResponseHeader('location');
@@ -30,14 +33,15 @@ describe('belhop', function() {
       var meta = {status: 'draft'};
       var factory = belhop.factory.evidence;
       var ev = factory(statement, citation, ctxt, summary, meta);
+      createdEvidence = ev;
       belhop.evidence.create(ev, cb);
     });
 
-    it('retrieved', function(done) {
+    it('can be retrieved', function(done) {
       expect(locations.length).toEqual(1);
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(200);
-        evidence = response[0];
+        retrievedEvidence = response[0];
         done();
       };
       var onErr = function(xhr) {
@@ -51,12 +55,39 @@ describe('belhop', function() {
       belhop.evidence.get(id, null, null, cb);
     });
 
-    it('reset', function(done) {
-      expect(evidence).not.toBeNull();
-      var oldstmt = evidence.bel_statement;
+    it('is equivalent between client and server', function() {
+      expect(createdEvidence).toBeDefined();
+      expect(createdEvidence).not.toBeNull();
+      expect(retrievedEvidence).toBeDefined();
+      expect(retrievedEvidence).not.toBeNull();
+
+      expected = createdEvidence.bel_statement;
+      actual = retrievedEvidence.bel_statement;
+      expect(expected).toEqual(actual);
+
+      expected = createdEvidence.citation;
+      actual = retrievedEvidence.citation;
+      expect(expected).toEqual(actual);
+
+      expected = createdEvidence.biological_context;
+      actual = retrievedEvidence.biological_context;
+      expect(expected).toEqual(actual);
+
+      expected = createdEvidence.metadata;
+      actual = retrievedEvidence.metadata;
+      expect(expected).toEqual(actual);
+
+      expected = createdEvidence.summary_text;
+      actual = retrievedEvidence.summary_text;
+      expect(expected).toEqual(actual);
+    });
+
+    it('can be reset', function(done) {
+      expect(retrievedEvidence).not.toBeNull();
+      var oldstmt = retrievedEvidence.bel_statement;
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(200);
-        expect(evidence.bel_statement).toEqual(oldstmt);
+        expect(retrievedEvidence.bel_statement).toEqual(oldstmt);
         done();
       };
       var onErr = function(xhr) {
@@ -64,14 +95,14 @@ describe('belhop', function() {
         done();
       };
       var newstmt = 'a foo that bars';
-      evidence.bel_statement = newstmt;
+      retrievedEvidence.bel_statement = newstmt;
       var cb = belhop.factory.callback(onSucc, onErr);
       expect(belhop.evidence.reset).toBeDefined();
-      belhop.evidence.reset(evidence, cb);
+      belhop.evidence.reset(retrievedEvidence, cb);
     });
 
-    it('updated', function(done) {
-      expect(evidence).not.toBeNull();
+    it('can be updated', function(done) {
+      expect(retrievedEvidence).not.toBeNull();
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(202);
         done();
@@ -81,14 +112,15 @@ describe('belhop', function() {
         done();
       };
       var newstmt = 'p(evidence) increases p(canBeUpdated)';
-      evidence.bel_statement = newstmt;
+      retrievedEvidence.bel_statement = newstmt;
       var cb = belhop.factory.callback(onSucc, onErr);
       expect(belhop.evidence.update).toBeDefined();
-      belhop.evidence.update(evidence, cb);
+      belhop.evidence.update(retrievedEvidence, cb);
     });
 
-    it('deleted', function(done) {
-      expect(evidence).not.toBeNull();
+    it('can be deleted', function(done) {
+      expect(retrievedEvidence).toBeDefined();
+      expect(retrievedEvidence).not.toBeNull();
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(202);
         done();
@@ -99,7 +131,8 @@ describe('belhop', function() {
       };
       var cb = belhop.factory.callback(onSucc, onErr);
       expect(belhop.evidence.delete).toBeDefined();
-      belhop.evidence.delete(evidence, cb);
+      belhop.evidence.delete(retrievedEvidence, cb);
+
     });
 
   });
