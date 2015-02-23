@@ -64,13 +64,10 @@ describe('belhop', function() {
     describe('values', function() {
 
       it('can be retrieved', function(done) {
-        expect(belhop.annotations.getTypes).toBeDefined();
-        var onSucc = function(annotations, status, xhr) {
+        expect(belhop.annotations.getValue).toBeDefined();
+        var onSucc = function(annotationValue, status, xhr) {
           expect(xhr.status).toEqual(200);
-          expect(annotations.length).toBeGreaterThan(0);
-          annotations.forEach(function(x) {
-            types.push(x);
-          });
+          expect(annotationValue).not.toBeNull();
           done();
         };
         var onErr = function(xhr) {
@@ -78,7 +75,7 @@ describe('belhop', function() {
           done();
         };
         var cb = belhop.factory.callback(onSucc, onErr);
-        belhop.annotations.getTypes(cb);
+        belhop.annotations.getValue('taxon', '9606', cb);
       });
 
       it('can be retrieved even when not found', function(done) {
