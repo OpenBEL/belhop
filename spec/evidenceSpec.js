@@ -7,13 +7,14 @@ describe('belhop', function() {
   var retrievedEvidence = null;
   var expected = null;
   var actual = null;
+  var factory = null;
 
   describe('evidence', function() {
 
     it('can be created minimally', function() {
       var citation = belhop.factory.citation(10022765, 'PubMed');
       var statement = 'p(evidenceCreated) increases p(Minimally)';
-      var factory = belhop.factory.evidence;
+      factory = belhop.factory.evidence;
       var ev = factory(statement, citation);
       expect(ev.bel_statement).toEqual(statement);
       expect(ev.citation).toEqual(citation);
@@ -40,7 +41,7 @@ describe('belhop', function() {
       ];
       var summary = 'Found this on a post-it near a sciency looking person.';
       var meta = {status: 'draft'};
-      var factory = belhop.factory.evidence;
+      factory = belhop.factory.evidence;
       var ev = factory(statement, citation, ctxt, summary, meta);
       createdEvidence = ev;
       belhop.evidence.create(ev, cb);
@@ -141,6 +142,70 @@ describe('belhop', function() {
       var cb = belhop.factory.callback(onSucc, onErr);
       expect(belhop.evidence.delete).toBeDefined();
       belhop.evidence.delete(retrievedEvidence, cb);
+    });
+
+    describe('annotations', function() {
+
+      it('can be added by name/value', function() {
+        var statement = 'p(annos) increases p(canBeAddedNV)';
+        var citation = {type: 'PubMed', name: 'None', id: '10022765'};
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation);
+
+        expect(belhop.evidence.annotation.addNameValue).toBeDefined();
+        var add = belhop.evidence.annotation.addNameValue;
+
+        expect(belhop.factory.annotations.nameValue).toBeDefined();
+        factory = belhop.factory.annotations.nameValue;
+
+        add(ev, factory('THE_NAME', 'THE_VALUE'));
+        expect(ev.biological_context).toBeDefined();
+        var ctxt = ev.biological_context;
+        expect(ctxt.length).toEqual(1);
+        expect(ctxt[0].name).toEqual('THE_NAME');
+        expect(ctxt[0].value).toEqual('THE_VALUE');
+      });
+
+      it('can be added by type', function() {
+        var statement = 'p(annos) increases p(canBeAddedNV)';
+        var citation = {type: 'PubMed', name: 'None', id: '10022765'};
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation);
+
+        expect(belhop.evidence.annotation.addType).toBeDefined();
+        var add = belhop.evidence.annotation.addType;
+
+        expect(belhop.factory.annotations.type).toBeDefined();
+        factory = belhop.factory.annotations.type;
+
+        var type = factory('NAME', 'PREFIX', 'DOMAIN', 'URI');
+        add(ev, type, 'THE_VALUE');
+        expect(ev.biological_context).toBeDefined();
+        var ctxt = ev.biological_context;
+        expect(ctxt.length).toEqual(1);
+        expect(ctxt[0].name).toEqual('PREFIX');
+        expect(ctxt[0].value).toEqual('THE_VALUE');
+      });
+
+      it('can be added by value', function() {
+        var statement = 'p(annos) increases p(canBeAddedNV)';
+        var citation = {type: 'PubMed', name: 'None', id: '10022765'};
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation);
+
+        expect(belhop.evidence.annotation.addAnnotation).toBeDefined();
+        var add = belhop.evidence.annotation.addAnnotation;
+
+        expect(belhop.factory.annotations.type).toBeDefined();
+        factory = belhop.factory.annotations.value;
+
+        var value = factory('IDENTIFIER', 'NAME', 'TYPE', 'URI');
+        add(ev, value);
+        expect(ev.biological_context).toBeDefined();
+        var ctxt = ev.biological_context;
+        expect(ctxt.length).toEqual(1);
+        expect(ctxt[0]).toEqual('URI');
+      });
 
     });
 
