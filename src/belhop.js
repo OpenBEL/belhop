@@ -46,20 +46,62 @@
     this.error = error;
   }
 
+  function _nonnull(x) {
+    if (x !== null) {
+      return true;
+    }
+    return false;
+  }
+
+  function _null(x) {
+    if (x === null) {
+      return true;
+    }
+    return false;
+  }
+
+  function _def(x) {
+    if (x === 'undefined' || typeof x === 'undefined') {
+      return false;
+    }
+    return true;
+  }
+
+  function _undef(x) {
+    if (x === 'undefined' || typeof x === 'undefined') {
+      return true;
+    }
+    return false;
+  }
+
+  function _defNonNull(x) {
+    if (_def(x) && _nonnull(x)) {
+      return true;
+    }
+    return false;
+  }
+
+  function _undefOrNull(x) {
+    if (_undef(x) || _null(x)) {
+      return true;
+    }
+    return false;
+  }
+
   function _assert_args(args, required) {
     //if (_invalid(cb)) throw new _Ex(_badfcall, arguments, 3);
     var x, i;
     var msg;
     for (i = 0; i < required; i++) {
       x = args[i];
-      if (typeof x === 'undefined' || x === null) {
+      if (_undef(typeof x) || _null(x)) {
         // validate required argument
         msg = _badfcall;
         msg += ': argument ' + (i + 1) + ' is required';
         throw new _Ex(msg, args, required);
       } else if (x instanceof _Callback) {
         // validate callback
-        if (typeof x.success === 'undefined') {
+        if (_undef(typeof x.success)) {
           msg = _badcb;
           msg += ': undefined success function';
           throw new _Ex(msg, args, required);
@@ -68,7 +110,7 @@
           msg += ': invalid success function';
           msg += ' (' + typeof x.success + ')';
           throw new _Ex(msg, args, required);
-        } else if (typeof x.error === 'undefined') {
+        } else if (_undef(typeof x.error)) {
           msg = _badcb;
           msg += ': undefined error function';
           throw new _Ex(msg, args, required);
@@ -86,19 +128,19 @@
     // the openbel server API uses HAL so...
     // ... does obj support HAL?
     var _links = obj._links;
-    if (typeof _links === 'undefined' || _links === null) {
+    if (_undefOrNull(_links)) {
       // ... nope it's a UFO.
       return false;
     }
     // ... does obj know itself?
     var self = _links.self;
-    if (typeof self === 'undefined' || self === null) {
+    if (_undefOrNull(self)) {
       // ... know thyself... Socrates?
       return false;
     }
     // ... does self href?
     var href = self.href;
-    if (typeof href === 'undefined' || href === null) {
+    if (_undefOrNull(href)) {
       return false;
     }
     return true;
@@ -247,12 +289,13 @@
     *
     * @name Citation
     * @typedef {Citation} Citation
-    * @property {string} id Identifies the citation
+    * @property {(string|number)} id Identifies the citation
     * @property {string} type One of the following: PubMed, Book, Journal,
     * Online Resource, or Other
     * @property {string} [name] Name of the citation
     * @property {string} [date] Date of the citation
     * (in {@link https://en.wikipedia.org/wiki/ISO_8601 ISO 8601 format})
+    * @property {string[]} [authors] Authors of the citation
     * @property {string} [comment] Citation comment
     */
 
@@ -459,7 +502,7 @@
    */
   belhop.configuration.getAPIURL = function() {
     var url = belhop.currentAPIURL;
-    if (typeof url === 'undefined' || url === null) {
+    if (_undefOrNull(url)) {
       return belhop.DEFAULT_API_URL;
     }
     return belhop.currentAPIURL;
@@ -495,7 +538,7 @@
    */
   belhop.configuration.getSchemaURL = function() {
     var url = belhop.currentSchemaURL;
-    if (typeof url === 'undefined' || url === null) {
+    if (_undefOrNull(url)) {
       return belhop.DEFAULT_SCHEMA_URL;
     }
     return belhop.currentSchemaURL;
@@ -629,22 +672,30 @@
    * @function
    * @memberof belhop.factory
    *
-   * @param {!string} stmt Soure/Relationship/Target string
-   * @param {!Citation} citation
-   * @param {?object} ctxt
-   * @param {?string} summary
-   * @param {?object} meta
+   * @param {!string} stmt <i>Refer to the factory type</i>
+   * @param {!Citation} citation <i>Refer to the factory type</i>
+   * @param {?object} [ctxt] <i>Refer to the factory type</i>
+   * @param {?string} [summary] <i>Refer to the factory type</i>
+   * @param {?object} [meta] <i>Refer to the factory type</i>
    *
    * @return {Evidence}
    */
   belhop.factory.evidence = function(stmt, citation, ctxt, summary, meta) {
-    return {
+    _assert_args(arguments, 2);
+    var evidence = {
       bel_statement: stmt,
-      citation: citation,
-      biological_context: ctxt,
-      summary_text: summary,
-      metadata: meta
+      citation: citation
     };
+    if (_def(typeof ctxt) && _nonnull(ctxt)) {
+      evidence.biological_context = ctxt;
+    }
+    if (_def(typeof summary) && _nonnull(summary)) {
+      evidence.summary_text = summary;
+    }
+    if (_def(typeof meta) && _nonnull(meta)) {
+      evidence.metadata = meta;
+    }
+    return evidence;
   };
 
   /**
@@ -654,14 +705,34 @@
    * @function
    * @memberof belhop.factory
    *
-   * @param {!string} type
-   * @param {?object} arg2 Argument two
-   * @param {object} [arg3] Argument three
+   * @param {!(string|number)} id <i>Refer to the factory type</i>
+   * @param {!string} type <i>Refer to the factory type</i>
+   * @param {?string} [name] <i>Refer to the factory type</i>
+   * @param {?string} [date] <i>Refer to the factory type</i>
+   * @param {?string[]} [authors] <i>Refer to the factory type</i>
+   * @param {?string} [comment] <i>Refer to the factory type</i>
    *
    * @return {Citation}
    */
-  belhop.factory.citation = function() {
-
+  belhop.factory.citation = function(id, type, name, date, authors, comment) {
+    _assert_args(arguments, 2);
+    var citation = {
+      id: id,
+      type: type
+    };
+    if (_def(typeof name) && _nonnull(name)) {
+      citation.name = name;
+    }
+    if (_def(typeof date) && _nonnull(date)) {
+      citation.date = date;
+    }
+    if (_def(typeof authors) && _nonnull(authors)) {
+      citation.authors = authors;
+    }
+    if (_def(typeof comment) && _nonnull(comment)) {
+      citation.comment = comment;
+    }
+    return citation;
   };
 
   /**
@@ -676,8 +747,8 @@
    * @function
    * @memberof belhop.factory.annotations
    *
-   * @param {!string} name The annotation's name
-   * @param {!string} value The annotation's value
+   * @param {!string} name <i>Refer to the factory type</i>
+   * @param {!string} value <i>Refer to the factory type</i>
    *
    * @return {NameValueAnnotation}
    */
@@ -695,10 +766,10 @@
    * @function
    * @memberof belhop.factory.annotations
    *
-   * @param {!string} name The annotation type's name
-   * @param {!string} prefix The annotation type's prefix
-   * @param {!string} domain The annotation type's domain
-   * @param {!string} uri The annotation type's URI
+   * @param {!string} name <i>Refer to the factory type</i>
+   * @param {!string} prefix <i>Refer to the factory type</i>
+   * @param {!string} domain <i>Refer to the factory type</i>
+   * @param {!string} uri <i>Refer to the factory type</i>
    *
    * @return {AnnotationType}
    */
@@ -718,12 +789,12 @@
    * @function
    * @memberof belhop.factory.annotations
    *
-   * @param {!string} identifier The annotation value's name
-   * @param {!string} name The annotation value's name
-   * @param {!string} type The annotation value's type
-   * @param {!string} uri The annotation value's URI
+   * @param {!string} identifier <i>Refer to the factory type</i>
+   * @param {!string} name <i>Refer to the factory type</i>
+   * @param {!string} type <i>Refer to the factory type</i>
+   * @param {!string} uri <i>Refer to the factory type</i>
    *
-   * @return {AnnotationType}
+   * @return {AnnotationValue}
    */
   belhop.factory.annotations.value = function(identifier, name, type, uri) {
     return {
@@ -873,7 +944,7 @@
   belhop.complete.getCompletions = function(input, caretPosition, cb) {
     var path = '/expressions/' + input + '/completions';
     var options = {};
-    if (typeof caretPosition !== 'undefined' && caretPosition !== null) {
+    if (_def(typeof caretPosition) && _nonnull(caretPosition)) {
       options.queryParams = 'caret_position=' + caretPosition;
     }
     apiGET(null, path, cb, options);
@@ -1120,6 +1191,7 @@
 
   /**
    * @namespace belhop.evidence.annotation
+   * @tutorial working-with-annotations
    */
   belhop.evidence.annotation = {};
 
@@ -1131,6 +1203,7 @@
    *
    * @param {!Evidence} evidence The evidence to add to
    * @param {!NameValueAnnotation} nameValueAnnotation The annotation to add
+   * @tutorial working-with-annotations
    */
   belhop.evidence.annotation.addNameValue =
     function(evidence, nameValueAnnotation) {
@@ -1150,6 +1223,7 @@
    * @param {!Evidence} evidence The evidence to add to
    * @param {!AnnotationType} annotationType The annotation type to add
    * @param {!string} value The annotation value to add
+   * @tutorial working-with-annotations
    */
   belhop.evidence.annotation.addType =
     function(evidence, annotationType, value) {
@@ -1167,6 +1241,7 @@
    *
    * @param {!Evidence} evidence The evidence to add to
    * @param {!AnnotationValue} annotationValue The annotation to add
+   * @tutorial working-with-annotations
    */
   belhop.evidence.annotation.addAnnotation =
     function(evidence, annotationValue) {
@@ -1178,5 +1253,24 @@
       // and defer to name-value function
       belhop.evidence.annotation.addNameValue(evidence, name, value);
     };
+
+  /**
+   * @namespace belhop.evidence.citation
+   */
+  belhop.evidence.citation = {};
+
+  /**
+   * Replaces the current {@link Citation} on {@link Evidence evidence}.
+   *
+   * @function
+   * @memberof belhop.evidence.citation
+   *
+   * @param {!Evidence} evidence The evidence to set a citation on
+   * @param {!Citation} citation The citation to set
+   */
+  belhop.evidence.citation.set = function(evidence, citation) {
+    _assert_args(arguments, 2);
+    evidence.citation = citation;
+  };
 
 }.call(this));
