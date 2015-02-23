@@ -51,14 +51,22 @@ belhop.evidence.annotation.addNameValue(evidence, nameValueAnnotation);
 
 ## Add Annotation By Value
 
-This uses the BELHop API to directly add a specific annotation value.
+This uses the backend API to get a specific annotation value by <em>prefix</em>
+and <em>value</em>.
 
 ```javascript
-var identifier = '9606';
-var name = 'Ncbi Taxonomy';
-var type = 'SpeciesAnnotationConcept';
-var uri = 'http://next.belframework.org/api/annotations/ncbi-taxonomy/values/9606';
-var valueAnnotation = belhop.factory.annotations.value(identifier, name, type, uri);
+var annotationValue = null;
+function success(response) {
+    annotationValue = response;
+}
+var cb = belhop.factory.callbackNoErrors(success);
 
-belhop.evidence.annotation.addAnnotation(evidence, valueAnnotation);
+// get the annotation value
+belhop.annotations.getValue('taxon', '9606');
+```
+
+The result is then added to evidence through the BELHop API.
+
+```javascript
+belhop.evidence.annotation.addAnnotation(evidence, annotationValue);
 ```
