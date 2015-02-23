@@ -10,6 +10,15 @@ describe('belhop', function() {
 
   describe('evidence', function() {
 
+    it('can be created minimally', function() {
+      var citation = belhop.factory.citation(10022765, 'PubMed');
+      var statement = 'p(evidenceCreated) increases p(Minimally)';
+      var factory = belhop.factory.evidence;
+      var ev = factory(statement, citation);
+      expect(ev.bel_statement).toEqual(statement);
+      expect(ev.citation).toEqual(citation);
+    });
+
     it('can be created', function(done) {
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(201);
