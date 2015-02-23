@@ -2,6 +2,24 @@
 // Generated on Mon Jan 12 2015 11:54:03 GMT-0500 (EST)
 
 module.exports = function(config) {
+
+  // list of files / patterns to load in the browser
+  var files = [
+    'node_modules/jquery/dist/jquery.min.js',
+    'src/*.js'
+  ];
+
+  var specTargets = process.env.JASMINE_SPEC_TARGETS;
+  if (specTargets !== undefined) {
+    specTargets.split(',').forEach(function(target) {
+      files.push(target);
+    });
+  } else {
+    // default target all spec tests
+    files.push('spec/*.js');
+  }
+
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -12,11 +30,7 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
-    files: [
-      "node_modules/jquery/dist/jquery.min.js",
-      "src/*.js",
-      "spec/**/*Spec.js"
-    ],
+    files: files,
 
     // list of files to exclude
     exclude: [

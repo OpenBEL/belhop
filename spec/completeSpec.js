@@ -1,4 +1,6 @@
+/* global describe it expect beforeEach belhop */
 describe('belhop', function() {
+  'use strict';
 
   it('can complete expressions', function() {
     expect(belhop.complete.apply).toBeDefined();
@@ -8,16 +10,12 @@ describe('belhop', function() {
 
     it('can handle deletion actions', function() {
       var completion = {
-        completion: {
-          actions: [
-            {
-              delete: {
-                start_position: 0,
-                end_position: 2
-              }
-            }
-          ]
-        }
+        actions: [{
+          delete: {
+            start_position: 0,
+            end_position: 2
+          }
+        }]
       };
       var input = 'fooHGNC:AKT1';
       input = belhop.complete.apply(completion, input);
@@ -28,16 +26,12 @@ describe('belhop', function() {
 
       it('that prepend text', function() {
         var completion = {
-          completion: {
-            actions: [
-              {
-                insert: {
-                  value: 'HGNC:',
-                  position: 0
-                }
-              }
-            ]
-          }
+          actions: [{
+            insert: {
+              value: 'HGNC:',
+              position: 0
+            }
+          }]
         };
         var input = 'AKT1';
         input = belhop.complete.apply(completion, input);
@@ -46,16 +40,12 @@ describe('belhop', function() {
 
       it('can insert text in the middle', function() {
         var completion = {
-          completion: {
-            actions: [
-              {
-                insert: {
-                  value: 'NC',
-                  position: 2
-                }
-              }
-            ]
-          }
+          actions: [{
+            insert: {
+              value: 'NC',
+              position: 2
+            }
+          }]
         };
         var input = 'HG:AKT1';
         input = belhop.complete.apply(completion, input);
@@ -64,16 +54,12 @@ describe('belhop', function() {
 
       it('can append text to the end', function() {
         var completion = {
-          completion: {
-            actions: [
-              {
-                insert: {
-                  value: 'AKT1',
-                  position: 5
-                }
-              }
-            ]
-          }
+          actions: [{
+            insert: {
+              value: 'AKT1',
+              position: 5
+            }
+          }]
         };
         var input = 'HGNC:';
         input = belhop.complete.apply(completion, input);
@@ -93,7 +79,7 @@ describe('belhop', function() {
         completions = response.completions;
         done();
       };
-      var onErr = function(arg1, arg2) {
+      var onErr = function() {
         done();
       };
       var cb = belhop.factory.callback(onSucc, onErr);

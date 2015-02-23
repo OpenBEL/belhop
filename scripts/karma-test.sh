@@ -23,8 +23,17 @@ if [ "$TEST_HEADLESS" == "yes" ]; then
     require-cmd-or-die "xvfb-run" || exit 1
     # shellcheck disable=SC2086
     xvfb-run $CMD $CMD_ARGS
+    ec=$?
 else
     # shellcheck disable=SC2086
     $CMD $CMD_ARGS
+    ec=$?
 fi
+
+# always "succeed" when returning on a build server
+if [ ! -z "$CI" -o ! -z "$bamboo_CI" ]; then
+    exit 0
+fi
+
+exit $ec
 

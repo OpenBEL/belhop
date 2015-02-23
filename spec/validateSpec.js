@@ -1,4 +1,6 @@
+/* global describe it expect belhop */
 describe('belhop', function() {
+  'use strict';
 
   describe('validate', function() {
 

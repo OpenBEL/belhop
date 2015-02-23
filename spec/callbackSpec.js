@@ -1,4 +1,6 @@
+/* global describe it expect belhop */
 describe('belhop', function() {
+  'use strict';
 
   describe('callbacks', function() {
 
@@ -46,7 +48,7 @@ describe('belhop', function() {
       expect(cb.success).toBe(success);
       expect(typeof cb.error).toBe('function');
       expect(cb.error()).not.toBeDefined();
-     });
+    });
 
     it('can no-op success', function() {
       function error() { }
@@ -54,7 +56,7 @@ describe('belhop', function() {
       expect(cb.error).toBe(error);
       expect(typeof cb.success).toBe('function');
       expect(cb.success()).not.toBeDefined();
-     });
+    });
 
   });
 
