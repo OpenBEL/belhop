@@ -1208,9 +1208,12 @@
   belhop.evidence.annotation.addNameValue =
     function(evidence, nameValueAnnotation) {
       _assert_args(arguments, 2);
-      var ctxt = evidence.biological_context || {};
-      var annotation = ctxt[nameValueAnnotation.name] || [];
-      annotation.push(nameValueAnnotation.value);
+      var ctxt = evidence.biological_context || [];
+      var annotations = {
+        name: nameValueAnnotation.name,
+        value: nameValueAnnotation.value
+      };
+      ctxt.push(annotation);
       evidence.biological_context = ctxt;
     };
 
