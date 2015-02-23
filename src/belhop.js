@@ -1209,7 +1209,7 @@
     function(evidence, nameValueAnnotation) {
       _assert_args(arguments, 2);
       var ctxt = evidence.biological_context || [];
-      var annotations = {
+      var annotation = {
         name: nameValueAnnotation.name,
         value: nameValueAnnotation.value
       };
@@ -1232,8 +1232,9 @@
     function(evidence, annotationType, value) {
       // extract annotation name from type
       var name = annotationType.prefix;
+      var annotation = belhop.factory.annotations.nameValue(name, value);
       // and defer to name-value function
-      belhop.evidence.annotation.addNameValue(evidence, name, value);
+      belhop.evidence.annotation.addNameValue(evidence, annotation);
     };
 
   /**
@@ -1250,11 +1251,9 @@
     function(evidence, annotationValue) {
       _assert_args(arguments, 2);
       // extract name-value from annotation value
-      // FIXME use URI
-      var name = annotationValue.prefix;
-      var value = annotationValue.identifier;
-      // and defer to name-value function
-      belhop.evidence.annotation.addNameValue(evidence, name, value);
+      var ctxt = evidence.biological_context || [];
+      ctxt.push(annotationValue.uri);
+      evidence.biological_context = ctxt;
     };
 
   /**
