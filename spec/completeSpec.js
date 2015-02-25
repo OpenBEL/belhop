@@ -72,29 +72,20 @@ describe('belhop', function() {
 
   describe('completions', function() {
 
-    var completions;
-
-    beforeEach(function(done) {
+    it('can get completions', function(done) {
       var onSucc = function(response) {
-        completions = response.completions;
+        expect(response.completions).toBeDefined();
+        expect(response.completions.length).toBeGreaterThan(0);
         done();
       };
       var onErr = function() {
         done();
       };
       var cb = belhop.factory.callback(onSucc, onErr);
-      var input = 'p(HGNC:A)';
-      var caretPos = 8;
+      var input = 'p(HGNC:AK)';
+      var caretPos = 9;
       expect(belhop.complete.getCompletions).toBeDefined();
       belhop.complete.getCompletions(input, caretPos, cb);
-    });
-
-    it('can get completions', function(done) {
-      expect(completions.length).toBeDefined();
-      expect(completions.length).toBeGreaterThan(0);
-      expect(completions[0]).toBeDefined();
-      expect(completions[0].actions).toBeDefined();
-      done();
     });
 
   });
