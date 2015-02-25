@@ -120,6 +120,12 @@
           msg += ' (' + typeof x.error + ')';
           throw new _Ex(msg, args, required);
         }
+      } else if (_def(x.__bhValidate)) {
+        // validate internal type
+        var rslt = x.__bhValidate(x);
+        if (!rslt.valid) {
+          throw new _Ex(rslt.msg, args, required);
+        }
       }
     }
   }
