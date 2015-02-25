@@ -476,7 +476,257 @@
     $.ajax(ajaxOptions);
   }
 
-  belhop.__ = {};
+  /**
+   * @class
+   * @name FilterOptions
+   * @memberof belhop.__
+   *
+   * @param {!string} category
+   * @param {!string} name
+   * @param {!string} value
+   *
+   * @property {string} category No further documentation.
+   * @property {string} name No further documentation.
+   * @property {string} value No further documentation.
+   */
+  function FilterOptions(category, name, value) {
+    this.category = category;  // non-null
+    this.name = name;  // non-null
+    this.value = value;  // non-null
+  }
+
+  /**
+   * Internal validation of filter options.
+   *
+   * @protected
+   * @name __bhValidate
+   * @memberof belhop.__.FilterOptions
+   * @instance
+   * @method
+   *
+   * @example
+   * // not valid, missing value
+   * > (new FilterOptions('cat', 'name', null).__bhValidate()).valid
+   * false
+   */
+  FilterOptions.prototype.__bhValidate = function() {
+    var msgs = [];
+    var valid = true;
+    try {
+      if (_null(this.category)) {
+        valid = false;
+        msgs.push('null category');
+      }
+      if (_null(this.name)) {
+        valid = false;
+        msgs.push('null name');
+      }
+      if (_null(this.value)) {
+        valid = false;
+        msgs.push('null value');
+      }
+      return {valid: valid, msg: msgs.join('|')};
+    } catch (e) {
+      return {valid: false, msg: e.toString()};
+    }
+  };
+
+  /**
+   * Translates the filter options to JSON.
+   *
+   * @name toJSON
+   * @memberof belhop.__.FilterOptions
+   * @instance
+   * @method
+   *
+   * @example
+   * > new FilterOptions('cat', 'name', 'val').toJSON()
+   * {"category":"cat","name":"name","value":"val"}
+   */
+  FilterOptions.prototype.toJSON = function() {
+    var json = {
+      category: this.category,
+      name: this.name,
+      value: this.value
+    };
+    return json;
+  };
+
+  /**
+   * Translates the filter options to a query string.
+   *
+   * @name toQueryString
+   * @memberof belhop.__.FilterOptions
+   * @instance
+   * @method
+   *
+   * @example
+   * > new FilterOptions('cat', 'name', 'val').toQueryString()
+   * 'filter={"category":"cat","name":"name","value":"val"}'
+   */
+  FilterOptions.prototype.toQueryString = function() {
+    var qname = 'filter';
+    var qvalue = JSON.stringify(this);
+    var qparam = qname + '=' + qvalue;
+    return qparam;
+  };
+
+  /**
+   * This class defaults category to <code>fts</code> and <code>name</code>
+   * to search.
+   *
+   * @class
+   * @name DefaultFilterOptions
+   * @memberof belhop.__
+   * @augments belhop.__.FilterOptions
+   *
+   * @param {!string} value Search term
+   *
+   * @property {string} value Search term
+   */
+  function DefaultFilterOptions(value) {
+    FilterOptions.call(this);
+    this.category = 'fts';
+    this.name = 'search';
+    this.value = value;
+  }
+  DefaultFilterOptions.prototype = Object.create(FilterOptions.prototype);
+  DefaultFilterOptions.prototype.constructor = FilterOptions;
+
+  /**
+   * @class
+   * @name SearchOptions
+   * @memberof belhop.__
+   *
+   * @param {!string} start Index to start from (for paging)
+   * @param {!string} size Size limit (for paging)
+   * @param {!FilterOptions} filterOptions Filter options
+   *
+   * @property {string} start Index to start from (for paging)
+   * @property {string} size Size limit (for paging)
+   * @property {FilterOptions} filterOptions Filter options
+   */
+  function SearchOptions(start, size, filterOptions) {
+    this.start = start;  // non-null
+    this.size = size;  // non-null
+    this.filterOptions = filterOptions;  // nullable
+  }
+  /**
+   * Internal validation of search options.
+   *
+   * @protected
+   * @name __bhValidate
+   * @memberof belhop.__.SearchOptions
+   * @instance
+   * @method
+   *
+   * @example
+   * // not valid, missing value
+   * > (new SearchOptions(null, 'name', null).__bhValidate()).valid
+   * false
+   */
+  SearchOptions.prototype.__bhValidate = function() {
+    var msgs = [];
+    var valid = true;
+    try {
+      if (_null(this.start)) {
+        valid = false;
+        msgs.push('null start');
+      }
+      if (_null(this.size)) {
+        valid = false;
+        msgs.push('null size');
+      }
+      return {valid: valid, msg: msgs.join('|')};
+    } catch (e) {
+      return {valid: false, msg: e.toString()};
+    }
+  };
+
+  /**
+   * Translates the search options to a query string.
+   *
+   * @name toQueryString
+   * @memberof belhop.__.SearchOptions
+   * @instance
+   * @method
+   *
+   * @example
+   * // start from item 20, get 10 results, no filter
+   * > new SearchOptions('20', '10', null).toQueryString();
+   * 'start=20&size=10'
+   */
+  SearchOptions.prototype.toQueryString = function() {
+    var queryParams = [];
+    var qpstart = ('start=' + this.start);
+    queryParams.push(qpstart);
+    var qpsize = ('size=' + this.size);
+    queryParams.push(qpsize);
+    if (_nonnull(this.filterOptions)) {
+      var qpfilter = this.filterOptions.toQueryString();
+      queryParams.push(qpfilter);
+    }
+    var queryString = queryParams.join('&');
+    return queryString;
+  };
+
+  /**
+   * This class defaults start to <code>'0'</code> and <code>size</code>
+   * to <code>'10'</code>.
+   *
+   * @class
+   * @name DefaultSearchOptions
+   * @memberof belhop.__
+   * @augments belhop.__.SearchOptions
+   *
+   * @param {!string} value Search term
+   *
+   * @property {string} value Search term
+   */
+  function DefaultSearchOptions(value) {
+    SearchOptions.call(this);
+    this.start = '0';
+    this.size = '10';
+    this.filterOptions = new DefaultFilterOptions(value);
+  }
+  DefaultSearchOptions.prototype = Object.create(SearchOptions.prototype);
+  DefaultSearchOptions.prototype.constructor = SearchOptions;
+
+  /**
+   * This class defaults start to <code>'0'</code> and <code>size</code>
+   * to <code>'100'</code>.
+   *
+   * @class
+   * @name EvidenceSearchOptions
+   * @memberof belhop.__
+   * @augments belhop.__.SearchOptions
+   *
+   * @param {!string} value Search term
+   *
+   * @property {string} value Search term
+   */
+  function EvidenceSearchOptions(filterOptions) {
+    SearchOptions.call(this);
+    this.start = '0';
+    this.size = '100';
+    this.filterOptions = filterOptions;
+  }
+  EvidenceSearchOptions.prototype = Object.create(SearchOptions.prototype);
+  EvidenceSearchOptions.prototype.constructor = SearchOptions;
+
+  /**
+   * Internal namespace used by the library. Accessing this API directly
+   * is discouraged.
+   *
+   * @namespace belhop.__
+   */
+  belhop.__ = {
+    FilterOptions: FilterOptions,
+    DefaultFilterOptions: DefaultFilterOptions,
+    SearchOptions: SearchOptions,
+    DefaultSearchOptions: DefaultSearchOptions,
+    EvidenceSearchOptions: EvidenceSearchOptions
+  };
 
   belhop.__.self = function(obj) {
     var apiurl = belhop.configuration.getAPIURL();
@@ -874,7 +1124,7 @@
       return;
     }
     // intercept on error...
-    function error(request, errorstr, exception) {
+    function error(request, errorstr) {
       // not found? null
       if (request.status === 404) {
         cb.success(null, _not_found, request);
@@ -918,7 +1168,7 @@
       return;
     }
     // intercept on error...
-    function error(request, errorstr, exception) {
+    function error(request, errorstr) {
       // not found? null
       if (request.status === 404) {
         cb.success(null, _not_found, request);
