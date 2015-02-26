@@ -4,12 +4,13 @@ This is a library for working with the Biological Expression Language ([BEL](
 http://www.openbel.org)) in JavaScript. The library is open source and
 available on [GitHub](https://github.com/OpenBEL/belhop).
 
-<a href="https://github.com/you">
+<a href="https://github.com/OpenBEL/belhop">
 <img style="position: absolute; top: 0; right: 0; border: 0;"
      src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67"
      alt="Fork me on GitHub"
      data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png">
 </a>
+<img src="http://www-tc.pbs.org/parents/curiousgeorge/program/img/char_doorman.gif">
 
 ## Getting Started
 
@@ -20,7 +21,8 @@ the library can do.
 [behavioral tests](https://github.com/OpenBEL/belhop/tree/next/spec)
 to see how to interact with the library in JavaScript.
 
-**Understand** the [types and globals](global.html) to use it effectively.
+**Understand** the [types](belhop.html) and [globals](global.html) to use it
+effectively. And stay away from [__](belhop.__.html).
 
 ## Builds
 

@@ -91,8 +91,34 @@ describe('belhop', function() {
         belhop.annotations.getValue('BAD_ANNOTYPE_PREFIX', 'BAD_VALUE', cb);
       });
 
-      it('can be searched', function(done) {
-        done();
+      it('can be searched globally', function(done) {
+        var onSucc = function(values, status, xhr) {
+          expect(xhr.status).toEqual(200);
+          expect(values).not.toBeNull();
+          expect(values.length).toBeGreaterThan(0);
+          done();
+        };
+        var onErr = function(xhr) {
+          expect(xhr.status).toEqual(200);
+          done();
+        };
+        var cb = belhop.factory.callback(onSucc, onErr);
+        belhop.annotations.search('9606', cb);
+      });
+
+      it('can be searched in a single annotation', function(done) {
+        var onSucc = function(values, status, xhr) {
+          expect(xhr.status).toEqual(200);
+          expect(values).not.toBeNull();
+          expect(values.length).toBeGreaterThan(0);
+          done();
+        };
+        var onErr = function(xhr) {
+          expect(xhr.status).toEqual(200);
+          done();
+        };
+        var cb = belhop.factory.callback(onSucc, onErr);
+        belhop.annotations.searchByType('taxon', '9606', cb);
       });
 
     });
