@@ -145,7 +145,7 @@
           msg = _badcb;
           msg += ': undefined success function';
           throw new _Ex(msg, args, required);
-        } else if (!x.success instanceof Function) {
+        } else if (!(x.success instanceof Function)) {
           msg = _badcb;
           msg += ': invalid success function';
           msg += ' (' + typeof x.success + ')';
@@ -154,7 +154,7 @@
           msg = _badcb;
           msg += ': undefined error function';
           throw new _Ex(msg, args, required);
-        } else if (!x.error instanceof Function) {
+        } else if (!(x.error instanceof Function)) {
           msg = _badcb;
           msg += ': invalid error function';
           msg += ' (' + typeof x.error + ')';
@@ -163,7 +163,7 @@
       } else if (_def(x.__bhValidate)) {
         // validate internal type
         var rslt = x.__bhValidate(x);
-        if (!rslt.valid) {
+        if (!(rslt.valid)) {
           throw new _Ex(rslt.msg, args, required);
         }
       }
@@ -194,7 +194,7 @@
 
   function _self(apiurl, obj) {
     var errmsg = '';
-    if (!_hasself(obj)) {
+    if (!(_hasself(obj))) {
       throw _Ex(_ufo, arguments, 1);
     }
     var self = obj._links.self.href;
