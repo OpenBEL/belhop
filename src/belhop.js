@@ -1108,15 +1108,179 @@
   };
 
   /**
+   * @protected
+   * @namespace belhop.factory.options
+   */
+  belhop.factory.options = {};
+
+  /**
+   * @namespace belhop.factory.options.filter
+   */
+  belhop.factory.options.filter = {};
+
+  /**
+   * Custom filter options factory.
+   * See the {@link belhop.__.FilterOptions type} this factory produces for
+   * more.
+   *
+   * @memberOf belhop.factory.options.filter
+   * @todo Improve parameter documentation.
+   *
+   * @param {!string} category Category to filter on
+   * @param {!string} name Name to filter on
+   * @param {!string} value Value to filter on
+   *
+   * @return {belhop.__.FilterOptions} the BELHop type produced by this factory
+   */
+  belhop.factory.options.filter.custom = function(category, name, value) {
+    _assert_args(arguments, 3);
+    var filter = new FilterOptions(category, name, value);
+    return filter;
+  };
+
+  /**
+   * Default filter options factory.
+   * See the {@link belhop.__.DefaultFilterOptions type} this factory produces
+   * for more.
+   *
+   * @memberOf belhop.factory.options.filter
+   * @param {!string} value Search term
+   *
+   * @return {belhop.__.DefaultFilterOptions} the BELHop type produced by this
+   * factory
+   */
+  belhop.factory.options.filter.default = function(value) {
+    _assert_args(arguments, 1);
+    var filter = new DefaultFilterOptions(value);
+    return filter;
+  };
+
+  /**
+   * @namespace belhop.factory.options.search
+   */
+  belhop.factory.options.search = {};
+
+  /**
+   * Custom search options factory.
+   * See the {@link belhop.__.SearchOptions type} this factory produces for
+   * more.
+   *
+   * @memberOf belhop.factory.options.search
+   *
+   * @param {!belhop.__.FilterOptions} Filter options
+   * @param {number} [start=0] Page to start from
+   * @param {number} [size=10] Maximum search results
+   *
+   * @return {belhop.__.SearchOptions} the BELHop type produced by this factory
+   * @example
+   * // search for 'foo'
+   * var filterOpts = belhop.factory.options.filter.default('foo');
+   * // paging search results 10 at a time, get the second page
+   * var searchOpts = belhop.factory.options.search.custom(filterOpts, 10, 10);
+   */
+  belhop.factory.options.search.custom = function(filterOptions, start, size) {
+    // only filterOptions is required
+    _assert_args(arguments, 1);
+    // assert first arg are filter options
+    _assert_type(arguments, 0, FilterOptions);
+    var _start;
+    var _size;
+
+    // accept start or default it
+    if (_def(typeof start) && _nonnull(start)) {
+      _assert_num(arguments, 1);
+      _start = start;
+    } else {
+      // default to 0 as per function docs
+      _start = 0;
+    }
+
+    // accept size or default it
+    if (_def(typeof size) & _nonnull(size)) {
+      _assert_num(arguments, 2);
+      _size = size;
+    } else {
+      // default to 10 as per function docs
+      _size = 10;
+    }
+
+    var searchOpts = new SearchOptions(_start, _size, filterOptions);
+    return searchOpts;
+  };
+
+  /**
+   * Default search options factory.
+   * See the {@link belhop.__.DefaultSearchOptions type} this factory produces for
+   * more.
+   *
+   * @memberOf belhop.factory.options.search
+   *
+   * @param {!string} value Search term
+   *
+   * @return {belhop.__.DefaultSearchOptions} the BELHop type produced by this factory
+   * @example
+   * // search for 'foo' using defaults
+   * var opts = belhop.factory.options.search.default('foo');
+   */
+  belhop.factory.options.search.default = function(value) {
+    _assert_args(arguments, 1);
+    var searchOpts = new DefaultSearchOptions(value);
+    return searchOpts;
+  };
+
+  /**
+   * Default evidence search options factory.
+   * See the {@link belhop.__.SearchOptions type} this factory
+   * produces for more.
+   *
+   * @memberOf belhop.factory.options.search
+   *
+   * @param {!belhop.__.FilterOptions} Filter options
+   * @param {number} [start=0] Page to start from
+   * @param {number} [size=100] Maximum search results
+   *
+   * @return {belhop.__.SearchOptions} the BELHop type produced by this factory
+   */
+  belhop.factory.options.search.evidence = function(filterOptions, start, size) {
+    // only filterOptions is required
+    _assert_args(arguments, 1);
+    var _start;
+    var _size;
+
+    // accept start or default it
+    if (_def(typeof start) && _nonnull(start)) {
+      _assert_num(arguments, 1);
+      _start = start;
+    } else {
+      // default to 0 as per function docs
+      _start = 0;
+    }
+
+    // accept size or default it
+    if (_def(typeof size) & _nonnull(size)) {
+      _assert_num(arguments, 2);
+      _size = size;
+    } else {
+      // default to 100 as per function docs
+      _size = 100;
+    }
+
+    var searchOpts = new SearchOptions(filterOptions);
+    return searchOpts;
+  };
+
+  /**
+   * This namespace contains APIs for interacting with annotations.
    * @namespace belhop.annotations
+   *
+   * @summary Interact with annotations.
    */
   belhop.annotations = {};
 
   /**
    * Get annotation types.
    *
-   * @function
-   * @memberof belhop.annotations
+   * @memberOf belhop.annotations
    *
    * @param {!Callback} cb Zero or more {@link AnnotationType annotation types}
    */
