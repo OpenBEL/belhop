@@ -1396,10 +1396,102 @@
   };
 
   /**
+   * Search annotation values of a specific type.
+   *
+   * @memberOf belhop.annotations
+   *
+   * @param {!string} prefix The annotation type's prefix
+   * @param {!string} searchTerm Search term
+   * @param {!Callback} cb Zero or more {@link AnnotationValue}
+   */
+  belhop.annotations.searchByType = function(type, searchTerm, cb) {
+    // type can be an annotation type or string
+    _assert_args(arguments, 3);
+    var searchOpts = new DefaultSearchOptions(searchTerm);
+    // XXX assuming type is string for now
+    var path = '/annotations/' + type + '/values';
+    var options = {};
+    options.queryParams = searchOpts.toQueryString();
+
+    // intercept on success...
+    function success(data, status, request) {
+      var factory = belhop.factory.annotations.value;
+      // ... dig into annotation_values, we only want the content.
+      var values = [];
+      data.annotation_values.forEach(function(x) {
+        var type = x.type;
+        var identifier = x.identifier;
+        var name = x.name;
+        var uri = belhop.__.self(x);
+        var value = factory(identifier, name, type, uri);
+        values.push(value);
+      });
+      cb.success(values, status, request);
+      return;
+    }
+    // intercept on error...
+    function error(request, errorstr) {
+      // not found? []
+      if (request.status === 404) {
+        cb.success([], _not_found, request);
+        return;
+      }
+      cb.error(request, errorstr, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, error);
+    apiGET(null, path, _cb, options);
+  };
+
+  /**
+   * Search across all annotation values.
+   *
+   * @memberOf belhop.annotations
+   *
+   * @param {!string} searchTerm Search term
+   * @param {!Callback} cb Zero or more {@link AnnotationValue}
+   */
+  belhop.annotations.search = function(searchTerm, cb) {
+    _assert_args(arguments, 2);
+    var searchOpts = new DefaultSearchOptions(searchTerm);
+    var path = '/annotations/values';
+    var options = {};
+    options.queryParams = searchOpts.toQueryString();
+
+    // intercept on success...
+    function success(data, status, request) {
+      var factory = belhop.factory.annotations.value;
+      // ... dig into annotation_values, we only want the content.
+      var values = [];
+      data.annotation_values.forEach(function(x) {
+        var type = x.type;
+        var identifier = x.identifier;
+        var name = x.name;
+        var uri = belhop.__.self(x);
+        var value = factory(identifier, name, type, uri);
+        values.push(value);
+      });
+      cb.success(values, status, request);
+      return;
+    }
+    // intercept on error...
+    function error(request, errorstr) {
+      // not found? []
+      if (request.status === 404) {
+        cb.success([], _not_found, request);
+        return;
+      }
+      cb.error(request, errorstr, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, error);
+    apiGET(null, path, _cb, options);
+  };
+
+  /**
    * Gets completions for the given input and returns the results.
    *
-   * @function
-   * @memberof belhop.complete
+   * @memberOf belhop.complete
    *
    * @param {string} input - BEL expression to autocomplete.
    * @param {number} caretPosition - optional caret position
