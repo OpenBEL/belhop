@@ -17,35 +17,6 @@
 
   function _NO_OP() {}
 
-  function _Ex(message, args, required) {
-    this.name = 'BELHopException';
-    var msg = message;
-    if (required !== args.length) {
-      msg += ' (bad arity: ';
-      msg += args.length + ' of ' + required + ' given)';
-    }
-    this.message = msg;
-    this.args = args;
-    this.required = required;
-    this.given = args.length;
-  }
-  _Ex.prototype = Object.create(Error.prototype);
-  _Ex.prototype.constructor = _Ex;
-
-  function _Callback(success, error) {
-    var msg = 'is not a function';
-    if (!success instanceof Function) {
-      msg = 'success ' + msg + '(' + typeof success + ')';
-      throw new Error(msg);
-    }
-    if (!error instanceof Function) {
-      msg = 'error ' + msg + ' (' + typeof success + ')';
-      throw new Error(msg);
-    }
-    this.success = success;
-    this.error = error;
-  }
-
   function _nonnull(x) {
     if (x !== null) {
       return true;
@@ -88,8 +59,77 @@
     return false;
   }
 
+  function _Ex(message, args, required) {
+    this.name = 'BELHopException';
+    var msg = message;
+    if (_def(typeof required) && _nonnull(required)) {
+      if (required !== args.length) {
+        msg += ' (bad arity: ';
+        msg += args.length + ' of ' + required + ' given)';
+      }
+    }
+    this.message = msg;
+    this.args = args;
+    this.required = required;
+    this.given = args.length;
+  }
+  _Ex.prototype = Object.create(Error.prototype);
+  _Ex.prototype.constructor = _Ex;
+
+  function _Callback(success, error) {
+    var msg = 'is not a function';
+    if (!(success instanceof Function)) {
+      msg = 'success ' + msg + '(' + typeof success + ')';
+      throw new Error(msg);
+    }
+    if (!(error instanceof Function)) {
+      msg = 'error ' + msg + ' (' + typeof success + ')';
+      throw new Error(msg);
+    }
+    this.success = success;
+    this.error = error;
+  }
+
+  function _assert_num(args, index) {
+    var x, i;
+    var msg;
+    var arg;
+
+    if (index >= args.length) {
+      msg = _badfcall;
+      msg += ': argument ' + (index + 1) + ' is required';
+      throw new _Ex(msg, args);
+    }
+    arg = args[index];
+    if (typeof arg !== 'number') {
+      msg = _badfcall;
+      msg += ': argument ' + (index + 1) + ' is not a number';
+      throw new _Ex(msg, args);
+    }
+  }
+
+  function _assert_type(args, index, type) {
+    var x, i;
+    var msg;
+    var arg;
+    var argtype;
+
+    if (index >= args.length) {
+      msg = _badfcall;
+      msg += ': argument ' + (index + 1) + ' is required';
+      throw new _Ex(msg, args);
+    }
+    arg = args[index];
+    if (!(arg instanceof type)) {
+      argtype = typeof arg;
+      msg = _badfcall;
+      msg += ': argument ' + (index + 1) + ' is not a valid type';
+      msg += ' (' + argtype + ') for this function';
+      throw new _Ex(msg, args);
+    }
+  }
+
   function _assert_args(args, required) {
-    //if (_invalid(cb)) throw new _Ex(_badfcall, arguments, 3);
     var x, i;
     var msg;
     for (i = 0; i < required; i++) {
