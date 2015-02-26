@@ -23,7 +23,9 @@ assert-env-or-die DOCS_BUILD
 cd "$DIR" || exit 1
 require-cmd-or-die "jsdoc"
 jsdoc --readme "$DOCS"/readme \
+      --template "./tools/jsdoc/template" \
       --destination "$DOCS_BUILD" \
       --tutorials "$TUTS" \
+      --configure "./tools/jsdoc/jsdoc-conf.js" \
       "$SRC" \
       --verbose

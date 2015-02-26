@@ -19,7 +19,7 @@ export GOSH_CONTRIB_PYTHON_VENV="$GJSLINT_ENV"
 create_python_env "python2"
 
 JSDOC_TAGS="function,namespace,default,example,property,name,file,exports,
-version,readonly,tutorial,memberof,instance,method,augments"
+version,readonly,tutorial,memberof,instance,method,augments,todo"
 
 cd "$DIR" || exit 1
 require-cmd-or-die "gjslint"
