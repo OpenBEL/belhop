@@ -91,7 +91,6 @@
   }
 
   function _assert_num(args, index) {
-    var x, i;
     var msg;
     var arg;
 
@@ -109,7 +108,6 @@
   }
 
   function _assert_type(args, index, type) {
-    var x, i;
     var msg;
     var arg;
     var argtype;
@@ -1046,7 +1044,8 @@
 
   /**
    * Name/Value annotation factory.
-   * See the {@link belhop.NameValueAnnotation type} this factory produces for more.
+   * See the {@link belhop.NameValueAnnotation type} this factory produces for
+   * more.
    *
    * @memberOf belhop.factory.annotations
    *
@@ -1210,14 +1209,15 @@
 
   /**
    * Default search options factory.
-   * See the {@link belhop.__.DefaultSearchOptions type} this factory produces for
-   * more.
+   * See the {@link belhop.__.DefaultSearchOptions type} this factory produces
+   * for more.
    *
    * @memberOf belhop.factory.options.search
    *
    * @param {!string} value Search term
    *
-   * @return {belhop.__.DefaultSearchOptions} the BELHop type produced by this factory
+   * @return {belhop.__.DefaultSearchOptions} the BELHop type produced by this
+   * factory
    * @example
    * // search for 'foo' using defaults
    * var opts = belhop.factory.options.search.default('foo');
@@ -1241,7 +1241,8 @@
    *
    * @return {belhop.__.SearchOptions} the BELHop type produced by this factory
    */
-  belhop.factory.options.search.evidence = function(filterOptions, start, size) {
+  belhop.factory.options.search.evidence =
+      function(filterOptions, start, size) {
     // only filterOptions is required
     _assert_args(arguments, 1);
     var _start;
@@ -1265,7 +1266,7 @@
       _size = 100;
     }
 
-    var searchOpts = new SearchOptions(filterOptions);
+    var searchOpts = new SearchOptions(_start, _size, filterOptions);
     return searchOpts;
   };
 
@@ -1419,11 +1420,11 @@
       // ... dig into annotation_values, we only want the content.
       var values = [];
       data.annotation_values.forEach(function(x) {
-        var type = x.type;
+        var avtype = x.type;
         var identifier = x.identifier;
         var name = x.name;
         var uri = belhop.__.self(x);
-        var value = factory(identifier, name, type, uri);
+        var value = factory(identifier, name, avtype, uri);
         values.push(value);
       });
       cb.success(values, status, request);

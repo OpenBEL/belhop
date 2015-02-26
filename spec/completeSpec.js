@@ -1,4 +1,4 @@
-/* global describe it expect beforeEach belhop */
+/* global describe it expect belhop */
 describe('belhop', function() {
   'use strict';
 

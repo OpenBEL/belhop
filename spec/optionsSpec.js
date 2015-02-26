@@ -1,4 +1,4 @@
-/* global describe it expect belhop */
+/* global describe it expect belhop beforeEach */
 describe('belhop', function() {
   'use strict';
 
@@ -37,6 +37,8 @@ describe('belhop', function() {
       expect(filter instanceof belhop.__.DefaultFilterOptions).toEqual(true);
     });
 
+  });
+
   describe('search options', function() {
     var factory;
     var filter;
@@ -70,8 +72,6 @@ describe('belhop', function() {
       search = factory.evidence(filter, 10, 10);
       expect(search instanceof belhop.__.SearchOptions).toEqual(true);
     });
-
-  });
 
   });
 
