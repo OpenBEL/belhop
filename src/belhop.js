@@ -242,6 +242,7 @@
   /**
   * BELHop completion type definition.
   * @name Completion
+  * @memberOf belhop
   * @typedef {Completion} Completion
   * @property {array} actions - The completion actions.
   * @property {string} value - The completion value (the proposal).
@@ -254,6 +255,7 @@
    * These types can be created in {@link belhop.factory the factory}.
    *
    * @name Callback
+   * @memberOf belhop
    * @typedef {Callback} Callback
    * @property {function} success - Function called on success. This function
    * is called with the response data, status string, and original request (in
@@ -278,6 +280,7 @@
    * species and anatomy.
    *
    * @name AnnotationType
+   * @memberOf belhop
    * @typedef {AnnotationType} AnnotationType
    * @property {string} name Name suitable for display
    * @property {string} prefix Prefix uniquely identifying this type
@@ -294,6 +297,7 @@
    * name and value properties.
    *
    * @name NameValueAnnotation
+   * @memberOf belhop
    * @typedef {NameValueAnnotation} NameValueAnnotation
    * @property {string} name The annotation's name
    * @property {string} value The annotation's value
@@ -307,6 +311,7 @@
    * found in the "taxon" annotation type.
    *
    * @name AnnotationValue
+   * @memberOf belhop
    * @typedef {AnnotationValue} AnnotationValue
    * @property {string} identifier Identifies the value within the type
    * @property {string} name Name suitable for display
@@ -319,10 +324,11 @@
    * These types can be created in {@link belhop.factory the factory}.
    *
    * @name Evidence
+   * @memberOf belhop
    * @typedef {Evidence} Evidence
    * @property {?string} id The evidence identifier (if previously created)
    * @property {string} bel_statement Represents the biological knowledge
-   * @property {Citation} citation Source of the biological knowledge
+   * @property {belhop.Citation} citation Source of the biological knowledge
    * @property {object} [biological_context] Where the interaction was observed
    * @property {string} [summary_text] Abstract from source text
    * @property {object} [metadata] Additional key-value details
@@ -334,6 +340,7 @@
     * These types can be created in {@link belhop.factory the factory}.
     *
     * @name Citation
+    * @memberOf belhop
     * @typedef {Citation} Citation
     * @property {(string|number)} id Identifies the citation
     * @property {string} type One of the following: PubMed, Book, Journal,
@@ -523,13 +530,20 @@
   }
 
   /**
+   * <h2>Warning</h2>
+   * The definition of this class can and <strong>will likely change</strong>
+   * over time. Instances of this class <strong>should be treated as</strong>
+   * an <em>opaque type</em>.
+   *
    * @class
    * @name FilterOptions
-   * @memberof belhop.__
+   * @memberOf belhop.__
+   * @summary Internal representation of a BEL API filter.
+   * @protected
    *
-   * @param {!string} category
-   * @param {!string} name
-   * @param {!string} value
+   * @param {!string} category No further documentation.
+   * @param {!string} name No further documentation.
+   * @param {!string} value No further documentation.
    *
    * @property {string} category No further documentation.
    * @property {string} name No further documentation.
@@ -546,7 +560,7 @@
    *
    * @protected
    * @name __bhValidate
-   * @memberof belhop.__.FilterOptions
+   * @memberOf belhop.__.FilterOptions
    * @instance
    * @method
    *
@@ -581,7 +595,7 @@
    * Translates the filter options to JSON.
    *
    * @name toJSON
-   * @memberof belhop.__.FilterOptions
+   * @memberOf belhop.__.FilterOptions
    * @instance
    * @method
    *
@@ -602,7 +616,7 @@
    * Translates the filter options to a query string.
    *
    * @name toQueryString
-   * @memberof belhop.__.FilterOptions
+   * @memberOf belhop.__.FilterOptions
    * @instance
    * @method
    *
@@ -618,13 +632,17 @@
   };
 
   /**
-   * This class defaults category to <code>fts</code> and <code>name</code>
-   * to search.
+   * <h2>Warning</h2>
+   * The definition of this class can and <strong>will likely change</strong>
+   * over time. Instances of this class <strong>should be treated as</strong>
+   * an <em>opaque type</em>.
    *
    * @class
    * @name DefaultFilterOptions
-   * @memberof belhop.__
+   * @memberOf belhop.__
    * @augments belhop.__.FilterOptions
+   * @summary Internal representation of a default BEL API filter.
+   * @protected
    *
    * @param {!string} value Search term
    *
@@ -640,9 +658,16 @@
   DefaultFilterOptions.prototype.constructor = FilterOptions;
 
   /**
+   * <h2>Warning</h2>
+   * The definition of this class can and <strong>will likely change</strong>
+   * over time. Instances of this class <strong>should be treated as</strong>
+   * an <em>opaque type</em>.
+   *
    * @class
    * @name SearchOptions
-   * @memberof belhop.__
+   * @memberOf belhop.__
+   * @summary Internal representation of BEL API search options.
+   * @protected
    *
    * @param {!string} start Index to start from (for paging)
    * @param {!string} size Size limit (for paging)
@@ -662,7 +687,7 @@
    *
    * @protected
    * @name __bhValidate
-   * @memberof belhop.__.SearchOptions
+   * @memberOf belhop.__.SearchOptions
    * @instance
    * @method
    *
@@ -693,7 +718,7 @@
    * Translates the search options to a query string.
    *
    * @name toQueryString
-   * @memberof belhop.__.SearchOptions
+   * @memberOf belhop.__.SearchOptions
    * @instance
    * @method
    *
@@ -717,13 +742,17 @@
   };
 
   /**
-   * This class defaults start to <code>'0'</code> and <code>size</code>
-   * to <code>'10'</code>.
+   * <h2>Warning</h2>
+   * The definition of this class can and <strong>will likely change</strong>
+   * over time. Instances of this class <strong>should be treated as</strong>
+   * an <em>opaque type</em>.
    *
    * @class
    * @name DefaultSearchOptions
-   * @memberof belhop.__
+   * @memberOf belhop.__
    * @augments belhop.__.SearchOptions
+   * @summary Internal representation of default BEL API search options.
+   * @protected
    *
    * @param {!string} value Search term
    *
@@ -739,39 +768,19 @@
   DefaultSearchOptions.prototype.constructor = SearchOptions;
 
   /**
-   * This class defaults start to <code>'0'</code> and <code>size</code>
-   * to <code>'100'</code>.
+   * This namespace is used internally by the library. Accessing this API
+   * directly is discouraged.
    *
-   * @class
-   * @name EvidenceSearchOptions
-   * @memberof belhop.__
-   * @augments belhop.__.SearchOptions
-   *
-   * @param {!string} value Search term
-   *
-   * @property {string} value Search term
-   */
-  function EvidenceSearchOptions(filterOptions) {
-    SearchOptions.call(this);
-    this.start = '0';
-    this.size = '100';
-    this.filterOptions = filterOptions;
-  }
-  EvidenceSearchOptions.prototype = Object.create(SearchOptions.prototype);
-  EvidenceSearchOptions.prototype.constructor = SearchOptions;
-
-  /**
-   * Internal namespace used by the library. Accessing this API directly
-   * is discouraged.
-   *
+   * @protected
    * @namespace belhop.__
+   *
+   * @summary Internal namespace.
    */
   belhop.__ = {
     FilterOptions: FilterOptions,
     DefaultFilterOptions: DefaultFilterOptions,
     SearchOptions: SearchOptions,
-    DefaultSearchOptions: DefaultSearchOptions,
-    EvidenceSearchOptions: EvidenceSearchOptions
+    DefaultSearchOptions: DefaultSearchOptions
   };
 
   belhop.__.self = function(obj) {
@@ -780,15 +789,18 @@
   };
 
   /**
+   * This namespace contains APIs targeting the configuration of the library.
    * @namespace belhop.configuration
+   *
+   * @summary Configure BELHop.
+   * @tutorial configuration-test
    */
   belhop.configuration = {};
 
   /**
    * Get the current API URL.
    *
-   * @function
-   * @memberof belhop.configuration
+   * @memberOf belhop.configuration
    *
    * @example
    * > belhop.configuration.getAPIURL()
@@ -807,8 +819,7 @@
   /**
    * Set the API URL.
    *
-   * @function
-   * @memberof belhop.configuration
+   * @memberOf belhop.configuration
    *
    * @param {string} url - The API URL to use
    *
@@ -823,8 +834,7 @@
   /**
    * Get the current schema URL.
    *
-   * @function
-   * @memberof belhop.configuration
+   * @memberOf belhop.configuration
    *
    * @example
    * > belhop.configuration.getSchemaURL()
@@ -843,8 +853,7 @@
   /**
    * Set the schema URL.
    *
-   * @function
-   * @memberof belhop.configuration
+   * @memberOf belhop.configuration
    *
    * @param {string} url - The schema URL to use
    *
@@ -859,8 +868,7 @@
   /**
    * Verify the library configuration and server availability.
    *
-   * @function
-   * @memberof belhop.configuration
+   * @memberOf belhop.configuration
    *
    * @param {Callback} cb
    * @tutorial configuration-test
@@ -870,16 +878,17 @@
   };
 
   /**
+   * This namespace exposes BEL autocompletion capabilities.
    * @namespace belhop.complete
+   *
+   * @summary Generate and use BEL autocompletions.
    */
   belhop.complete = {};
 
   /**
    * Applies a completion to the input and returns the result.
-   * @namespace belhop.complete
    *
-   * @function
-   * @memberof belhop.complete
+   * @memberOf belhop.complete
    *
    * @param {object} completion - BEL API completion object.
    * @param {string} input - BEL expression to autocomplete.
@@ -906,21 +915,23 @@
   };
 
   /**
+   * This namespace contains functions to create BEL and BELHop types.
    * @namespace belhop.factory
+   *
+   * @summary Create BEL and BELHop types in the factory.
    */
   belhop.factory = {};
 
   /**
    * Create a callback.
-   * See the {@link Callback type} this factory produces for more.
+   * See the {@link belhop.Callback type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory
+   * @memberOf belhop.factory
    *
    * @param {function} success - Function to call on success
    * @param {function} error - Function to call on error
    *
-   * @return {Callback}
+   * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callbackNoErrors
    * @see belhop.factory.callbackNoSuccess
    */
@@ -930,13 +941,13 @@
 
   /**
    * Create a callback that treats errors as a no-op.
+   * See the {@link belhop.Callback type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory
+   * @memberOf belhop.factory
    *
    * @param {function} success - Function to call on success
    *
-   * @return {Callback}
+   * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callback
    * @see belhop.factory.callbackNoSuccess
    */
@@ -946,14 +957,13 @@
 
   /**
    * Create a callback that treats success as a no-op.
-   * See the {@link Callback type} this factory produces for more.
+   * See the {@link belhop.Callback type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory
+   * @memberOf belhop.factory
    *
    * @param {function} error - Function to call on error
    *
-   * @return {Callback}
+   * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callback
    * @see belhop.factory.callbackNoErrors
    */
@@ -963,18 +973,17 @@
 
   /**
    * Evidence factory.
-   * See the {@link Evidence type} this factory produces for more.
+   * See the {@link belhop.Evidence type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory
+   * @memberOf belhop.factory
    *
    * @param {!string} stmt <i>Refer to the factory type</i>
-   * @param {!Citation} citation <i>Refer to the factory type</i>
+   * @param {!belhop.Citation} citation <i>Refer to the factory type</i>
    * @param {?object} [ctxt] <i>Refer to the factory type</i>
    * @param {?string} [summary] <i>Refer to the factory type</i>
    * @param {?object} [meta] <i>Refer to the factory type</i>
    *
-   * @return {Evidence}
+   * @return {belhop.Evidence} the BELHop type produced by this factory
    */
   belhop.factory.evidence = function(stmt, citation, ctxt, summary, meta) {
     _assert_args(arguments, 2);
@@ -996,10 +1005,9 @@
 
   /**
    * Citation factory.
-   * See the {@link Citation type} this factory produces for more.
+   * See the {@link belhop.Citation type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory
+   * @memberOf belhop.factory
    *
    * @param {!(string|number)} id <i>Refer to the factory type</i>
    * @param {!string} type <i>Refer to the factory type</i>
@@ -1008,7 +1016,7 @@
    * @param {?string[]} [authors] <i>Refer to the factory type</i>
    * @param {?string} [comment] <i>Refer to the factory type</i>
    *
-   * @return {Citation}
+   * @return {belhop.Citation} the BELHop type produced by this factory
    */
   belhop.factory.citation = function(id, type, name, date, authors, comment) {
     _assert_args(arguments, 2);
@@ -1038,15 +1046,15 @@
 
   /**
    * Name/Value annotation factory.
-   * See the {@link NameValueAnnotation type} this factory produces for more.
+   * See the {@link belhop.NameValueAnnotation type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory.annotations
+   * @memberOf belhop.factory.annotations
    *
    * @param {!string} name <i>Refer to the factory type</i>
    * @param {!string} value <i>Refer to the factory type</i>
    *
-   * @return {NameValueAnnotation}
+   * @return {belhop.NameValueAnnotation} the BELHop type produced by this
+   * factory
    */
   belhop.factory.annotations.nameValue = function(name, value) {
     return {
@@ -1057,17 +1065,16 @@
 
   /**
    * Annotation type factory.
-   * See the {@link AnnotationType type} this factory produces for more.
+   * See the {@link belhop.AnnotationType type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory.annotations
+   * @memberOf belhop.factory.annotations
    *
    * @param {!string} name <i>Refer to the factory type</i>
    * @param {!string} prefix <i>Refer to the factory type</i>
    * @param {!string} domain <i>Refer to the factory type</i>
    * @param {!string} uri <i>Refer to the factory type</i>
    *
-   * @return {AnnotationType}
+   * @return {belhop.AnnotationType} the BELHop type produced by this factory
    */
   belhop.factory.annotations.type = function(name, prefix, domain, uri) {
     return {
@@ -1080,17 +1087,16 @@
 
   /**
    * Annotation value factory.
-   * See the {@link AnnotationValue type} this factory produces for more.
+   * See the {@link belhop.AnnotationValue type} this factory produces for more.
    *
-   * @function
-   * @memberof belhop.factory.annotations
+   * @memberOf belhop.factory.annotations
    *
    * @param {!string} identifier <i>Refer to the factory type</i>
    * @param {!string} name <i>Refer to the factory type</i>
    * @param {!string} type <i>Refer to the factory type</i>
    * @param {!string} uri <i>Refer to the factory type</i>
    *
-   * @return {AnnotationValue}
+   * @return {belhop.AnnotationValue} the BELHop type produced by this factory
    */
   belhop.factory.annotations.value = function(identifier, name, type, uri) {
     return {
@@ -1143,8 +1149,7 @@
   /**
    * Get an annotation type.
    *
-   * @function
-   * @memberof belhop.annotations
+   * @memberOf belhop.annotations
    *
    * @param {!string} prefix The annotation type's prefix
    * @param {!Callback} cb An {@link AnnotationType annotation type} or
@@ -1186,8 +1191,7 @@
   /**
    * Get an annotation value.
    *
-   * @function
-   * @memberof belhop.annotations
+   * @memberOf belhop.annotations
    *
    * @param {!string} prefix The annotation type's prefix
    * @param {!string} value The annotation type's value
@@ -1246,9 +1250,6 @@
     apiGET(null, path, cb, options);
   };
 
-  /**
-   * @namespace belhop.complete.actions
-   */
   belhop.complete.actions = {};
 
   /**
@@ -1256,8 +1257,7 @@
    * result.
    *
    * @protected
-   * @function
-   * @memberof belhop.complete.actions
+   * @memberOf belhop.complete.actions
    *
    * @param {string} str - Input string to operate on.
    * @param {number} startPos - Starting position of the deletion range.
@@ -1281,8 +1281,7 @@
    * Insert the string value at position and return the result.
    *
    * @protected
-   * @function
-   * @memberof belhop.complete.actions.insert
+   * @memberOf belhop.complete.actions.insert
    *
    * @param {string} str - Input string to operate on.
    * @param {string} value - String to insert.
@@ -1304,15 +1303,20 @@
   };
 
   /**
+   * This namespace exposes BEL validation capabilities.
    * @namespace belhop.validate
+   *
+   * @todo implement
+   *
+   * @summary Validate BEL expressions.
    */
   belhop.validate = {};
 
   /**
    * Insert the string value at position and return the result.
    *
-   * @function
-   * @memberof belhop.validate
+   * @memberOf belhop.validate
+   * @todo implement
    *
    * @param {string} str - Input string to operate on.
    * @param {string} value - String to insert.
@@ -1327,8 +1331,8 @@
   /**
    * Insert the string value at position and return the result.
    *
-   * @function
-   * @memberof belhop.validate
+   * @memberOf belhop.validate
+   * @todo implement
    *
    * @param {string} str - Input string to operate on.
    * @param {string} value - String to insert.
@@ -1341,16 +1345,18 @@
   };
 
   /**
+   * This namespace contains APIs for interacting with evidence.
    * @namespace belhop.evidence
-   * @see Evidence The type used by this namespace.
+   *
+   * @summary Interact with evidence.
+   * @see {Evidence} The type used by this namespace.
    */
   belhop.evidence = {};
 
   /**
    * Create new evidence.
    *
-   * @function
-   * @memberof belhop.evidence
+   * @memberOf belhop.evidence
    *
    * @param {!Evidence} evidence Evidence to create
    * @param {!Callback} cb
@@ -1374,8 +1380,7 @@
    * Get evidence.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
-   * @function
-   * @memberof belhop.evidence
+   * @memberOf belhop.evidence
    *
    * @param {?string} id Evidence to get
    * @param {number} [start=0] Page to start from
@@ -1405,8 +1410,7 @@
    * Update evidence, saving changes.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
-   * @function
-   * @memberof belhop.evidence
+   * @memberOf belhop.evidence
    *
    * @param {!Evidence} evidence The evidence to update
    * @param {!Callback} cb
@@ -1439,8 +1443,7 @@
    * Reset evidence, reverting unsaved changes.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
-   * @function
-   * @memberof belhop.evidence
+   * @memberOf belhop.evidence
    *
    * @param {!Evidence} evidence The evidence to reset
    * @param {!Callback} cb
@@ -1473,8 +1476,7 @@
    * Delete evidence.
    * Invokes the callback functions in the <b>cb</b> parameter.
    *
-   * @function
-   * @memberof belhop.evidence
+   * @memberOf belhop.evidence
    *
    * @param {!Evidence} evidence The evidence to delete
    * @param {!Callback} cb
@@ -1494,8 +1496,7 @@
   /**
    * Add {@link NameValueAnnotation} to {@link Evidence evidence}.
    *
-   * @function
-   * @memberof belhop.evidence.annotation
+   * @memberOf belhop.evidence.annotation
    *
    * @param {!Evidence} evidence The evidence to add to
    * @param {!NameValueAnnotation} nameValueAnnotation The annotation to add
@@ -1516,8 +1517,7 @@
   /**
    * Add {@link AnnotationType} value to {@link Evidence evidence}.
    *
-   * @function
-   * @memberof belhop.evidence.annotation
+   * @memberOf belhop.evidence.annotation
    *
    * @param {!Evidence} evidence The evidence to add to
    * @param {!AnnotationType} annotationType The annotation type to add
@@ -1536,8 +1536,7 @@
   /**
    * Add a {@link AnnotationValue} to {@link Evidence evidence}.
    *
-   * @function
-   * @memberof belhop.evidence.annotation
+   * @memberOf belhop.evidence.annotation
    *
    * @param {!Evidence} evidence The evidence to add to
    * @param {!AnnotationValue} annotationValue The annotation to add
@@ -1560,8 +1559,7 @@
   /**
    * Replaces the current {@link Citation} on {@link Evidence evidence}.
    *
-   * @function
-   * @memberof belhop.evidence.citation
+   * @memberOf belhop.evidence.citation
    *
    * @param {!Evidence} evidence The evidence to set a citation on
    * @param {!Citation} citation The citation to set
