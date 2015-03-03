@@ -1699,14 +1699,12 @@
    * @memberOf belhop.evidence
    *
    * @param {?string} id Evidence to get
-   * @param {number} [start=0] Page to start from
-   * @param {number} [size=<em>all</em>] Number to retrieve
-   * @param {Callback} cb
+   * @param {!belhop.Callback} cb {@link belhop.Evidence} if it exists;
+   * <code>null</code> if not
    */
-  belhop.evidence.get = function(id, start, size, cb) {
-    _assert_args([id, cb], 2);
-    var path = '/evidence';
-    if (id !== null) path += '/' + id;
+  belhop.evidence.get = function(id, cb) {
+    _assert_args(arguments, 2);
+    var path = '/evidence/' + id;
     var options = {
       accept: _haljson
     };
@@ -1718,7 +1716,17 @@
       cb.success(evidenceArr, status, request);
       return;
     }
-    var _cb = belhop.factory.callback(success, cb.error);
+    // intercept on error...
+    function error(request, errorstr) {
+      // not found? null
+      if (request.status === 404) {
+        cb.success(null, _not_found, request);
+        return;
+      }
+      cb.error(request, errorstr, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, error);
     apiGET(null, path, _cb, options);
   };
 
