@@ -6,6 +6,9 @@
 (function() {
   'use strict';
 
+  // declare globals not recognized by eslint
+  /* global module $ console */
+
   var root = this;
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
@@ -14,6 +17,7 @@
   var _ufo = 'unidentified object';
   var _haljson = 'application/hal+json';
   var _not_found = 'not found';
+  var _deprecations = {};
 
   function _NO_OP() {}
 
@@ -57,6 +61,24 @@
       return true;
     }
     return false;
+  }
+
+  function _console() {
+    if (_def(typeof console)) return true;
+    return false;
+  }
+
+  function _warndep(sym, replacement) {
+    // emit warning only once
+    if (_def(_deprecations[sym])) return;
+    _deprecations[sym] = null;
+    var msg;
+    if (_console) {
+      msg = 'BELHop deprecation warning: ';
+      msg += 'Use of ' + sym + ' is deprecated. Use ';
+      msg += replacement + ' instead';
+      console.log(msg);
+    }
   }
 
   function _Ex(message, args, required) {
@@ -217,10 +239,6 @@
     }
     return self;
   }
-
-  // declare globals not recognized by eslint
-  /* global module */
-  /* global $ */
 
   /**
    * The BELHop module.
@@ -669,7 +687,7 @@
    *
    * @param {!string} start Index to start from (for paging)
    * @param {!string} size Size limit (for paging)
-   * @param {!FilterOptions} filterOptions Filter options
+   * @param {!belhop.__.FilterOptions} filterOptions Filter options
    *
    * @property {string} start Index to start from (for paging)
    * @property {string} size Size limit (for paging)
@@ -868,7 +886,7 @@
    *
    * @memberOf belhop.configuration
    *
-   * @param {Callback} cb
+   * @param {belhop.Callback} cb
    * @tutorial configuration-test
    */
   belhop.configuration.test = function(cb) {
@@ -888,8 +906,8 @@
    *
    * @memberOf belhop.complete
    *
-   * @param {object} completion - BEL API completion object.
-   * @param {string} input - BEL expression to autocomplete.
+   * @param {belhop.Completion} completion BEL API completion object
+   * @param {string} input BEL expression to autocomplete.
    *
    * @return {string} Completed input string.
    */
@@ -910,6 +928,117 @@
     var actions = completion.actions;
     actions.forEach(actOn);
     return input;
+  };
+
+  /**
+   * Gets expression completions for the given input.
+   *
+   * @memberOf belhop.complete
+   *
+   * @param {string} input BEL expression to autocomplete
+   * @param {number} caretPosition optional caret position
+   * @param {!belhop.Callback} cb Zero or more completions on success
+   */
+  belhop.complete.expression = function(input, caretPosition, cb) {
+    var path = '/expressions/' + input + '/completions';
+    var options = {};
+    if (_def(typeof caretPosition) && _nonnull(caretPosition)) {
+      options.queryParams = 'caret_position=' + caretPosition;
+    }
+    apiGET(null, path, cb, options);
+  };
+
+  /**
+   * Gets annotation completions for the given input.
+
+   * @param {!string} prefix The annotation type's prefix
+   * @param {!string} searchTerm Search term
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
+   */
+  belhop.complete.annotation = function(input, cb) {
+    belhop.annotations.search(input, cb);
+  };
+
+  /**
+   * Gets annotation completions for the given input and within a specific
+   * annotation type.
+   *
+   * @memberOf belhop.complete
+   *
+   * @param {!string} input The annotation type's prefix
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
+   * @param {!string} type The annotation type
+   */
+  belhop.complete.annotationByType = function(input, cb, type) {
+    belhop.annotations.searchByType(type, input, cb);
+  };
+
+  /**
+   * Gets completions for the given input and returns the results.
+   *
+   * @memberOf belhop.complete
+   *
+   * @param {string} input - BEL expression to autocomplete.
+   * @param {number} caretPosition - optional caret position
+   * @param {Callback} cb Zero or more completions on success
+   *
+   * @deprecated Deprecated in favor of {@link belhop.complete.expression}
+   */
+  belhop.complete.getCompletions = function(input, caretPosition, cb) {
+    _warndep('complete.getCompletions', 'complete.expression');
+    belhop.complete.expression(input, caretPosition, cb);
+  };
+
+  belhop.complete.actions = {};
+
+  /**
+   * Delete the characters from startPos to endPos inclusively and return the
+   * result.
+   *
+   * @protected
+   * @memberOf belhop.complete.actions
+   *
+   * @param {string} str - Input string to operate on.
+   * @param {number} startPos - Starting position of the deletion range.
+   * @param {number} endPos - Ending position of the deletion range.
+   *
+   * @example
+   * > // delete "JUNK" from input
+   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * 'foobar'
+   *
+   * @return {string} Input string after deletion operation.
+   */
+  belhop.complete.actions.delete = function(str, startPos, endPos) {
+    var str1 = str.substr(0, startPos);
+    var str2 = str.substr(endPos + 1);
+    var ret = str1 + str2;
+    return ret;
+  };
+
+  /**
+   * Insert the string value at position and return the result.
+   *
+   * @protected
+   * @memberOf belhop.complete.actions.insert
+   *
+   * @param {string} str - Input string to operate on.
+   * @param {string} value - String to insert.
+   * @param {number} position - Insertion position.
+   *
+   * @example
+   * > // insert "bar" into input
+   * > belhop.complete.actions.insert('foo', 'bar', 3);
+   * 'foobar'
+   *
+   * @return {string} Input string after insertion operation.
+   */
+  belhop.complete.actions.insert = function(str, value, position) {
+    var str1 = str.substr(0, position);
+    var str2 = value;
+    var str3 = str.substr(position);
+    var rslt = str1 + str2 + str3;
+    return rslt;
   };
 
   /**
@@ -1283,7 +1412,7 @@
    *
    * @memberOf belhop.annotations
    *
-   * @param {!Callback} cb Zero or more {@link AnnotationType annotation types}
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationType}
    */
   belhop.annotations.getTypes = function(cb) {
     _assert_args(arguments, 1);
@@ -1317,7 +1446,7 @@
    * @memberOf belhop.annotations
    *
    * @param {!string} prefix The annotation type's prefix
-   * @param {!Callback} cb An {@link AnnotationType annotation type} or
+   * @param {!belhop.Callback} cb An {@link belhop.AnnotationType};
    * <code>null</code> if not found
    */
   belhop.annotations.getType = function(prefix, cb) {
@@ -1360,8 +1489,8 @@
    *
    * @param {!string} prefix The annotation type's prefix
    * @param {!string} value The annotation type's value
-   * @param {!Callback} cb {@link AnnotationValue} if it
-   * exists, <code>null</code> otherwise
+   * @param {!belhop.Callback} cb {@link belhop.AnnotationValue} if it
+   * exists; <code>null</code> if not
    */
   belhop.annotations.getValue = function(prefix, value, cb) {
     _assert_args(arguments, 3);
@@ -1401,9 +1530,9 @@
    *
    * @memberOf belhop.annotations
    *
-   * @param {!string} prefix The annotation type's prefix
+   * @param {!string} type The annotation type
    * @param {!string} searchTerm Search term
-   * @param {!Callback} cb Zero or more {@link AnnotationValue}
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
    */
   belhop.annotations.searchByType = function(type, searchTerm, cb) {
     // type can be an annotation type or string
@@ -1450,7 +1579,7 @@
    * @memberOf belhop.annotations
    *
    * @param {!string} searchTerm Search term
-   * @param {!Callback} cb Zero or more {@link AnnotationValue}
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
    */
   belhop.annotations.search = function(searchTerm, cb) {
     _assert_args(arguments, 2);
@@ -1487,76 +1616,6 @@
     }
     var _cb = belhop.factory.callback(success, error);
     apiGET(null, path, _cb, options);
-  };
-
-  /**
-   * Gets completions for the given input and returns the results.
-   *
-   * @memberOf belhop.complete
-   *
-   * @param {string} input - BEL expression to autocomplete.
-   * @param {number} caretPosition - optional caret position
-   * @param {Callback} cb Zero or more completions on success
-   */
-  belhop.complete.getCompletions = function(input, caretPosition, cb) {
-    var path = '/expressions/' + input + '/completions';
-    var options = {};
-    if (_def(typeof caretPosition) && _nonnull(caretPosition)) {
-      options.queryParams = 'caret_position=' + caretPosition;
-    }
-    apiGET(null, path, cb, options);
-  };
-
-  belhop.complete.actions = {};
-
-  /**
-   * Delete the characters from startPos to endPos inclusively and return the
-   * result.
-   *
-   * @protected
-   * @memberOf belhop.complete.actions
-   *
-   * @param {string} str - Input string to operate on.
-   * @param {number} startPos - Starting position of the deletion range.
-   * @param {number} endPos - Ending position of the deletion range.
-   *
-   * @example
-   * > // delete "JUNK" from input
-   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
-   * 'foobar'
-   *
-   * @return {string} Input string after deletion operation.
-   */
-  belhop.complete.actions.delete = function(str, startPos, endPos) {
-    var str1 = str.substr(0, startPos);
-    var str2 = str.substr(endPos + 1);
-    var ret = str1 + str2;
-    return ret;
-  };
-
-  /**
-   * Insert the string value at position and return the result.
-   *
-   * @protected
-   * @memberOf belhop.complete.actions.insert
-   *
-   * @param {string} str - Input string to operate on.
-   * @param {string} value - String to insert.
-   * @param {number} position - Insertion position.
-   *
-   * @example
-   * > // insert "bar" into input
-   * > belhop.complete.actions.insert('foo', 'bar', 3);
-   * 'foobar'
-   *
-   * @return {string} Input string after insertion operation.
-   */
-  belhop.complete.actions.insert = function(str, value, position) {
-    var str1 = str.substr(0, position);
-    var str2 = value;
-    var str3 = str.substr(position);
-    var rslt = str1 + str2 + str3;
-    return rslt;
   };
 
   /**
@@ -1616,7 +1675,7 @@
    * @memberOf belhop.evidence
    *
    * @param {!Evidence} evidence Evidence to create
-   * @param {!Callback} cb
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.create = function(evidence, cb) {
     var path = '/evidence';
@@ -1640,14 +1699,12 @@
    * @memberOf belhop.evidence
    *
    * @param {?string} id Evidence to get
-   * @param {number} [start=0] Page to start from
-   * @param {number} [size=<em>all</em>] Number to retrieve
-   * @param {Callback} cb
+   * @param {!belhop.Callback} cb {@link belhop.Evidence} if it exists;
+   * <code>null</code> if not
    */
-  belhop.evidence.get = function(id, start, size, cb) {
-    _assert_args([id, cb], 2);
-    var path = '/evidence';
-    if (id !== null) path += '/' + id;
+  belhop.evidence.get = function(id, cb) {
+    _assert_args(arguments, 2);
+    var path = '/evidence/' + id;
     var options = {
       accept: _haljson
     };
@@ -1659,7 +1716,17 @@
       cb.success(evidenceArr, status, request);
       return;
     }
-    var _cb = belhop.factory.callback(success, cb.error);
+    // intercept on error...
+    function error(request, errorstr) {
+      // not found? null
+      if (request.status === 404) {
+        cb.success(null, _not_found, request);
+        return;
+      }
+      cb.error(request, errorstr, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, error);
     apiGET(null, path, _cb, options);
   };
 
@@ -1669,8 +1736,8 @@
    *
    * @memberOf belhop.evidence
    *
-   * @param {!Evidence} evidence The evidence to update
-   * @param {!Callback} cb
+   * @param {!belhop.Evidence} evidence The evidence to update
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.update = function(evidence, cb) {
     _assert_args(arguments, 2);
@@ -1702,8 +1769,8 @@
    *
    * @memberOf belhop.evidence
    *
-   * @param {!Evidence} evidence The evidence to reset
-   * @param {!Callback} cb
+   * @param {!belhop.Evidence} evidence The evidence to reset
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.reset = function(evidence, cb) {
     _assert_args(arguments, 2);
@@ -1735,13 +1802,26 @@
    *
    * @memberOf belhop.evidence
    *
-   * @param {!Evidence} evidence The evidence to delete
-   * @param {!Callback} cb
+   * @param {!belhop.Evidence} evidence The evidence to delete
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.delete = function(evidence, cb) {
     _assert_args(arguments, 2);
     var self = belhop.__.self(evidence);
     apiDELETE(self, null, cb);
+  };
+
+  /**
+   * Search for evidence.
+   *
+   * @memberOf belhop.evidence
+
+   * @param {belhop.__.SearchOptions} searchOptions Search options
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.Evidence}
+   */
+  belhop.evidence.search = function(searchOptions, cb) {
+    // TODO NEXT
+    // AND THEN FACETING?
   };
 
   /**
@@ -1751,12 +1831,14 @@
   belhop.evidence.annotation = {};
 
   /**
-   * Add {@link NameValueAnnotation} to {@link Evidence evidence}.
+   * Add {@link belhop.NameValueAnnotation} to {@link belhop.Evidence
+   * evidence}.
    *
    * @memberOf belhop.evidence.annotation
    *
-   * @param {!Evidence} evidence The evidence to add to
-   * @param {!NameValueAnnotation} nameValueAnnotation The annotation to add
+   * @param {!belhop.Evidence} evidence The evidence to add to
+   * @param {!belhop.NameValueAnnotation} nameValueAnnotation The annotation
+   * to add
    * @tutorial working-with-annotations
    */
   belhop.evidence.annotation.addNameValue =
@@ -1772,12 +1854,13 @@
     };
 
   /**
-   * Add {@link AnnotationType} value to {@link Evidence evidence}.
+   * Add {@link belhop.AnnotationType} value to {@link belhop.Evidence
+   * evidence}.
    *
    * @memberOf belhop.evidence.annotation
    *
-   * @param {!Evidence} evidence The evidence to add to
-   * @param {!AnnotationType} annotationType The annotation type to add
+   * @param {!belhop.Evidence} evidence The evidence to add to
+   * @param {!belhop.AnnotationType} annotationType The annotation type to add
    * @param {!string} value The annotation value to add
    * @tutorial working-with-annotations
    */
@@ -1791,12 +1874,13 @@
     };
 
   /**
-   * Add a {@link AnnotationValue} to {@link Evidence evidence}.
+   * Add a {@link belhop.AnnotationValue} to {@link belhop.Evidence
+   * evidence}.
    *
    * @memberOf belhop.evidence.annotation
    *
-   * @param {!Evidence} evidence The evidence to add to
-   * @param {!AnnotationValue} annotationValue The annotation to add
+   * @param {!belhop.Evidence} evidence The evidence to add to
+   * @param {!belhop.AnnotationValue} annotationValue The annotation to add
    * @tutorial working-with-annotations
    */
   belhop.evidence.annotation.addAnnotation =
@@ -1814,12 +1898,12 @@
   belhop.evidence.citation = {};
 
   /**
-   * Replaces the current {@link Citation} on {@link Evidence evidence}.
+   * Replaces the current {@link belhop.Citation} on {@link Evidence evidence}.
    *
    * @memberOf belhop.evidence.citation
    *
-   * @param {!Evidence} evidence The evidence to set a citation on
-   * @param {!Citation} citation The citation to set
+   * @param {!belhop.Evidence} evidence The evidence to set a citation on
+   * @param {!belhop.Citation} citation The citation to set
    */
   belhop.evidence.citation.set = function(evidence, citation) {
     _assert_args(arguments, 2);
