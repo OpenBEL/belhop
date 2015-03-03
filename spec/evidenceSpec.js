@@ -62,7 +62,22 @@ describe('belhop', function() {
       expect(belhop.evidence.get).toBeDefined();
       var tokens = locations[0].split('/');
       var id = tokens.slice(-1)[0];
-      belhop.evidence.get(id, null, null, cb);
+      belhop.evidence.get(id, cb);
+    });
+
+    it('can be retrieved when not there', function(done) {
+      var onSucc = function(evidence, status, xhr) {
+        expect(xhr.status).toEqual(404);
+        expect(evidence).toBeNull();
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+      expect(belhop.evidence.get).toBeDefined();
+      belhop.evidence.get('proof-of-the-yeti', cb);
     });
 
     it('is equivalent between client and server', function() {
