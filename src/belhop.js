@@ -931,6 +931,117 @@
   };
 
   /**
+   * Gets expression completions for the given input.
+   *
+   * @memberOf belhop.complete
+   *
+   * @param {string} input BEL expression to autocomplete
+   * @param {number} caretPosition optional caret position
+   * @param {!belhop.Callback} cb Zero or more completions on success
+   */
+  belhop.complete.expression = function(input, caretPosition, cb) {
+    var path = '/expressions/' + input + '/completions';
+    var options = {};
+    if (_def(typeof caretPosition) && _nonnull(caretPosition)) {
+      options.queryParams = 'caret_position=' + caretPosition;
+    }
+    apiGET(null, path, cb, options);
+  };
+
+  /**
+   * Gets annotation completions for the given input.
+
+   * @param {!string} prefix The annotation type's prefix
+   * @param {!string} searchTerm Search term
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
+   */
+  belhop.complete.annotation = function(input, cb) {
+    belhop.annotations.search(input, cb);
+  };
+
+  /**
+   * Gets annotation completions for the given input and within a specific
+   * annotation type.
+   *
+   * @memberOf belhop.complete
+   *
+   * @param {!string} input The annotation type's prefix
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
+   * @param {!string} type The annotation type
+   */
+  belhop.complete.annotationByType = function(input, cb, type) {
+    belhop.annotations.searchByType(type, input, cb);
+  };
+
+  /**
+   * Gets completions for the given input and returns the results.
+   *
+   * @memberOf belhop.complete
+   *
+   * @param {string} input - BEL expression to autocomplete.
+   * @param {number} caretPosition - optional caret position
+   * @param {Callback} cb Zero or more completions on success
+   *
+   * @deprecated Deprecated in favor of {@link belhop.complete.expression}
+   */
+  belhop.complete.getCompletions = function(input, caretPosition, cb) {
+    _warndep('complete.getCompletions', 'complete.expression');
+    belhop.complete.expression(input, caretPosition, cb);
+  };
+
+  belhop.complete.actions = {};
+
+  /**
+   * Delete the characters from startPos to endPos inclusively and return the
+   * result.
+   *
+   * @protected
+   * @memberOf belhop.complete.actions
+   *
+   * @param {string} str - Input string to operate on.
+   * @param {number} startPos - Starting position of the deletion range.
+   * @param {number} endPos - Ending position of the deletion range.
+   *
+   * @example
+   * > // delete "JUNK" from input
+   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
+   * 'foobar'
+   *
+   * @return {string} Input string after deletion operation.
+   */
+  belhop.complete.actions.delete = function(str, startPos, endPos) {
+    var str1 = str.substr(0, startPos);
+    var str2 = str.substr(endPos + 1);
+    var ret = str1 + str2;
+    return ret;
+  };
+
+  /**
+   * Insert the string value at position and return the result.
+   *
+   * @protected
+   * @memberOf belhop.complete.actions.insert
+   *
+   * @param {string} str - Input string to operate on.
+   * @param {string} value - String to insert.
+   * @param {number} position - Insertion position.
+   *
+   * @example
+   * > // insert "bar" into input
+   * > belhop.complete.actions.insert('foo', 'bar', 3);
+   * 'foobar'
+   *
+   * @return {string} Input string after insertion operation.
+   */
+  belhop.complete.actions.insert = function(str, value, position) {
+    var str1 = str.substr(0, position);
+    var str2 = value;
+    var str3 = str.substr(position);
+    var rslt = str1 + str2 + str3;
+    return rslt;
+  };
+
+  /**
    * This namespace contains functions to create BEL and BELHop types.
    * @namespace belhop.factory
    *
@@ -1505,76 +1616,6 @@
     }
     var _cb = belhop.factory.callback(success, error);
     apiGET(null, path, _cb, options);
-  };
-
-  /**
-   * Gets completions for the given input and returns the results.
-   *
-   * @memberOf belhop.complete
-   *
-   * @param {string} input - BEL expression to autocomplete.
-   * @param {number} caretPosition - optional caret position
-   * @param {Callback} cb Zero or more completions on success
-   */
-  belhop.complete.getCompletions = function(input, caretPosition, cb) {
-    var path = '/expressions/' + input + '/completions';
-    var options = {};
-    if (_def(typeof caretPosition) && _nonnull(caretPosition)) {
-      options.queryParams = 'caret_position=' + caretPosition;
-    }
-    apiGET(null, path, cb, options);
-  };
-
-  belhop.complete.actions = {};
-
-  /**
-   * Delete the characters from startPos to endPos inclusively and return the
-   * result.
-   *
-   * @protected
-   * @memberOf belhop.complete.actions
-   *
-   * @param {string} str - Input string to operate on.
-   * @param {number} startPos - Starting position of the deletion range.
-   * @param {number} endPos - Ending position of the deletion range.
-   *
-   * @example
-   * > // delete "JUNK" from input
-   * > belhop.complete.actions.delete('fooJUNKbar', 3, 6);
-   * 'foobar'
-   *
-   * @return {string} Input string after deletion operation.
-   */
-  belhop.complete.actions.delete = function(str, startPos, endPos) {
-    var str1 = str.substr(0, startPos);
-    var str2 = str.substr(endPos + 1);
-    var ret = str1 + str2;
-    return ret;
-  };
-
-  /**
-   * Insert the string value at position and return the result.
-   *
-   * @protected
-   * @memberOf belhop.complete.actions.insert
-   *
-   * @param {string} str - Input string to operate on.
-   * @param {string} value - String to insert.
-   * @param {number} position - Insertion position.
-   *
-   * @example
-   * > // insert "bar" into input
-   * > belhop.complete.actions.insert('foo', 'bar', 3);
-   * 'foobar'
-   *
-   * @return {string} Input string after insertion operation.
-   */
-  belhop.complete.actions.insert = function(str, value, position) {
-    var str1 = str.substr(0, position);
-    var str2 = value;
-    var str3 = str.substr(position);
-    var rslt = str1 + str2 + str3;
-    return rslt;
   };
 
   /**
