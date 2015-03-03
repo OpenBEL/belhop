@@ -687,7 +687,7 @@
    *
    * @param {!string} start Index to start from (for paging)
    * @param {!string} size Size limit (for paging)
-   * @param {!FilterOptions} filterOptions Filter options
+   * @param {!belhop.__.FilterOptions} filterOptions Filter options
    *
    * @property {string} start Index to start from (for paging)
    * @property {string} size Size limit (for paging)
@@ -886,7 +886,7 @@
    *
    * @memberOf belhop.configuration
    *
-   * @param {Callback} cb
+   * @param {belhop.Callback} cb
    * @tutorial configuration-test
    */
   belhop.configuration.test = function(cb) {
@@ -906,8 +906,8 @@
    *
    * @memberOf belhop.complete
    *
-   * @param {object} completion - BEL API completion object.
-   * @param {string} input - BEL expression to autocomplete.
+   * @param {belhop.Completion} completion BEL API completion object
+   * @param {string} input BEL expression to autocomplete.
    *
    * @return {string} Completed input string.
    */
@@ -1301,7 +1301,7 @@
    *
    * @memberOf belhop.annotations
    *
-   * @param {!Callback} cb Zero or more {@link AnnotationType annotation types}
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationType}
    */
   belhop.annotations.getTypes = function(cb) {
     _assert_args(arguments, 1);
@@ -1335,7 +1335,7 @@
    * @memberOf belhop.annotations
    *
    * @param {!string} prefix The annotation type's prefix
-   * @param {!Callback} cb An {@link AnnotationType annotation type} or
+   * @param {!belhop.Callback} cb An {@link belhop.AnnotationType};
    * <code>null</code> if not found
    */
   belhop.annotations.getType = function(prefix, cb) {
@@ -1378,8 +1378,8 @@
    *
    * @param {!string} prefix The annotation type's prefix
    * @param {!string} value The annotation type's value
-   * @param {!Callback} cb {@link AnnotationValue} if it
-   * exists, <code>null</code> otherwise
+   * @param {!belhop.Callback} cb {@link belhop.AnnotationValue} if it
+   * exists; <code>null</code> if not
    */
   belhop.annotations.getValue = function(prefix, value, cb) {
     _assert_args(arguments, 3);
@@ -1419,9 +1419,9 @@
    *
    * @memberOf belhop.annotations
    *
-   * @param {!string} prefix The annotation type's prefix
+   * @param {!string} type The annotation type
    * @param {!string} searchTerm Search term
-   * @param {!Callback} cb Zero or more {@link AnnotationValue}
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
    */
   belhop.annotations.searchByType = function(type, searchTerm, cb) {
     // type can be an annotation type or string
@@ -1468,7 +1468,7 @@
    * @memberOf belhop.annotations
    *
    * @param {!string} searchTerm Search term
-   * @param {!Callback} cb Zero or more {@link AnnotationValue}
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
    */
   belhop.annotations.search = function(searchTerm, cb) {
     _assert_args(arguments, 2);
@@ -1634,7 +1634,7 @@
    * @memberOf belhop.evidence
    *
    * @param {!Evidence} evidence Evidence to create
-   * @param {!Callback} cb
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.create = function(evidence, cb) {
     var path = '/evidence';
@@ -1687,8 +1687,8 @@
    *
    * @memberOf belhop.evidence
    *
-   * @param {!Evidence} evidence The evidence to update
-   * @param {!Callback} cb
+   * @param {!belhop.Evidence} evidence The evidence to update
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.update = function(evidence, cb) {
     _assert_args(arguments, 2);
@@ -1720,8 +1720,8 @@
    *
    * @memberOf belhop.evidence
    *
-   * @param {!Evidence} evidence The evidence to reset
-   * @param {!Callback} cb
+   * @param {!belhop.Evidence} evidence The evidence to reset
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.reset = function(evidence, cb) {
     _assert_args(arguments, 2);
@@ -1753,13 +1753,26 @@
    *
    * @memberOf belhop.evidence
    *
-   * @param {!Evidence} evidence The evidence to delete
-   * @param {!Callback} cb
+   * @param {!belhop.Evidence} evidence The evidence to delete
+   * @param {!belhop.Callback} cb
    */
   belhop.evidence.delete = function(evidence, cb) {
     _assert_args(arguments, 2);
     var self = belhop.__.self(evidence);
     apiDELETE(self, null, cb);
+  };
+
+  /**
+   * Search for evidence.
+   *
+   * @memberOf belhop.evidence
+
+   * @param {belhop.__.SearchOptions} searchOptions Search options
+   * @param {!belhop.Callback} cb Zero or more {@link belhop.Evidence}
+   */
+  belhop.evidence.search = function(searchOptions, cb) {
+    // TODO NEXT
+    // AND THEN FACETING?
   };
 
   /**
@@ -1769,12 +1782,14 @@
   belhop.evidence.annotation = {};
 
   /**
-   * Add {@link NameValueAnnotation} to {@link Evidence evidence}.
+   * Add {@link belhop.NameValueAnnotation} to {@link belhop.Evidence
+   * evidence}.
    *
    * @memberOf belhop.evidence.annotation
    *
-   * @param {!Evidence} evidence The evidence to add to
-   * @param {!NameValueAnnotation} nameValueAnnotation The annotation to add
+   * @param {!belhop.Evidence} evidence The evidence to add to
+   * @param {!belhop.NameValueAnnotation} nameValueAnnotation The annotation
+   * to add
    * @tutorial working-with-annotations
    */
   belhop.evidence.annotation.addNameValue =
@@ -1790,12 +1805,13 @@
     };
 
   /**
-   * Add {@link AnnotationType} value to {@link Evidence evidence}.
+   * Add {@link belhop.AnnotationType} value to {@link belhop.Evidence
+   * evidence}.
    *
    * @memberOf belhop.evidence.annotation
    *
-   * @param {!Evidence} evidence The evidence to add to
-   * @param {!AnnotationType} annotationType The annotation type to add
+   * @param {!belhop.Evidence} evidence The evidence to add to
+   * @param {!belhop.AnnotationType} annotationType The annotation type to add
    * @param {!string} value The annotation value to add
    * @tutorial working-with-annotations
    */
@@ -1809,12 +1825,13 @@
     };
 
   /**
-   * Add a {@link AnnotationValue} to {@link Evidence evidence}.
+   * Add a {@link belhop.AnnotationValue} to {@link belhop.Evidence
+   * evidence}.
    *
    * @memberOf belhop.evidence.annotation
    *
-   * @param {!Evidence} evidence The evidence to add to
-   * @param {!AnnotationValue} annotationValue The annotation to add
+   * @param {!belhop.Evidence} evidence The evidence to add to
+   * @param {!belhop.AnnotationValue} annotationValue The annotation to add
    * @tutorial working-with-annotations
    */
   belhop.evidence.annotation.addAnnotation =
@@ -1832,12 +1849,12 @@
   belhop.evidence.citation = {};
 
   /**
-   * Replaces the current {@link Citation} on {@link Evidence evidence}.
+   * Replaces the current {@link belhop.Citation} on {@link Evidence evidence}.
    *
    * @memberOf belhop.evidence.citation
    *
-   * @param {!Evidence} evidence The evidence to set a citation on
-   * @param {!Citation} citation The citation to set
+   * @param {!belhop.Evidence} evidence The evidence to set a citation on
+   * @param {!belhop.Citation} citation The citation to set
    */
   belhop.evidence.citation.set = function(evidence, citation) {
     _assert_args(arguments, 2);
