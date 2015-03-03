@@ -6,6 +6,9 @@
 (function() {
   'use strict';
 
+  // declare globals not recognized by eslint
+  /* global module $ console */
+
   var root = this;
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
@@ -14,6 +17,7 @@
   var _ufo = 'unidentified object';
   var _haljson = 'application/hal+json';
   var _not_found = 'not found';
+  var _deprecations = {};
 
   function _NO_OP() {}
 
@@ -57,6 +61,24 @@
       return true;
     }
     return false;
+  }
+
+  function _console() {
+    if (_def(typeof console)) return true;
+    return false;
+  }
+
+  function _warndep(sym, replacement) {
+    // emit warning only once
+    if (_def(_deprecations[sym])) return;
+    _deprecations[sym] = null;
+    var msg;
+    if (_console) {
+      msg = 'BELHop deprecation warning: ';
+      msg += 'Use of ' + sym + ' is deprecated. Use ';
+      msg += replacement + ' instead';
+      console.log(msg);
+    }
   }
 
   function _Ex(message, args, required) {
@@ -217,10 +239,6 @@
     }
     return self;
   }
-
-  // declare globals not recognized by eslint
-  /* global module */
-  /* global $ */
 
   /**
    * The BELHop module.
