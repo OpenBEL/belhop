@@ -521,7 +521,7 @@
    * @param {!string} name No further documentation.
    * @param {!string} value No further documentation.
    *
-   * @property {string} category No further documentation.
+   * @property {!string} category No further documentation.
    * @property {string} name No further documentation.
    * @property {string} value No further documentation.
    */
@@ -530,6 +530,7 @@
     this.name = name;  // non-null
     this.value = value;  // non-null
   }
+  FilterOptions.prototype.__bhType = 'FilterOptions';
 
   /**
    * Internal validation of filter options.
@@ -630,6 +631,7 @@
     this.name = 'search';
     this.value = value;
   }
+  DefaultFilterOptions.prototype.__bhType = 'DefaultFilterOptions';
   DefaultFilterOptions.prototype = Object.create(FilterOptions.prototype);
   DefaultFilterOptions.prototype.constructor = FilterOptions;
 
@@ -658,6 +660,8 @@
     this.size = size;  // non-null
     this.filterOptions = filterOptions;  // nullable
   }
+  SearchOptions.prototype.__bhType = 'SearchOptions';
+
   /**
    * Internal validation of search options.
    *
