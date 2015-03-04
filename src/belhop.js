@@ -296,53 +296,6 @@
    */
 
   /**
-   * BELHop annotation type definition.
-   *
-   * These types are controlled by the BEL API and are well-defined definitions
-   * of a reusable class of common annotations. Examples of these types include
-   * species and anatomy.
-   *
-   * @name AnnotationType
-   * @memberOf belhop
-   * @typedef {AnnotationType} AnnotationType
-   * @property {string} name Name suitable for display
-   * @property {string} prefix Prefix uniquely identifying this type
-   * @property {string} domain The domain of the annotation
-   * @property {string} uri The type's URI
-   * @see belhop.annotations
-   */
-
-  /**
-   * BELHop generic name/value annotation type definition.
-   * These types can be created in {@link belhop.factory the factory}.
-   *
-   * Only the form of these types is defined. No constraints are placed on the
-   * name and value properties.
-   *
-   * @name NameValueAnnotation
-   * @memberOf belhop
-   * @typedef {NameValueAnnotation} NameValueAnnotation
-   * @property {string} name The annotation's name
-   * @property {string} value The annotation's value
-   */
-
-  /**
-   * BELHop annotation value definition.
-   *
-   * These types are controlled by the BEL API and are specific values
-   * of a annotation types. An example here is the 9606 taxonomy identifier
-   * found in the "taxon" annotation type.
-   *
-   * @name AnnotationValue
-   * @memberOf belhop
-   * @typedef {AnnotationValue} AnnotationValue
-   * @property {string} identifier Identifies the value within the type
-   * @property {string} name Name suitable for display
-   * @property {string} type The type of the value
-   * @property {string} uri The value's URI
-   */
-
-  /**
    * BELHop evidence type definition.
    * These types can be created in {@link belhop.factory the factory}.
    *
@@ -787,8 +740,77 @@
     this.size = '10';
     this.filterOptions = new DefaultFilterOptions(value);
   }
+  DefaultSearchOptions.prototype.__bhType = 'DefaultSearchOptions';
   DefaultSearchOptions.prototype = Object.create(SearchOptions.prototype);
   DefaultSearchOptions.prototype.constructor = SearchOptions;
+
+  /**
+   * BELHop annotation type definition.
+   *
+   * Well-defined definitions of common annotations, controlled by the BEL API.
+   * Examples include species and anatomy.
+   *
+   * @name AnnotationType
+   * @memberOf belhop
+   * @typedef {AnnotationType} AnnotationType
+   * @property {string} name Name suitable for display
+   * @property {string} prefix Prefix uniquely identifying this type
+   * @property {string} domain The domain of the annotation
+   * @property {string} uri The type's URI
+   * @see belhop.annotations
+   */
+  function AnnotationType(name, prefix, domain, uri) {
+    this.name = name;
+    this.prefix = prefix;
+    this.domain = domain;
+    this.uri = uri;
+  }
+  belhop.AnnotationType = AnnotationType;
+  AnnotationType.prototype.__bhType = 'AnnotationType';
+
+  /**
+   * BELHop annotation value definition.
+   *
+   * These types are controlled by the BEL API and are specific values
+   * of a annotation types. An example here is the 9606 taxonomy identifier
+   * found in the "taxon" annotation type.
+   *
+   * @name AnnotationValue
+   * @memberOf belhop
+   * @typedef {AnnotationValue} AnnotationValue
+   * @property {string} identifier Identifies the value within the type
+   * @property {string} name Name suitable for display
+   * @property {string} type The type of the value
+   * @property {string} uri The value's URI
+   */
+  function AnnotationValue(identifier, name, type, uri) {
+    this.identifier = identifier;
+    this.name = name;
+    this.type = type;
+    this.uri = uri;
+  }
+  belhop.AnnotationValue = AnnotationValue;
+  AnnotationValue.prototype.__bhType = 'AnnotationValue';
+
+  /**
+   * BELHop generic name/value annotation type definition.
+   * These types can be created in {@link belhop.factory the factory}.
+   *
+   * Only the form of these types is defined. No constraints are placed on the
+   * name and value properties beyond the type.
+   *
+   * @name NameValueAnnotation
+   * @memberOf belhop
+   * @typedef {NameValueAnnotation} NameValueAnnotation
+   * @property {string} name The annotation's name
+   * @property {string} value The annotation's value
+   */
+  function NameValueAnnotation(name, value) {
+    this.name = name;
+    this.value = value;
+  }
+  belhop.NameValueAnnotation = NameValueAnnotation;
+  NameValueAnnotation.prototype.__bhType = 'NameValueAnnotation';
 
   /**
    * This namespace is used internally by the library. Accessing this API
