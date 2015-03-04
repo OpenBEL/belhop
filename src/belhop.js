@@ -133,6 +133,7 @@
     var msg;
     var arg;
     var argtype;
+    var expectedType;
 
     if (index >= args.length) {
       msg = _badfcall;
@@ -144,7 +145,13 @@
       argtype = typeof arg;
       msg = _badfcall;
       msg += ': argument ' + (index + 1) + ' is not a valid type';
-      msg += ' (' + argtype + ') for this function';
+      msg += ' for this function';
+      if (_def(type.prototype) && _def(type.prototype.__bhType)) {
+        expectedType = type.prototype.__bhType;
+        msg += ' (expected ' + expectedType + ', got ' + argtype + ')';
+        throw new _Ex(msg, args);
+      }
+      msg += ' (got ' + argtype + ')';
       throw new _Ex(msg, args);
     }
   }
