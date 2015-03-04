@@ -211,7 +211,7 @@ describe('belhop', function() {
         expect(belhop.evidence.annotation.addAnnotation).toBeDefined();
         var add = belhop.evidence.annotation.addAnnotation;
 
-        expect(belhop.factory.annotations.type).toBeDefined();
+        expect(belhop.factory.annotations.value).toBeDefined();
         factory = belhop.factory.annotations.value;
 
         var value = factory('IDENTIFIER', 'NAME', 'TYPE', 'URI');
@@ -220,6 +220,35 @@ describe('belhop', function() {
         var ctxt = ev.biological_context;
         expect(ctxt.length).toEqual(1);
         expect(ctxt[0]).toEqual('URI');
+      });
+
+      it('can be added by annotation search results', function(done) {
+        var statement = 'p(annos) increases p(canBeAddedNV)';
+        var citation = {type: 'PubMed', name: 'None', id: '10022765'};
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation);
+
+        expect(belhop.evidence.annotation.addAnnotation).toBeDefined();
+        var add = belhop.evidence.annotation.addAnnotation;
+
+        var onSucc = function(values, status, xhr) {
+          expect(xhr.status).toEqual(200);
+          expect(values).not.toBeNull();
+          expect(values.length).toBeGreaterThan(0);
+          var value = values[0];
+          add(ev, value);
+          expect(ev.biological_context).toBeDefined();
+          var ctxt = ev.biological_context;
+          expect(ctxt.length).toEqual(1);
+          expect(ctxt[0]).toEqual(value.uri);
+          done();
+        };
+        var onErr = function(xhr) {
+          expect(xhr.status).toEqual(200);
+          done();
+        };
+        var cb = belhop.factory.callback(onSucc, onErr);
+        belhop.annotations.search('9606', cb);
       });
 
     });
