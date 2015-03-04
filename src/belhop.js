@@ -1556,16 +1556,22 @@
    *
    * @memberOf belhop.annotations
    *
-   * @param {!string} type The annotation type
+   * @param {!(string|belhop.AnnotationType)} type The annotation type
    * @param {!string} searchTerm Search term
    * @param {!belhop.Callback} cb Zero or more {@link belhop.AnnotationValue}
    */
   belhop.annotations.searchByType = function(type, searchTerm, cb) {
     // type can be an annotation type or string
     _assert_args(arguments, 3);
+    var path;
+    if (type instanceof AnnotationType) {
+      // search values rooted at annotation type URI
+      path = type.uri + '/values';
+    } else {
+      // search values rooted at indicated type
+      path = '/annotations/' + type + '/values';
+    }
     var searchOpts = new DefaultSearchOptions(searchTerm);
-    // XXX assuming type is string for now
-    var path = '/annotations/' + type + '/values';
     var options = {};
     options.queryParams = searchOpts.toQueryString();
 
