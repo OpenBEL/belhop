@@ -1218,10 +1218,9 @@
    * factory
    */
   belhop.factory.annotations.nameValue = function(name, value) {
-    return {
-      name: name,
-      value: value
-    };
+    _assert_args(arguments, 2);
+    var product = new NameValueAnnotation(name, value);
+    return product;
   };
 
   /**
@@ -1238,12 +1237,9 @@
    * @return {belhop.AnnotationType} the BELHop type produced by this factory
    */
   belhop.factory.annotations.type = function(name, prefix, domain, uri) {
-    return {
-      name: name,
-      prefix: prefix,
-      domain: domain,
-      uri: uri
-    };
+    _assert_args(arguments, 4);
+    var product = new AnnotationType(name, prefix, domain, uri);
+    return product;
   };
 
   /**
@@ -1260,12 +1256,9 @@
    * @return {belhop.AnnotationValue} the BELHop type produced by this factory
    */
   belhop.factory.annotations.value = function(identifier, name, type, uri) {
-    return {
-      identifier: identifier,
-      name: name,
-      type: type,
-      uri: uri
-    };
+    _assert_args(arguments, 4);
+    var product = new AnnotationValue(identifier, name, type, uri);
+    return product;
   };
 
   /**
@@ -1295,8 +1288,8 @@
    */
   belhop.factory.options.filter.custom = function(category, name, value) {
     _assert_args(arguments, 3);
-    var filter = new FilterOptions(category, name, value);
-    return filter;
+    var product = new FilterOptions(category, name, value);
+    return product;
   };
 
   /**
@@ -1312,8 +1305,8 @@
    */
   belhop.factory.options.filter.default = function(value) {
     _assert_args(arguments, 1);
-    var filter = new DefaultFilterOptions(value);
-    return filter;
+    var product = new DefaultFilterOptions(value);
+    return product;
   };
 
   /**
@@ -1365,8 +1358,8 @@
       _size = 10;
     }
 
-    var searchOpts = new SearchOptions(_start, _size, filterOptions);
-    return searchOpts;
+    var product = new SearchOptions(_start, _size, filterOptions);
+    return product;
   };
 
   /**
@@ -1386,8 +1379,8 @@
    */
   belhop.factory.options.search.default = function(value) {
     _assert_args(arguments, 1);
-    var searchOpts = new DefaultSearchOptions(value);
-    return searchOpts;
+    var product = new DefaultSearchOptions(value);
+    return product;
   };
 
   /**
@@ -1428,8 +1421,8 @@
       _size = 100;
     }
 
-    var searchOpts = new SearchOptions(_start, _size, filterOptions);
-    return searchOpts;
+    var product = new SearchOptions(_start, _size, filterOptions);
+    return product;
   };
 
   /**
@@ -1853,8 +1846,7 @@
    * @param {!belhop.Callback} cb Zero or more {@link belhop.Evidence}
    */
   belhop.evidence.search = function(searchOptions, cb) {
-    // TODO NEXT
-    // AND THEN FACETING?
+    // TODO
   };
 
   /**
