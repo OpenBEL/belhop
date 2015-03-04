@@ -16,8 +16,10 @@ create_node_env
 cd "$DIR" || exit 1
 require-cmd-or-die "karma"
 
+vdefault KARMA_PORT 9876
+
 CMD="karma"
-CMD_ARGS="start belhop.conf.js"
+CMD_ARGS="start --port $KARMA_PORT belhop.conf.js"
 if [ "$TEST_HEADLESS" == "yes" ]; then
     echo "(headless)"
     require-cmd-or-die "xvfb-run" || exit 1
