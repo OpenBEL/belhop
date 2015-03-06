@@ -817,6 +817,24 @@
   NameValueAnnotation.prototype.__bhType = 'NameValueAnnotation';
 
   /**
+   * BEL API facet type definition.
+   *
+   * @name Facet
+   * @memberOf belhop
+   * @typedef {Facet} Facet
+   * @property {number} count Facet count
+   * @property {string} category Facet category
+   * @property {string} name Facet name
+   * @property value
+   */
+  function Facet(count, category, name, value) {
+    this.count = count;
+    this.filter = new FilterOptions(category, name, value);
+  }
+  belhop.Facet = Facet;
+  Facet.prototype.__bhType = 'Facet';
+
+  /**
    * This namespace is used internally by the library. Accessing this API
    * directly is discouraged.
    *
@@ -1197,6 +1215,24 @@
       citation.comment = comment;
     }
     return citation;
+  };
+
+  /**
+   * Facet factory.
+   * See the {@link belhop.Facet type} this factory produces for more.
+   *
+   * @memberOf belhop.factory
+   *
+   * @param {number} count
+   * @param {string} category
+   * @param {string} name
+   * @param {string} value
+   * @return {belhop.Facet} the BELHop type produced by this factory
+   */
+  belhop.factory.facet = function(count, category, name, value) {
+    _assert_args(arguments, 4);
+    var product = new Facet(count, category, name, value);
+    return product;
   };
 
   /**
@@ -1852,7 +1888,55 @@
    * @param {!belhop.Callback} cb Zero or more {@link belhop.Evidence}
    */
   belhop.evidence.search = function(searchOptions, cb) {
-    // TODO
+    _assert_args(arguments, 2);
+    var path = '/evidence';
+    var options = {
+      accept: _haljson
+    };
+
+    // intercept on success...
+    function success(data, status, request) {
+      // ... dig into evidence, we only want the content.
+      var evidence = [];
+      var facets = [];
+      var efactory = belhop.factory.evidence;
+      var ffactory = belhop.factory.facet;
+      data.evidence.forEach(function(x) {
+        var stmt = x.bel_statement;
+        var ctxt = x.biological_context;
+        var citation = x.citation;
+        var meta = x.metadata;
+        var summary = x.summary_text;
+        var ev = efactory(stmt, citation, ctxt, summary, meta);
+        evidence.push(ev);
+      });
+      data.facets.forEach(function(x) {
+        var count = x.count;
+        var category = x.category;
+        var name = x.name;
+        var value = x.value;
+        var facet = ffactory(count, category, name, value);
+        facets.push(facet);
+      });
+      var response = {
+        'evidence': evidence,
+        'facets': facets
+      };
+      cb.success(response, status, request);
+      return;
+    }
+    // intercept on error...
+    function error(request, errorstr) {
+      // not found? null
+      if (request.status === 404) {
+        cb.success(null, _not_found, request);
+        return;
+      }
+      cb.error(request, errorstr, request);
+      return;
+    }
+    var _cb = belhop.factory.callback(success, error);
+    apiGET(null, path, _cb, options);
   };
 
   /**

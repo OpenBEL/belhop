@@ -159,6 +159,10 @@ describe('belhop', function() {
       belhop.evidence.delete(retrievedEvidence, cb);
     });
 
+    it('can be searched', function(done) {
+      done();
+    });
+
     describe('annotations', function() {
 
       it('can be added by name/value', function() {
