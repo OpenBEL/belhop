@@ -641,6 +641,8 @@
    * @param {!string} value Search term
    *
    * @property {string} value Search term
+   * @protected @property {string} category 'fts'
+   * @protected @property {string} name 'search'
    */
   function DefaultFilterOptions(value) {
     FilterOptions.call(this);
@@ -1403,7 +1405,7 @@
     }
 
     // accept size or default it
-    if (_def(typeof size) & _nonnull(size)) {
+    if (_def(typeof size) && _nonnull(size)) {
       _assert_num(arguments, 2);
       _size = size;
     } else {
@@ -1466,7 +1468,7 @@
     }
 
     // accept size or default it
-    if (_def(typeof size) & _nonnull(size)) {
+    if (_def(typeof size) && _nonnull(size)) {
       _assert_num(arguments, 2);
       _size = size;
     } else {
