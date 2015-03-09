@@ -159,8 +159,83 @@ describe('belhop', function() {
       belhop.evidence.delete(retrievedEvidence, cb);
     });
 
-    it('can be searched', function(done) {
-      done();
+    it('can be searched using default options', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // default options won't return more than 10 things
+        expect(response.evidence.length).not.toBeGreaterThan(10);
+        // default options do not facet responses
+        expect(response.facets.length).toEqual(0);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      // generic search
+      var factory = belhop.factory.options.search.default;
+      var searchOptions = factory('promote lipid hydrolysis');
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb);
+    });
+
+    it('can be searched using evidence options', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // our default options shouldn't return more than 100 things
+        expect(response.evidence.length).not.toBeGreaterThan(100);
+        // our options should include faceted responses
+        expect(response.facets.length).toBeGreaterThan(0);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      // generic search with evidence tuning (larger size, etc.)
+      var filterFactory = belhop.factory.options.filter.default;
+      var searchFactory = belhop.factory.options.search.evidence;
+      var filter = filterFactory('promote lipid hydrolysis');
+      var searchOptions = searchFactory(filter, null, null, true);
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb);
+    });
+
+    it('can be searched using custom options', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // our options shouldn't return more than 20 things
+        expect(response.evidence.length).not.toBeGreaterThan(20);
+        // our options should include faceted responses
+        expect(response.facets.length).toBeGreaterThan(0);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      // custom search with start offset 40, size 20, faceting, and filter
+      var filterFactory = belhop.factory.options.filter.custom;
+      var searchFactory = belhop.factory.options.search.evidence;
+      var filter = filterFactory('biological_context', 'Species', '10090');
+      var searchOptions = searchFactory(filter, 40, 20, true);
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb);
     });
 
     describe('annotations', function() {
