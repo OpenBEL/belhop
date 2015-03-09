@@ -1355,6 +1355,7 @@
    * @param {!string} value Value to filter on
    *
    * @return {belhop.__.FilterOptions} the BELHop type produced by this factory
+   * @tutorial working-with-options
    */
   belhop.factory.options.filter.custom = function(category, name, value) {
     _assert_args(arguments, 3);
