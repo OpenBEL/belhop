@@ -178,7 +178,7 @@ describe('belhop', function() {
       var cb = belhop.factory.callback(onSucc, onErr);
 
       // generic search
-      var factory = belhop.factory.options.search.default;
+      factory = belhop.factory.options.search.default;
       var searchOptions = factory('promote lipid hydrolysis');
       expect(belhop.evidence.search).toBeDefined();
       belhop.evidence.search(searchOptions, cb);

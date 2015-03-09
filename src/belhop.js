@@ -641,8 +641,8 @@
    * @param {!string} value Search term
    *
    * @property {string} value Search term
-   * @protected @property {string} category 'fts'
-   * @protected @property {string} name 'search'
+   * @property {string} category 'fts'
+   * @property {string} name 'search'
    */
   function DefaultFilterOptions(value) {
     FilterOptions.call(this);
@@ -765,10 +765,10 @@
    * @param {!string} value Search term
    *
    * @property {string} value Search term
-   * @protected @property {string} start Starts from the first resource
+   * @property {string} start Starts from the first resource
    * (i.e., '0')
-   * @protected @property {string} size Returns up to '10' resources
-   * @protected @property {boolean} faceted No faceting in the response
+   * @property {string} size Returns up to '10' resources
+   * @property {boolean} faceted No faceting in the response
    * (i.e., false)
    */
   function DefaultSearchOptions(value) {
