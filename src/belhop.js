@@ -129,6 +129,23 @@
     }
   }
 
+  function _assert_bool(args, index) {
+    var msg;
+    var arg;
+
+    if (index >= args.length) {
+      msg = _badfcall;
+      msg += ': argument ' + (index + 1) + ' is required';
+      throw new _Ex(msg, args);
+    }
+    arg = args[index];
+    if (typeof arg !== 'boolean') {
+      msg = _badfcall;
+      msg += ': argument ' + (index + 1) + ' is not a boolean';
+      throw new _Ex(msg, args);
+    }
+  }
+
   function _assert_type(args, index, type) {
     var msg;
     var arg;
