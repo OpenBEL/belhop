@@ -115,12 +115,14 @@ li {
 }
 .main h1 {
   font-weight: bold;
-  font-size: 1.6em;
+  font-size: 2em;
+  line-height: 2.0;
   margin: 0;
 }
 .main h2 {
   font-weight: bold;
-  font-size: 1.5em;
+  font-size: 1.4em;
+  line-height: 2.7;
   margin: 0;
 }
 .main h3 {

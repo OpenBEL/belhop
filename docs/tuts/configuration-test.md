@@ -1,3 +1,6 @@
+----
+# Configuration Test
+
 Testing the configuration and server availability.
 
 Create a {@link Callback callback} using the {@link belhop.factory.callback
