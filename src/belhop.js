@@ -668,15 +668,18 @@
    *
    * @param {!string} start Index to start from (for paging)
    * @param {!string} size Size limit (for paging)
+   * @param {!boolean} faceted Controls faceting of the response
    * @param {!belhop.__.FilterOptions} filterOptions Filter options
    *
    * @property {string} start Index to start from (for paging)
    * @property {string} size Size limit (for paging)
+   * @property {boolean} faceted Controls faceting of the response
    * @property {FilterOptions} filterOptions Filter options
    */
-  function SearchOptions(start, size, filterOptions) {
+  function SearchOptions(start, size, faceted, filterOptions) {
     this.start = start;  // non-null
     this.size = size;  // non-null
+    this.faceted = faceted; // non-null
     this.filterOptions = filterOptions;  // nullable
   }
   SearchOptions.prototype.__bhType = 'SearchOptions';
@@ -692,7 +695,7 @@
    *
    * @example
    * // not valid, missing value
-   * > (new SearchOptions(null, 'name', null).__bhValidate()).valid
+   * > (new SearchOptions(null, 'name', null, null).__bhValidate()).valid
    * false
    */
   SearchOptions.prototype.__bhValidate = function() {
@@ -701,11 +704,15 @@
     try {
       if (_null(this.start)) {
         valid = false;
-        msgs.push('null start');
+        msgs.push('null start property');
       }
       if (_null(this.size)) {
         valid = false;
-        msgs.push('null size');
+        msgs.push('null size property');
+      }
+      if (_null(this.faceted)) {
+        valid = false;
+        msgs.push('null faceted property');
       }
       return {valid: valid, msg: msgs.join('|')};
     } catch (e) {
@@ -723,8 +730,8 @@
    *
    * @example
    * // start from item 20, get 10 results, no filter
-   * > new SearchOptions('20', '10', null).toQueryString();
-   * 'start=20&size=10'
+   * > new SearchOptions('20', '10', false, null).toQueryString();
+   * 'start=20&size=10&faceted=false'
    */
   SearchOptions.prototype.toQueryString = function() {
     var queryParams = [];
@@ -732,6 +739,8 @@
     queryParams.push(qpstart);
     var qpsize = ('size=' + this.size);
     queryParams.push(qpsize);
+    var qpfaceted = ('faceted=' + this.faceted);
+    queryParams.push(qpfaceted);
     if (_nonnull(this.filterOptions)) {
       var qpfilter = this.filterOptions.toQueryString();
       queryParams.push(qpfilter);
@@ -756,11 +765,17 @@
    * @param {!string} value Search term
    *
    * @property {string} value Search term
+   * @protected @property {string} start Starts from the first resource
+   * (i.e., '0')
+   * @protected @property {string} size Returns up to '10' resources
+   * @protected @property {boolean} faceted No faceting in the response
+   * (i.e., false)
    */
   function DefaultSearchOptions(value) {
     SearchOptions.call(this);
     this.start = '0';
     this.size = '10';
+    this.faceted = false;
     this.filterOptions = new DefaultFilterOptions(value);
   }
   DefaultSearchOptions.prototype.__bhType = 'DefaultSearchOptions';
@@ -1379,6 +1394,7 @@
    * @param {!belhop.__.FilterOptions} Filter options
    * @param {number} [start=0] Page to start from
    * @param {number} [size=10] Maximum search results
+   * @param {boolean} [faceted=false] Controls faceting of the response
    *
    * @return {belhop.__.SearchOptions} the BELHop type produced by this factory
    * @example
@@ -1387,13 +1403,15 @@
    * // paging search results 10 at a time, get the second page
    * var searchOpts = belhop.factory.options.search.custom(filterOpts, 10, 10);
    */
-  belhop.factory.options.search.custom = function(filterOptions, start, size) {
+  belhop.factory.options.search.custom =
+      function(filterOptions, start, size, faceted) {
     // only filterOptions is required
     _assert_args(arguments, 1);
     // assert first arg are filter options
     _assert_type(arguments, 0, FilterOptions);
     var _start;
     var _size;
+    var _faceted;
 
     // accept start or default it
     if (_def(typeof start) && _nonnull(start)) {
@@ -1413,7 +1431,16 @@
       _size = 10;
     }
 
-    var product = new SearchOptions(_start, _size, filterOptions);
+    // accept faceted or default it
+    if (_def(typeof faceted) && _nonnull(faceted)) {
+      _assert_bool(arguments, 3);
+      _faceted = faceted;
+    } else {
+      // default to false as per function docs
+      _faceted = false;
+    }
+
+    var product = new SearchOptions(_start, _size, _faceted, filterOptions);
     return product;
   };
 
@@ -1448,15 +1475,17 @@
    * @param {!belhop.__.FilterOptions} Filter options
    * @param {number} [start=0] Page to start from
    * @param {number} [size=100] Maximum search results
+   * @param {boolean} [faceted=false] Controls faceting of the response
    *
    * @return {belhop.__.SearchOptions} the BELHop type produced by this factory
    */
   belhop.factory.options.search.evidence =
-      function(filterOptions, start, size) {
+      function(filterOptions, start, size, faceted) {
     // only filterOptions is required
     _assert_args(arguments, 1);
     var _start;
     var _size;
+    var _faceted;
 
     // accept start or default it
     if (_def(typeof start) && _nonnull(start)) {
@@ -1476,7 +1505,16 @@
       _size = 100;
     }
 
-    var product = new SearchOptions(_start, _size, filterOptions);
+    // accept faceted or default it
+    if (_def(typeof faceted) && _nonnull(faceted)) {
+      _assert_bool(arguments, 3);
+      _faceted = faceted;
+    } else {
+      // default to false as per function docs
+      _faceted = false;
+    }
+
+    var product = new SearchOptions(_start, _size, _faceted, filterOptions);
     return product;
   };
 
@@ -1904,13 +1942,16 @@
    * @memberOf belhop.evidence
 
    * @param {belhop.__.SearchOptions} searchOptions Search options
-   * @param {!belhop.Callback} cb Zero or more {@link belhop.Evidence}
+   * @param {!belhop.Callback} cb Plain object with <code>evidence</code>
+   * and <code>facets</code> properties containing {@link belhop.Evidence} and
+   * {@link belhop.Facet} elements respectively
    */
   belhop.evidence.search = function(searchOptions, cb) {
     _assert_args(arguments, 2);
     var path = '/evidence';
     var options = {
-      accept: _haljson
+      accept: _haljson,
+      queryParams: searchOptions.toQueryString()
     };
 
     // intercept on success...
@@ -1929,14 +1970,16 @@
         var ev = efactory(stmt, citation, ctxt, summary, meta);
         evidence.push(ev);
       });
-      data.facets.forEach(function(x) {
-        var count = x.count;
-        var category = x.category;
-        var name = x.name;
-        var value = x.value;
-        var facet = ffactory(count, category, name, value);
-        facets.push(facet);
-      });
+      if (_def(data.facets) && _nonnull(data.facets)) {
+        data.facets.forEach(function(x) {
+          var count = x.count;
+          var category = x.category;
+          var name = x.name;
+          var value = x.value;
+          var facet = ffactory(count, category, name, value);
+          facets.push(facet);
+        });
+      }
       var response = {
         'evidence': evidence,
         'facets': facets
