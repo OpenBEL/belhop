@@ -179,7 +179,7 @@ describe('belhop', function() {
 
       // generic search
       factory = belhop.factory.options.search.default;
-      var searchOptions = factory('promote lipid hydrolysis');
+      var searchOptions = factory('cell');
       expect(belhop.evidence.search).toBeDefined();
       belhop.evidence.search(searchOptions, cb);
     });
@@ -205,7 +205,7 @@ describe('belhop', function() {
       // generic search with evidence tuning (larger size, etc.)
       var filterFactory = belhop.factory.options.filter.default;
       var searchFactory = belhop.factory.options.search.evidence;
-      var filter = filterFactory('promote lipid hydrolysis');
+      var filter = filterFactory('cell');
       var searchOptions = searchFactory(filter, null, null, true);
       expect(belhop.evidence.search).toBeDefined();
       belhop.evidence.search(searchOptions, cb);
