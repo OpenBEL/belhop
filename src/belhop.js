@@ -1390,12 +1390,9 @@
    * See the {@link belhop.__.SearchOptions type} this factory produces for
    * more.
    *
-   * @todo See https://github.com/OpenBEL/belhop/issues/4
-   * (can't create search opts w/out filter opts)
-   *
    * @memberOf belhop.factory.options.search
    *
-   * @param {!belhop.__.FilterOptions} Filter options
+   * @param {?belhop.__.FilterOptions} filterOptions Filter options
    * @param {number} [start=0] Page to start from
    * @param {number} [size=10] Maximum search results
    * @param {boolean} [faceted=false] Controls faceting of the response
@@ -1409,13 +1406,19 @@
    */
   belhop.factory.options.search.custom =
       function(filterOptions, start, size, faceted) {
-    // only filterOptions is required
-    _assert_args(arguments, 1);
-    // assert first arg are filter options
-    _assert_type(arguments, 0, FilterOptions);
+    var _filterOptions;
     var _start;
     var _size;
     var _faceted;
+
+    // accept filterOptions or default to null
+    if (_def(typeof filterOptions) && _nonnull(filterOptions)) {
+      // assert its type
+      _assert_type(arguments, 0, FilterOptions);
+      _filterOptions = filterOptions;
+    } else {
+      _filterOptions = null;
+    }
 
     // accept start or default it
     if (_def(typeof start) && _nonnull(start)) {
@@ -1444,7 +1447,7 @@
       _faceted = false;
     }
 
-    var product = new SearchOptions(_start, _size, _faceted, filterOptions);
+    var product = new SearchOptions(_start, _size, _faceted, _filterOptions);
     return product;
   };
 
@@ -1476,7 +1479,7 @@
    *
    * @memberOf belhop.factory.options.search
    *
-   * @param {!belhop.__.FilterOptions} Filter options
+   * @param {?belhop.__.FilterOptions} filterOptions Filter options
    * @param {number} [start=0] Page to start from
    * @param {number} [size=100] Maximum search results
    * @param {boolean} [faceted=false] Controls faceting of the response
@@ -1485,11 +1488,19 @@
    */
   belhop.factory.options.search.evidence =
       function(filterOptions, start, size, faceted) {
-    // only filterOptions is required
-    _assert_args(arguments, 1);
+    var _filterOptions;
     var _start;
     var _size;
     var _faceted;
+
+    // accept filterOptions or default to null
+    if (_def(typeof filterOptions) && _nonnull(filterOptions)) {
+      // assert its type
+      _assert_type(arguments, 0, FilterOptions);
+      _filterOptions = filterOptions;
+    } else {
+      _filterOptions = null;
+    }
 
     // accept start or default it
     if (_def(typeof start) && _nonnull(start)) {
@@ -1518,7 +1529,7 @@
       _faceted = false;
     }
 
-    var product = new SearchOptions(_start, _size, _faceted, filterOptions);
+    var product = new SearchOptions(_start, _size, _faceted, _filterOptions);
     return product;
   };
 
