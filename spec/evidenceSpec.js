@@ -263,7 +263,7 @@ describe('belhop', function() {
       var searchOptions = factory('cell');
       expect(belhop.evidence.search).toBeDefined();
       belhop.evidence.search(searchOptions, cb, {
-        filterOptions: [filter1, filter2, filter3]
+        additionalFilters: [filter1, filter2, filter3]
       });
     });
 
