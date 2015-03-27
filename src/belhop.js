@@ -1391,7 +1391,7 @@
    * more.
    *
    * @todo See https://github.com/OpenBEL/belhop/issues/4
-   * (can't create search opts w/out filter opts) 
+   * (can't create search opts w/out filter opts)
    *
    * @memberOf belhop.factory.options.search
    *
