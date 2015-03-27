@@ -256,7 +256,7 @@ describe('belhop', function() {
 
       var filterFactory = belhop.factory.options.filter.custom;
       var filter1 = filterFactory('biological_context', 'Species', '9606');
-      var filter2 = filterFactory('metadata', 'status',  'Approved');
+      var filter2 = filterFactory('metadata', 'status', 'Approved');
       var filter3 = filterFactory('fts', 'search', 'nucleus');
 
       factory = belhop.factory.options.search.default;
