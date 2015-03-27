@@ -1973,7 +1973,7 @@
         additionalFilters = argOptions.additionalFilters;
       }
       additionalFilters.forEach(function(filterOption) {
-        getOpts.queryParams += filterOption.toQueryString();
+        getOpts.queryParams += ('&' + filterOption.toQueryString());
       });
     }
 
