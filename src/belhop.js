@@ -1026,11 +1026,11 @@
    */
   belhop.complete.expression = function(input, caretPosition, cb) {
     var path = '/expressions/' + input + '/completions';
-    var options = {};
+    var getOpts = {};
     if (_def(typeof caretPosition) && _nonnull(caretPosition)) {
-      options.queryParams = 'caret_position=' + caretPosition;
+      getOpts.queryParams = 'caret_position=' + caretPosition;
     }
-    apiGET(null, path, cb, options);
+    apiGET(null, path, cb, getOpts);
   };
 
   /**
@@ -1537,7 +1537,7 @@
   belhop.annotations.getTypes = function(cb) {
     _assert_args(arguments, 1);
     var path = '/annotations';
-    var options = {
+    var getOpts = {
       accept: _haljson
     };
 
@@ -1557,7 +1557,7 @@
       return;
     }
     var _cb = belhop.factory.callback(success, cb.error);
-    apiGET(null, path, _cb, options);
+    apiGET(null, path, _cb, getOpts);
   };
 
   /**
@@ -1572,7 +1572,7 @@
   belhop.annotations.getType = function(prefix, cb) {
     _assert_args(arguments, 2);
     var path = '/annotations/' + prefix;
-    var options = {
+    var getOpts = {
       accept: _haljson
     };
 
@@ -1599,7 +1599,7 @@
       return;
     }
     var _cb = belhop.factory.callback(success, error);
-    apiGET(null, path, _cb, options);
+    apiGET(null, path, _cb, getOpts);
   };
 
   /**
@@ -1615,7 +1615,7 @@
   belhop.annotations.getValue = function(prefix, value, cb) {
     _assert_args(arguments, 3);
     var path = '/annotations/' + prefix + '/values/' + value;
-    var options = {
+    var getOpts = {
       accept: _haljson
     };
 
@@ -1642,7 +1642,7 @@
       return;
     }
     var _cb = belhop.factory.callback(success, error);
-    apiGET(null, path, _cb, options);
+    apiGET(null, path, _cb, getOpts);
   };
 
   /**
@@ -1666,8 +1666,8 @@
       path = '/annotations/' + type + '/values';
     }
     var searchOpts = new DefaultSearchOptions(searchTerm);
-    var options = {};
-    options.queryParams = searchOpts.toQueryString();
+    var getOpts = {};
+    getOpts.queryParams = searchOpts.toQueryString();
 
     // intercept on success...
     function success(data, status, request) {
@@ -1696,7 +1696,7 @@
       return;
     }
     var _cb = belhop.factory.callback(success, error);
-    apiGET(null, path, _cb, options);
+    apiGET(null, path, _cb, getOpts);
   };
 
   /**
@@ -1711,8 +1711,8 @@
     _assert_args(arguments, 2);
     var searchOpts = new DefaultSearchOptions(searchTerm);
     var path = '/annotations/values';
-    var options = {};
-    options.queryParams = searchOpts.toQueryString();
+    var getOpts = {};
+    getOpts.queryParams = searchOpts.toQueryString();
 
     // intercept on success...
     function success(data, status, request) {
@@ -1741,7 +1741,7 @@
       return;
     }
     var _cb = belhop.factory.callback(success, error);
-    apiGET(null, path, _cb, options);
+    apiGET(null, path, _cb, getOpts);
   };
 
   /**
@@ -1812,10 +1812,10 @@
     var schemaURL = belhop.configuration.getSchemaURL();
     var profile = schemaURL + '/evidence.schema.json';
     var contentType = 'application/json;profile=' + profile;
-    var options = {
+    var postOpts = {
       contentType: contentType
     };
-    apiPOST(path, data, cb, options);
+    apiPOST(path, data, cb, postOpts);
   };
 
   /**
@@ -1831,7 +1831,7 @@
   belhop.evidence.get = function(id, cb) {
     _assert_args(arguments, 2);
     var path = '/evidence/' + id;
-    var options = {
+    var getOpts = {
       accept: _haljson
     };
 
@@ -1853,7 +1853,7 @@
       return;
     }
     var _cb = belhop.factory.callback(success, error);
-    apiGET(null, path, _cb, options);
+    apiGET(null, path, _cb, getOpts);
   };
 
   /**
@@ -1883,10 +1883,10 @@
     var schemaURL = belhop.configuration.getSchemaURL();
     var profile = schemaURL + '/evidence.schema.json';
     var contentType = 'application/json;profile=' + profile;
-    var options = {
+    var putOpts = {
       contentType: contentType
     };
-    apiPUT(self, null, data, cb, options);
+    apiPUT(self, null, data, cb, putOpts);
   };
 
   /**
@@ -1916,10 +1916,10 @@
       return;
     }
     var _cb = belhop.factory.callback(success, cb.error);
-    var options = {
+    var getOpts = {
       accept: _haljson
     };
-    apiGET(self, null, _cb, options);
+    apiGET(self, null, _cb, getOpts);
   };
 
   /**
