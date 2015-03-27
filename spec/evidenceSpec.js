@@ -238,6 +238,35 @@ describe('belhop', function() {
       belhop.evidence.search(searchOptions, cb);
     });
 
+    it('can be searched using multiple filters', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // our options shouldn't return more than 20 things
+        expect(response.evidence.length).not.toBeGreaterThan(200);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      var filterFactory = belhop.factory.options.filter.custom;
+      var filter1 = filterFactory('biological_context', 'Species', '9606');
+      var filter2 = filterFactory('metadata', 'status',  'Approved');
+      var filter3 = filterFactory('fts', 'search', 'nucleus');
+
+      factory = belhop.factory.options.search.default;
+      var searchOptions = factory('cell');
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb, {
+        filterOptions: [filter1, filter2, filter3]
+      });
+    });
+
     describe('annotations', function() {
 
       it('can be added by name/value', function() {
