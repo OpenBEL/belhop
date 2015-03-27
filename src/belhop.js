@@ -1946,14 +1946,33 @@
    * @param {!belhop.Callback} cb Plain object with <code>evidence</code>
    * and <code>facets</code> properties containing {@link belhop.Evidence} and
    * {@link belhop.Facet} elements respectively
+   * @param {?object} options Plain object with <code>additionalFilters</code>
+   * and any number of {@link belhop.__.FilterOptions}
    */
-  belhop.evidence.search = function(searchOptions, cb) {
+  belhop.evidence.search = function(searchOptions, cb, options) {
     _assert_args(arguments, 2);
     var path = '/evidence';
-    var options = {
+    var getOpts = {
       accept: _haljson,
       queryParams: searchOptions.toQueryString()
     };
+
+    // Apply any additional filters
+    var defaultOptions = { additionalFilters: null };
+    var argOptions = $.extend(defaultOptions, options || {});
+    if (_nonnull(argOptions.additionalFilters)) {
+      var additionalFilters = [];
+      if (argOptions.additionalFilters instanceof FilterOptions) {
+        var filterOptions = argOptions.additionalFilters;
+        additionalFilters.push(filterOptions);
+      } else {
+        // FIXME assume additional filters is an array vice LBYL
+        additionalFilters = argOptions.additionalFilters;
+      }
+      additionalFilters.forEach(function(filterOption) {
+        getOpts.queryParams += filterOption.toQueryString();
+      });
+    }
 
     // intercept on success...
     function success(data, status, request) {
@@ -1999,7 +2018,7 @@
       return;
     }
     var _cb = belhop.factory.callback(success, error);
-    apiGET(null, path, _cb, options);
+    apiGET(null, path, _cb, getOpts);
   };
 
   /**
