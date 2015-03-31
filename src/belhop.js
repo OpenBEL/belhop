@@ -10,11 +10,13 @@
   /* global module $ console */
 
   var root = this;
+  var _contentType = 'Content-Type';
   var _defaultAPIURL = 'http://next.belframework.org/api';
   var _defaultSchemaURL = 'http://next.belframework.org/schema';
   var _badfcall = 'invalid function call';
   var _badcb = 'invalid callback';
   var _ufo = 'unidentified object';
+  var _json = 'application/json';
   var _haljson = 'application/hal+json';
   var _not_found = 'not found';
   var _deprecations = {};
@@ -105,11 +107,26 @@
       throw new Error(msg);
     }
     if (!(error instanceof Function)) {
-      msg = 'error ' + msg + ' (' + typeof success + ')';
+      msg = 'error ' + msg + ' (' + typeof error + ')';
       throw new Error(msg);
     }
+
+    var errWrapper = function(request, errorstr, exception) {
+      // injects serverErr into the error callback
+      var serverErr = null;
+
+      // serverErr will be non-null in JSON responses...
+      if (_def(request) && request.getResponseHeader(_contentType) === _json) {
+        // ... and status >= 400.
+        if (request.status >= 400) {
+          serverErr = request.responseJSON;
+        }
+      }
+      // invoke callback with altered arg set
+      error(request, errorstr, serverErr, exception);
+    };
     this.success = success;
-    this.error = error;
+    this.error = errWrapper;
   }
 
   function _assert_num(args, index) {
@@ -301,14 +318,15 @@
    * is called with the response data, status string, and original request (in
    * that order).
    * @property {function} error - Function called on error. This function
-   * is called with the original request, error string, and exception object
-   * if one occurred (in that order).
+   * is called with the original request, error string, server error, and
+   * exception object if one occurred (in that order). HTTP errors will set
+   * exception to the HTTP status string (e.g., "Not Found").
    *
    * @example
    * // no-op callback, w/ function arguments for clarity
    * var cb = {
    *   success: function(responseData, statusString, request) {},
-   *   error: function(request, errorString, exception) {}
+   *   error: function(request, errorString, serverError, exception) {}
    * };
    */
 
@@ -1621,13 +1639,13 @@
       return;
     }
     // intercept on error...
-    function error(request, errorstr) {
+    function error(request, errorstr, exception) {
       // not found? null
       if (request.status === 404) {
         cb.success(null, _not_found, request);
         return;
       }
-      cb.error(request, errorstr, request);
+      cb.error(request, errorstr, exception);
       return;
     }
     var _cb = belhop.factory.callback(success, error);
@@ -1664,13 +1682,13 @@
       return;
     }
     // intercept on error...
-    function error(request, errorstr) {
+    function error(request, errorstr, exception) {
       // not found? null
       if (request.status === 404) {
         cb.success(null, _not_found, request);
         return;
       }
-      cb.error(request, errorstr, request);
+      cb.error(request, errorstr, exception);
       return;
     }
     var _cb = belhop.factory.callback(success, error);
@@ -1718,13 +1736,13 @@
       return;
     }
     // intercept on error...
-    function error(request, errorstr) {
+    function error(request, errorstr, exception) {
       // not found? []
       if (request.status === 404) {
         cb.success([], _not_found, request);
         return;
       }
-      cb.error(request, errorstr, request);
+      cb.error(request, errorstr, exception);
       return;
     }
     var _cb = belhop.factory.callback(success, error);
@@ -1763,13 +1781,13 @@
       return;
     }
     // intercept on error...
-    function error(request, errorstr) {
+    function error(request, errorstr, exception) {
       // not found? []
       if (request.status === 404) {
         cb.success([], _not_found, request);
         return;
       }
-      cb.error(request, errorstr, request);
+      cb.error(request, errorstr, exception);
       return;
     }
     var _cb = belhop.factory.callback(success, error);
@@ -1875,13 +1893,13 @@
       return;
     }
     // intercept on error...
-    function error(request, errorstr) {
+    function error(request, errorstr, exception) {
       // not found? null
       if (request.status === 404) {
         cb.success(null, _not_found, request);
         return;
       }
-      cb.error(request, errorstr, request);
+      cb.error(request, errorstr, exception);
       return;
     }
     var _cb = belhop.factory.callback(success, error);

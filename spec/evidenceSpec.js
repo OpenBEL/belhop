@@ -11,15 +11,6 @@ describe('belhop', function() {
 
   describe('evidence', function() {
 
-    it('can be created minimally', function() {
-      var citation = belhop.factory.citation(10022765, 'PubMed');
-      var statement = 'p(evidenceCreated) increases p(Minimally)';
-      factory = belhop.factory.evidence;
-      var ev = factory(statement, citation);
-      expect(ev.bel_statement).toEqual(statement);
-      expect(ev.citation).toEqual(citation);
-    });
-
     it('can be created', function(done) {
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(201);
@@ -45,6 +36,46 @@ describe('belhop', function() {
       var ev = factory(statement, citation, ctxt, summary, meta);
       createdEvidence = ev;
       belhop.evidence.create(ev, cb);
+    });
+
+    describe('creation', function() {
+
+      it('can be minimal', function() {
+        var citation = belhop.factory.citation(10022765, 'PubMed');
+        var statement = 'p(evidenceCreated) increases p(Minimally)';
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation);
+        expect(ev.bel_statement).toEqual(statement);
+        expect(ev.citation).toEqual(citation);
+      });
+
+      it('can fail gracefully', function(done) {
+        var onSucc = function(response, status, xhr) {
+          expect(xhr.status).toEqual(400);
+          done();
+        };
+        var onErr = function(xhr, errorString, serverError, exception) {
+          expect(xhr.status).toEqual(400);
+          expect(serverError).toBeDefined();
+          expect(typeof serverError).toEqual('object');
+          expect(typeof exception).toEqual('string');
+          done();
+        };
+        var cb = belhop.factory.callback(onSucc, onErr);
+        expect(belhop.evidence.create).toBeDefined();
+        var statement = 'p(evidence) increases p(canBeCreated)';
+        var citation = {type: 'PostIt', name: 'None', id: '10022765'};
+        var ctxt = [
+          {name: 'Species', value: [9606, 10090]},
+          {name: 'Cell', value: ['fibroblast', 'leukocyte']}
+        ];
+        var summary = 'Found this on a post-it near a sciency looking person.';
+        var meta = {status: 'draft'};
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation, ctxt, summary, meta);
+        belhop.evidence.create(ev, cb);
+      });
+
     });
 
     it('can be retrieved', function(done) {
