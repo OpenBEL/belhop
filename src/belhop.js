@@ -1146,6 +1146,7 @@
    * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callbackNoErrors
    * @see belhop.factory.callbackNoSuccess
+   * @see belhop.factory.callbackNoOp
    */
   belhop.factory.callback = function(success, error) {
     return new _Callback(success, error);
@@ -1162,6 +1163,7 @@
    * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callback
    * @see belhop.factory.callbackNoSuccess
+   * @see belhop.factory.callbackNoOp
    */
   belhop.factory.callbackNoErrors = function(success) {
     return new _Callback(success, _NO_OP);
@@ -1178,9 +1180,25 @@
    * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callback
    * @see belhop.factory.callbackNoErrors
+   * @see belhop.factory.callbackNoOp
    */
   belhop.factory.callbackNoSuccess = function(error) {
     return new _Callback(_NO_OP, error);
+  };
+
+  /**
+   * Create a callback that treats success and errors as a no-op.
+   * See the {@link belhop.Callback type} this factory produces for more.
+   *
+   * @memberOf belhop.factory
+   *
+   * @return {belhop.Callback} the BELHop type produced by this factory
+   * @see belhop.factory.callback
+   * @see belhop.factory.callbackNoErrors
+   * @see belhop.factory.callbackNoSuccess
+   */
+  belhop.factory.callbackNoOp = function() {
+    return new _Callback(_NO_OP, _NO_OP);
   };
 
   /**

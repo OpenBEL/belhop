@@ -58,6 +58,14 @@ describe('belhop', function() {
       expect(cb.success()).not.toBeDefined();
     });
 
+    it('can no-op both errors and success', function() {
+      var cb = belhop.factory.callbackNoOp();
+      expect(typeof cb.success).toBe('function');
+      expect(typeof cb.error).toBe('function');
+      expect(cb.success()).not.toBeDefined();
+      expect(cb.error()).not.toBeDefined();
+    });
+
   });
 
 });
