@@ -84,8 +84,8 @@ describe('belhop', function() {
       var cb = belhop.factory.callback(onSucc, onErr);
       var input = 'p(HGNC:AK)';
       var caretPos = 9;
-      expect(belhop.complete.getCompletions).toBeDefined();
-      belhop.complete.getCompletions(input, caretPos, cb);
+      expect(belhop.complete.expression).toBeDefined();
+      belhop.complete.expression(input, caretPos, cb);
     });
 
   });

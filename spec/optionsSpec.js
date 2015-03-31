@@ -73,6 +73,18 @@ describe('belhop', function() {
       expect(search instanceof belhop.__.SearchOptions).toEqual(true);
     });
 
+    it('can create custom search options without filters', function() {
+      expect(factory.custom).toBeDefined();
+      search = factory.custom(null, 0, 5);
+      expect(search instanceof belhop.__.SearchOptions).toEqual(true);
+    });
+
+    it('can create evidence search options without filters', function() {
+      expect(factory.evidence).toBeDefined();
+      search = factory.evidence(null, 10, 10);
+      expect(search instanceof belhop.__.SearchOptions).toEqual(true);
+    });
+
   });
 
 });

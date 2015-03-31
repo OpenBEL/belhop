@@ -11,15 +11,6 @@ describe('belhop', function() {
 
   describe('evidence', function() {
 
-    it('can be created minimally', function() {
-      var citation = belhop.factory.citation(10022765, 'PubMed');
-      var statement = 'p(evidenceCreated) increases p(Minimally)';
-      factory = belhop.factory.evidence;
-      var ev = factory(statement, citation);
-      expect(ev.bel_statement).toEqual(statement);
-      expect(ev.citation).toEqual(citation);
-    });
-
     it('can be created', function(done) {
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(201);
@@ -45,6 +36,46 @@ describe('belhop', function() {
       var ev = factory(statement, citation, ctxt, summary, meta);
       createdEvidence = ev;
       belhop.evidence.create(ev, cb);
+    });
+
+    describe('creation', function() {
+
+      it('can be minimal', function() {
+        var citation = belhop.factory.citation(10022765, 'PubMed');
+        var statement = 'p(evidenceCreated) increases p(Minimally)';
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation);
+        expect(ev.bel_statement).toEqual(statement);
+        expect(ev.citation).toEqual(citation);
+      });
+
+      it('can fail gracefully', function(done) {
+        var onSucc = function(response, status, xhr) {
+          expect(xhr.status).toEqual(400);
+          done();
+        };
+        var onErr = function(xhr, errorString, serverError, exception) {
+          expect(xhr.status).toEqual(400);
+          expect(serverError).toBeDefined();
+          expect(typeof serverError).toEqual('object');
+          expect(typeof exception).toEqual('string');
+          done();
+        };
+        var cb = belhop.factory.callback(onSucc, onErr);
+        expect(belhop.evidence.create).toBeDefined();
+        var statement = 'p(evidence) increases p(canBeCreated)';
+        var citation = {type: 'PostIt', name: 'None', id: '10022765'};
+        var ctxt = [
+          {name: 'Species', value: [9606, 10090]},
+          {name: 'Cell', value: ['fibroblast', 'leukocyte']}
+        ];
+        var summary = 'Found this on a post-it near a sciency looking person.';
+        var meta = {status: 'draft'};
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation, ctxt, summary, meta);
+        belhop.evidence.create(ev, cb);
+      });
+
     });
 
     it('can be retrieved', function(done) {
@@ -159,6 +190,114 @@ describe('belhop', function() {
       belhop.evidence.delete(retrievedEvidence, cb);
     });
 
+    it('can be searched using default options', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // default options won't return more than 10 things
+        expect(response.evidence.length).not.toBeGreaterThan(10);
+        // default options do not facet responses
+        expect(response.facets.length).toEqual(0);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      // generic search
+      factory = belhop.factory.options.search.default;
+      var searchOptions = factory('cell');
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb);
+    });
+
+    it('can be searched using evidence options', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // our default options shouldn't return more than 100 things
+        expect(response.evidence.length).not.toBeGreaterThan(100);
+        // our options should include faceted responses
+        expect(response.facets.length).toBeGreaterThan(0);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      // generic search with evidence tuning (larger size, etc.)
+      var filterFactory = belhop.factory.options.filter.default;
+      var searchFactory = belhop.factory.options.search.evidence;
+      var filter = filterFactory('cell');
+      var searchOptions = searchFactory(filter, null, null, true);
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb);
+    });
+
+    it('can be searched using custom options', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // our options shouldn't return more than 20 things
+        expect(response.evidence.length).not.toBeGreaterThan(20);
+        // our options should include faceted responses
+        expect(response.facets.length).toBeGreaterThan(0);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      // custom search with start offset 40, size 20, faceting, and filter
+      var filterFactory = belhop.factory.options.filter.custom;
+      var searchFactory = belhop.factory.options.search.evidence;
+      var filter = filterFactory('biological_context', 'Species', '10090');
+      var searchOptions = searchFactory(filter, 40, 20, true);
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb);
+    });
+
+    it('can be searched using multiple filters', function(done) {
+      var onSucc = function(response, status, xhr) {
+        expect(xhr.status).toEqual(200);
+        // docs say evidence and facets are in response object
+        expect(response.evidence).toBeDefined();
+        expect(response.facets).toBeDefined();
+        // our options shouldn't return more than 20 things
+        expect(response.evidence.length).not.toBeGreaterThan(200);
+        done();
+      };
+      var onErr = function(xhr) {
+        expect(xhr.status).toEqual(200);
+        done();
+      };
+      var cb = belhop.factory.callback(onSucc, onErr);
+
+      var filterFactory = belhop.factory.options.filter.custom;
+      var filter1 = filterFactory('biological_context', 'Species', '9606');
+      var filter2 = filterFactory('metadata', 'status', 'Approved');
+      var filter3 = filterFactory('fts', 'search', 'nucleus');
+
+      factory = belhop.factory.options.search.default;
+      var searchOptions = factory('cell');
+      expect(belhop.evidence.search).toBeDefined();
+      belhop.evidence.search(searchOptions, cb, {
+        additionalFilters: [filter1, filter2, filter3]
+      });
+    });
+
     describe('annotations', function() {
 
       it('can be added by name/value', function() {
@@ -211,7 +350,7 @@ describe('belhop', function() {
         expect(belhop.evidence.annotation.addAnnotation).toBeDefined();
         var add = belhop.evidence.annotation.addAnnotation;
 
-        expect(belhop.factory.annotations.type).toBeDefined();
+        expect(belhop.factory.annotations.value).toBeDefined();
         factory = belhop.factory.annotations.value;
 
         var value = factory('IDENTIFIER', 'NAME', 'TYPE', 'URI');
@@ -220,6 +359,35 @@ describe('belhop', function() {
         var ctxt = ev.biological_context;
         expect(ctxt.length).toEqual(1);
         expect(ctxt[0]).toEqual('URI');
+      });
+
+      it('can be added by annotation search results', function(done) {
+        var statement = 'p(annos) increases p(canBeAddedNV)';
+        var citation = {type: 'PubMed', name: 'None', id: '10022765'};
+        factory = belhop.factory.evidence;
+        var ev = factory(statement, citation);
+
+        expect(belhop.evidence.annotation.addAnnotation).toBeDefined();
+        var add = belhop.evidence.annotation.addAnnotation;
+
+        var onSucc = function(values, status, xhr) {
+          expect(xhr.status).toEqual(200);
+          expect(values).not.toBeNull();
+          expect(values.length).toBeGreaterThan(0);
+          var value = values[0];
+          add(ev, value);
+          expect(ev.biological_context).toBeDefined();
+          var ctxt = ev.biological_context;
+          expect(ctxt.length).toEqual(1);
+          expect(ctxt[0]).toEqual(value.uri);
+          done();
+        };
+        var onErr = function(xhr) {
+          expect(xhr.status).toEqual(200);
+          done();
+        };
+        var cb = belhop.factory.callback(onSucc, onErr);
+        belhop.annotations.search('9606', cb);
       });
 
     });

@@ -1,3 +1,4 @@
+----
 # Working With Annotations
 
 ## Create Evidence Using Factory Functions
@@ -10,13 +11,40 @@ var citation = belhop.factory.citation(10022765, 'PubMed');
 var evidence = belhop.factory.evidence(statement, citation);
 ```
 
-## Add Annotation From Search Results
+## Add Annotation From Annotation Search Results
 
-This uses the backend API to search values of an annotation type. A search
-result is then added.
+This uses the backend API to search all annotation values. A search result is
+then added.
 
 ```javascript
-TODO
+function success(values) {
+    // use the first search result for tutorial purposes
+    var value = values[0];
+    // add the search result
+    belhop.evidence.annotation.addAnnotation(evidence, value);
+}
+var cb = belhop.factory.callbackNoErrors(success);
+
+// search '96' across all annotations
+belhop.annotations.search('96', cb);
+```
+
+## Add Annotation From Annotation Type Search Results
+
+This uses the backend API to search all annotation values of a specific type. A
+search result is then added.
+
+```javascript
+function success(values) {
+    // use the first search result for tutorial purposes
+    var value = values[0];
+    // add the search result
+    belhop.evidence.annotation.addAnnotation(evidence, value);
+}
+var cb = belhop.factory.callbackNoErrors(success);
+
+// search '96' under taxonomy annotations
+belhop.annotations.searchByType('taxon', '96', cb);
 ```
 
 ## Add Annotation By Type

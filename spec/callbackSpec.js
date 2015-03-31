@@ -16,7 +16,7 @@ describe('belhop', function() {
       expect(cb).not.toBeNull();
 
       expect(cb.success).toBe(success);
-      expect(cb.error).toBe(error);
+      expect(cb.error).toBeDefined();
     });
 
     it('expose success/error functions', function() {
@@ -53,9 +53,17 @@ describe('belhop', function() {
     it('can no-op success', function() {
       function error() { }
       var cb = belhop.factory.callbackNoSuccess(error);
-      expect(cb.error).toBe(error);
+      expect(cb.error).toBeDefined();
       expect(typeof cb.success).toBe('function');
       expect(cb.success()).not.toBeDefined();
+    });
+
+    it('can no-op both errors and success', function() {
+      var cb = belhop.factory.callbackNoOp();
+      expect(typeof cb.success).toBe('function');
+      expect(typeof cb.error).toBe('function');
+      expect(cb.success()).not.toBeDefined();
+      expect(cb.error()).not.toBeDefined();
     });
 
   });
