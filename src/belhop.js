@@ -301,10 +301,10 @@
   * @name Completion
   * @memberOf belhop
   * @typedef {Completion} Completion
-  * @property {array} actions - The completion actions.
-  * @property {string} value - The completion value (the proposal).
-  * @property {string} label - Expanded representation of the value.
-  * @property {string} type - The type of the completion (provided by the API).
+  * @property {array} actions The completion actions.
+  * @property {string} value The completion value (the proposal).
+  * @property {string} label Expanded representation of the value.
+  * @property {string} type The type of the completion (provided by the API).
   */
 
   /**
@@ -314,10 +314,10 @@
    * @name Callback
    * @memberOf belhop
    * @typedef {Callback} Callback
-   * @property {function} success - Function called on success. This function
+   * @property {function} success Function called on success. This function
    * is called with the response data, status string, and original request (in
    * that order).
-   * @property {function} error - Function called on error. This function
+   * @property {function} error Function called on error. This function
    * is called with the original request, error string, server error, and
    * exception object if one occurred (in that order). HTTP errors will set
    * exception to the HTTP status string (e.g., "Not Found").
@@ -940,7 +940,7 @@
    *
    * @memberOf belhop.configuration
    *
-   * @param {string} url - The API URL to use
+   * @param {string} url The API URL to use
    *
    * @example
    * > // reset to the default URL
@@ -974,7 +974,7 @@
    *
    * @memberOf belhop.configuration
    *
-   * @param {string} url - The schema URL to use
+   * @param {string} url The schema URL to use
    *
    * @example
    * > // reset to the default URL
@@ -1081,8 +1081,8 @@
    *
    * @memberOf belhop.complete
    *
-   * @param {string} input - BEL expression to autocomplete.
-   * @param {number} caretPosition - optional caret position
+   * @param {string} input BEL expression to autocomplete.
+   * @param {number} caretPosition Optional caret position
    * @param {Callback} cb Zero or more completions on success
    *
    * @deprecated Deprecated in favor of {@link belhop.complete.expression}
@@ -1101,9 +1101,9 @@
    * @protected
    * @memberOf belhop.complete.actions
    *
-   * @param {string} str - Input string to operate on.
-   * @param {number} startPos - Starting position of the deletion range.
-   * @param {number} endPos - Ending position of the deletion range.
+   * @param {string} str Input string to operate on.
+   * @param {number} startPos Starting position of the deletion range.
+   * @param {number} endPos Ending position of the deletion range.
    *
    * @example
    * > // delete "JUNK" from input
@@ -1125,9 +1125,9 @@
    * @protected
    * @memberOf belhop.complete.actions.insert
    *
-   * @param {string} str - Input string to operate on.
-   * @param {string} value - String to insert.
-   * @param {number} position - Insertion position.
+   * @param {string} str Input string to operate on.
+   * @param {string} value String to insert.
+   * @param {number} position Insertion position.
    *
    * @example
    * > // insert "bar" into input
@@ -1158,8 +1158,8 @@
    *
    * @memberOf belhop.factory
    *
-   * @param {function} success - Function to call on success
-   * @param {function} error - Function to call on error
+   * @param {function} success Function to call on success
+   * @param {function} error Function to call on error
    *
    * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callbackNoErrors
@@ -1176,7 +1176,7 @@
    *
    * @memberOf belhop.factory
    *
-   * @param {function} success - Function to call on success
+   * @param {function} success Function to call on success
    *
    * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callback
@@ -1193,7 +1193,7 @@
    *
    * @memberOf belhop.factory
    *
-   * @param {function} error - Function to call on error
+   * @param {function} error Function to call on error
    *
    * @return {belhop.Callback} the BELHop type produced by this factory
    * @see belhop.factory.callback
@@ -1810,9 +1810,9 @@
    * @memberOf belhop.validate
    * @todo implement
    *
-   * @param {string} str - Input string to operate on.
-   * @param {string} value - String to insert.
-   * @param {number} position - Insertion position.
+   * @param {string} str Input string to operate on.
+   * @param {string} value String to insert.
+   * @param {number} position Insertion position.
    *
    * @return {Object}
    */
@@ -1826,9 +1826,9 @@
    * @memberOf belhop.validate
    * @todo implement
    *
-   * @param {string} str - Input string to operate on.
-   * @param {string} value - String to insert.
-   * @param {number} position - Insertion position.
+   * @param {string} str Input string to operate on.
+   * @param {string} value String to insert.
+   * @param {number} position Insertion position.
    *
    * @return {Object}
    */
