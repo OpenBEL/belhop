@@ -2040,7 +2040,7 @@
         var ev = efactory(stmt, citation, ctxt, summary, meta);
         evidence.push(ev);
       });
-      if (_def(data.facets) && _nonnull(data.facets)) {
+      if (_defNonNull(data.facets)) {
         data.facets.forEach(function(x) {
           var count = x.count;
           var category = x.category;
