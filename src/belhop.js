@@ -311,6 +311,11 @@
    * BELHop callback type definition.
    * These types can be created in {@link belhop.factory the factory}.
    *
+   * These types define the callback definition used throughout the library.
+   * The *success* and *error* criteria defined by these callbacks defer from
+   * traditional callbacks involving HTTP. The examples that follow further
+   * illustrate this point.
+   *
    * @name Callback
    * @memberOf belhop
    * @typedef {Callback} Callback
@@ -322,11 +327,25 @@
    * exception object if one occurred (in that order). HTTP errors will set
    * exception to the HTTP status string (e.g., "Not Found").
    *
-   * @example
-   * // no-op callback, w/ function arguments for clarity
+   * @example <caption>No-Op Callback</caption>
+   * // Function arguments included for clarity.
    * var cb = {
    *   success: function(responseData, statusString, request) {},
    *   error: function(request, errorString, serverError, exception) {}
+   * };
+   *
+   * @example <caption>Intercepting Callback</caption>
+   * // Intercept error function in "callback" and treat 404 as success.
+   * var intercept404 = {
+   *   success: callback.success,
+   *   error: function(request, errorString, exception) {
+   *     if (request.status === 404) {
+   *       // treat 404 as success with null response
+   *       callback.success(null, 'Not Found', request);
+   *       return;
+   *     }
+   *     callback.error(request, errorString, exception);
+   *   }
    * };
    */
 
