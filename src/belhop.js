@@ -932,7 +932,7 @@
     var self = _self(apiurl, obj);
     var pathTokens = self.split('/');
     return pathTokens.slice(-1);
-  }
+  };
 
   /**
    * This namespace contains APIs targeting the configuration of the library.
@@ -1924,12 +1924,10 @@
         var meta = x.metadata;
         var summary = x.summary_text;
         var ev = efactory(stmt, citation, ctxt, summary, meta);
-        // evidence URI
-        var self = belhop.__.self(x);
-        ev.uri = self;
+        // evidence URI (self)
+        ev.uri = belhop.__.self(x);
         // evidence id
-        var id = belhop.__.selfIdentifier(x);
-        ev.id = id;
+        ev.id = belhop.__.selfIdentifier(x);
         evidence.push(ev);
       });
       var response = {
@@ -2091,12 +2089,10 @@
         var meta = x.metadata;
         var summary = x.summary_text;
         var ev = efactory(stmt, citation, ctxt, summary, meta);
-        // evidence URI
-        var self = belhop.__.self(x);
-        ev.uri = self;
+        // evidence URI (self)
+        ev.uri = belhop.__.self(x);
         // evidence id
-        var id = belhop.__.selfIdentifier(x);
-        ev.id = id;
+        ev.id = belhop.__.selfIdentifier(x);
         evidence.push(ev);
       });
       if (_defNonNull(data.facets)) {
