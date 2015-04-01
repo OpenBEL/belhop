@@ -256,7 +256,7 @@
   function _self(apiurl, obj) {
     var errmsg = '';
     if (!(_hasself(obj))) {
-      throw _Ex(_ufo, arguments, 1);
+      throw new _Ex(_ufo, arguments, 1);
     }
     var self = obj._links.self.href;
 
@@ -267,7 +267,7 @@
     if (self.slice(-1) === '/') {
       // prevent dereferencing as self
       errmsg = 'unexpected self: ' + self;
-      throw _Ex(errmsg, arguments, 1);
+      throw new _Ex(errmsg, arguments, 1);
     }
     // 'http://host/api/resource/id' -> '/resource/id'
     var path = self.replace(apiurl, '');
@@ -276,7 +276,7 @@
     if (tokens.length < 3) {
       // prevent dereferencing as self
       errmsg = 'unexpected self: ' + self;
-      throw _Ex(errmsg, arguments, 1);
+      throw new _Ex(errmsg, arguments, 1);
     }
     return self;
   }
