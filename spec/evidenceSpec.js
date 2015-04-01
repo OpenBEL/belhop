@@ -82,7 +82,9 @@ describe('belhop', function() {
       expect(locations.length).toEqual(1);
       var onSucc = function(response, status, xhr) {
         expect(xhr.status).toEqual(200);
-        retrievedEvidence = response[0];
+        // get won't return more than 1 thing
+        expect(response.evidence.length).toEqual(1);
+        retrievedEvidence = response.evidence[0];
         done();
       };
       var onErr = function(xhr) {
