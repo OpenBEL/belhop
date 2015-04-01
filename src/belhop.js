@@ -357,6 +357,7 @@
    * @memberOf belhop
    * @typedef {Evidence} Evidence
    * @property {?string} id The evidence identifier (if previously created)
+   * @property {?string} uri The evidence URI (if previously created)
    * @property {string} bel_statement Represents the biological knowledge
    * @property {belhop.Citation} citation Source of the biological knowledge
    * @property {object} [biological_context] Where the interaction was observed
