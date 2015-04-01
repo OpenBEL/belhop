@@ -256,7 +256,7 @@
   function _self(apiurl, obj) {
     var errmsg = '';
     if (!(_hasself(obj))) {
-      throw _Ex(_ufo, arguments, 1);
+      throw new _Ex(_ufo, arguments, 1);
     }
     var self = obj._links.self.href;
 
@@ -267,7 +267,7 @@
     if (self.slice(-1) === '/') {
       // prevent dereferencing as self
       errmsg = 'unexpected self: ' + self;
-      throw _Ex(errmsg, arguments, 1);
+      throw new _Ex(errmsg, arguments, 1);
     }
     // 'http://host/api/resource/id' -> '/resource/id'
     var path = self.replace(apiurl, '');
@@ -276,7 +276,7 @@
     if (tokens.length < 3) {
       // prevent dereferencing as self
       errmsg = 'unexpected self: ' + self;
-      throw _Ex(errmsg, arguments, 1);
+      throw new _Ex(errmsg, arguments, 1);
     }
     return self;
   }
@@ -357,6 +357,7 @@
    * @memberOf belhop
    * @typedef {Evidence} Evidence
    * @property {?string} id The evidence identifier (if previously created)
+   * @property {?string} uri The evidence URI (if previously created)
    * @property {string} bel_statement Represents the biological knowledge
    * @property {belhop.Citation} citation Source of the biological knowledge
    * @property {object} [biological_context] Where the interaction was observed
@@ -925,6 +926,13 @@
     var apiurl = belhop.configuration.getAPIURL();
     return _self(apiurl, obj);
   };
+
+  belhop.__.selfIdentifier = function(obj) {
+    var apiurl = belhop.configuration.getAPIURL();
+    var self = _self(apiurl, obj);
+    var pathTokens = self.split('/');
+    return pathTokens.slice(-1);
+  }
 
   /**
    * This namespace contains APIs targeting the configuration of the library.
@@ -1894,8 +1902,8 @@
    * @memberOf belhop.evidence
    *
    * @param {?string} id Evidence to get
-   * @param {!belhop.Callback} cb {@link belhop.Evidence} if it exists;
-   * <code>null</code> if not
+   * @param {!belhop.Callback} cb Plain object with an <code>evidence</code>
+   * property containing {@link belhop.Evidence}
    */
   belhop.evidence.get = function(id, cb) {
     _assert_args(arguments, 2);
@@ -1907,8 +1915,27 @@
     // intercept on success...
     function success(data, status, request) {
       // ... dig into evidence, we only want the content.
-      var evidenceArr = data.evidence;
-      cb.success(evidenceArr, status, request);
+      var evidence = [];
+      var efactory = belhop.factory.evidence;
+      data.evidence.forEach(function(x) {
+        var stmt = x.bel_statement;
+        var ctxt = x.biological_context;
+        var citation = x.citation;
+        var meta = x.metadata;
+        var summary = x.summary_text;
+        var ev = efactory(stmt, citation, ctxt, summary, meta);
+        // evidence URI
+        var self = belhop.__.self(x);
+        ev.uri = self;
+        // evidence id
+        var id = belhop.__.selfIdentifier(x);
+        ev.id = id;
+        evidence.push(ev);
+      });
+      var response = {
+        'evidence': evidence
+      };
+      cb.success(response, status, request);
       return;
     }
     // intercept on error...
@@ -1936,8 +1963,11 @@
    */
   belhop.evidence.update = function(evidence, cb) {
     _assert_args(arguments, 2);
-    // self: what are we updating (PUT href)
-    var self = belhop.__.self(evidence);
+    // TODO should type assert evidence as Evidence
+    // (missing real prototype for this currently)
+
+    // uri: what are we updating (PUT href)
+    var uri = evidence.uri;
     var stmt = evidence.bel_statement;
     var citation = evidence.citation;
     var ctxt = evidence.biological_context;
@@ -1955,7 +1985,7 @@
     var putOpts = {
       contentType: contentType
     };
-    apiPUT(self, null, data, cb, putOpts);
+    apiPUT(uri, null, data, cb, putOpts);
   };
 
   /**
@@ -1969,8 +1999,11 @@
    */
   belhop.evidence.reset = function(evidence, cb) {
     _assert_args(arguments, 2);
-    // self: what are we getting (GET href)
-    var self = belhop.__.self(evidence);
+    // TODO should type assert evidence as Evidence
+    // (missing real prototype for this currently)
+
+    // uri: what are we updating (PUT href)
+    var uri = evidence.uri;
 
     // intercept on success and reset evidence prior to cb
     function success(data, status, request) {
@@ -1988,7 +2021,7 @@
     var getOpts = {
       accept: _haljson
     };
-    apiGET(self, null, _cb, getOpts);
+    apiGET(uri, null, _cb, getOpts);
   };
 
   /**
@@ -2002,8 +2035,9 @@
    */
   belhop.evidence.delete = function(evidence, cb) {
     _assert_args(arguments, 2);
-    var self = belhop.__.self(evidence);
-    apiDELETE(self, null, cb);
+    // TODO should type assert evidence as Evidence
+    // (missing real prototype for this currently)
+    apiDELETE(evidence.uri, null, cb);
   };
 
   /**
@@ -2057,6 +2091,12 @@
         var meta = x.metadata;
         var summary = x.summary_text;
         var ev = efactory(stmt, citation, ctxt, summary, meta);
+        // evidence URI
+        var self = belhop.__.self(x);
+        ev.uri = self;
+        // evidence id
+        var id = belhop.__.selfIdentifier(x);
+        ev.id = id;
         evidence.push(ev);
       });
       if (_defNonNull(data.facets)) {
