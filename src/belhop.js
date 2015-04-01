@@ -927,6 +927,13 @@
     return _self(apiurl, obj);
   };
 
+  belhop.__.selfIdentifier = function(obj) {
+    var apiurl = belhop.configuration.getAPIURL();
+    var self = _self(apiurl, obj);
+    var pathTokens = self.split('/');
+    return pathTokens.slice(-1);
+  }
+
   /**
    * This namespace contains APIs targeting the configuration of the library.
    * @namespace belhop.configuration
