@@ -6,8 +6,7 @@ node_js:
   - "iojs"
 
 env:
-  - TEST_HEADLESS=no
-  - KARMA_BROWSERS=Firefox
+  - TEST_HEADLESS=no KARMA_BROWSERS=Firefox
 
 before_install:
   - "export DISPLAY=:99.0"
