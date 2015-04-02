@@ -19,6 +19,16 @@ module.exports = function(config) {
     files.push('spec/*.js');
   }
 
+  var karmaBrowsers = process.env.KARMA_BROWSERS;
+  var browsers = [];
+  if (karmaBrowsers !== undefined) {
+    karmaBrowsers.split(',').forEach(function(browser) {
+      browsers.push(browser);
+    });
+  } else {
+    // default browsers to Chrome
+    browsers.push('Chrome');
+  }
 
   config.set({
 
@@ -63,9 +73,9 @@ module.exports = function(config) {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    // available browser launchers:
+    //   - https://npmjs.org/browse/keyword/karma-launcher
+    browsers: browsers,
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits

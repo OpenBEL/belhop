@@ -32,7 +32,11 @@ default BROWSERSYNC_PORT    3901
 default ESLINT_CFG      "$TOOLS"/eslint/eslint.yml
 
 ### TESTING CONFIGURATION ###
-default TEST_HEADLESS   "yes"
+default TEST_HEADLESS           "yes"
+# Comma-separated, possible values are Chrome and Firefox
+default KARMA_BROWSERS          "Chrome"
+# Comma-separated, e.g., "spec/oneSpec.js,spec/twoSpec.js"
+default JASMINE_SPEC_TARGETS    "spec/*.js"
 
 ### THE GO SHELL ###
 default GOSH_SCRIPTS    "$DIR"/scripts

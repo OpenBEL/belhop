@@ -1,0 +1,16 @@
+# Config file for automatic testing at travis-ci.org
+
+language: node_js
+node_js:
+  - "node"
+  - "iojs"
+
+env:
+  - TEST_HEADLESS=no KARMA_BROWSERS=Firefox
+
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
+script:
+  - scripts/travis.sh

@@ -356,8 +356,12 @@
    * @name Evidence
    * @memberOf belhop
    * @typedef {Evidence} Evidence
-   * @property {?string} id The evidence identifier (if previously created)
-   * @property {?string} uri The evidence URI (if previously created)
+   * @property {?string} id The evidence identifier (if previously created).
+   * For example, <code>5509906b38da0d74c7000002</code>
+   * @property {?string} uri The evidence URI (if previously created). For
+   * Example, <code>
+   * http://next.belframework.org/api/evidence/5509906b38da0d74c7000002
+   * </code>
    * @property {string} bel_statement Represents the biological knowledge
    * @property {belhop.Citation} citation Source of the biological knowledge
    * @property {object} [biological_context] Where the interaction was observed
