@@ -8,9 +8,9 @@ The development version of this library lives on the ``next`` branch. CI builds
 passing rigorous tests are made available on the
 [OpenBEL Build Server](http://build.openbel.org).
 
-[Travis CI](https://travis-ci.org) shows a quick status of whether the **next** branch build is passing.
+[Travis CI](https://travis-ci.org) shows a quick status of whether the **master** branch build is passing.
 
-[![Build Status](https://travis-ci.org/OpenBEL/belhop.svg?branch=next)](https://travis-ci.org/OpenBEL/belhop)
+[![Build Status](https://travis-ci.org/OpenBEL/belhop.svg?branch=master)](https://travis-ci.org/OpenBEL/belhop)
 
 [Waffle.io](https://waffle.io/) tracks the progress of this library. See what is being worked on by visiting our Waffle board.
 
